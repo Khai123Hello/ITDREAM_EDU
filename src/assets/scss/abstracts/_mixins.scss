@@ -1,0 +1,47 @@
+$grid-breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+);
+
+@mixin breakpoint($key) {
+  $breakpoint: map-get($grid-breakpoints, $key);
+  @if ($breakpoint) {
+    @media (max-width: ($breakpoint - 0.02)) {
+      @content;
+    }
+  } @else {
+    @error 'The value "#{$key}" is not in breakpoints list.';
+  }
+}
+
+// @media screen and (max-width: 992px) {
+//   html {
+//     background: #2484c2;
+//     position: relative;
+
+//     &::after {
+//       content: "website not working on mobile device ";
+//       display: flex;
+//       justify-content: center;
+
+//       text-transform: uppercase;
+//       margin-top: 30%;
+
+//       height: 100%;
+
+//       border-radius: 10px;
+//       font-size: 30px;
+//       text-align: center;
+//       background: white;
+//       font-style: bold;
+//       font-weight: 700;
+//     }
+//   }
+
+//   body {
+//     display: none;
+//   }
+// }

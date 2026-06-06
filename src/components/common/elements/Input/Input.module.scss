@@ -1,0 +1,185 @@
+.wrapper {
+    --input-color: #1d1d1d;
+    --input-bd: #d6d6d6;
+    --input-bd-focus: var(--primary-color);
+    --input-bd-error: #d32f2f;
+    --input-height: 4.4rem;
+    --input-radius: 0.8rem;
+
+    --input-padding-left: 1.6rem;
+    --input-padding-right: 1.6rem;
+    --input-right-section-pointer-events: none;
+    --input-left-section-pointer-events: none;
+
+    position: relative;
+
+    &[data-with-left-section='true'] {
+        --input-padding-left: var(--input-left-section-width, calc(var(--input-height) - 0.2rem));
+    }
+
+    &[data-with-right-section='true'] {
+        --input-padding-right: var(--input-right-section-width, calc(var(--input-height) - 0.2rem));
+    }
+
+    &[data-with-search='true'] {
+        --input-height: 4.4rem;
+        --input-left-section-width: 5.2rem;
+
+        .section {
+            padding-left: 1.6rem;
+            padding-right: 1.2rem;
+            justify-content: unset;
+        }
+    }
+
+    &[data-variant='unstyled'] {
+        --input-bd: transparent;
+        --input-bd-focus: transparent;
+        --input-padding-left: 0;
+        --input-padding-right: 0;
+    }
+}
+
+.label {
+    color: #0c1421;
+    font-size: 15px;
+    font-weight: 400px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.input {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    display: block;
+    width: 100%;
+    transition: border-color 100ms ease;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.8rem;
+    // line-height: calc(var(--input-height) - .2rem);
+    color: #1d1d1d;
+    border: 1px solid var(--input-bd);
+    height: var(--input-height);
+    border-radius: var(--input-radius);
+    padding-left: var(--input-padding-left);
+    padding-right: var(--input-padding-right);
+    // background-color: #f7fbff;
+    // &[data-label='true'] {
+    //     padding: 2.6rem var(--input-padding-right) 1rem var(--input-padding-left);
+    // }
+
+    &[data-error='true'] {
+        --input-bd: var(--input-bd-error);
+    }
+
+    &:focus,
+    &:focus-within {
+        outline: none;
+        --input-bd: var(--input-bd-focus);
+
+        &[data-error='true'] {
+            --input-bd: var(--input-bd-error);
+        }
+    }
+
+    &:focus,
+    &:focus-within,
+    &[data-has-value='true'] {
+        + .label {
+            color: #717171;
+            top: 0.8rem;
+            transform: translate3d(var(--input-padding-left), 0, 0) scale(0.75);
+        }
+    }
+
+    &:placeholder-shown {
+        text-overflow: ellipsis;
+    }
+
+    &::placeholder {
+        color: #8897ad;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button,
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration {
+        appearance: none;
+    }
+
+    &[type='password']::-ms-reveal,
+    &[type='password']::-ms-clear {
+        display: none;
+    }
+
+    &[type='number'] {
+        -moz-appearance: textfield;
+    }
+
+    &:disabled,
+    &[data-disabled] {
+        cursor: not-allowed;
+        background-color: rgba(0, 0, 0, 0.05);
+        --input-color: #717171;
+    }
+
+    /* Required to be a separate selector to work in Firefox, can be merged with &:disabled once :has is supported */
+    &:has(input:disabled) {
+        cursor: not-allowed;
+        background-color: rgba(0, 0, 0, 0.05);
+        --input-color: #717171;
+    }
+}
+
+.section {
+    pointer-events: var(--section-pointer-events);
+    position: absolute;
+    bottom: 1px;
+    top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--section-size);
+    border-radius: var(--input-radius);
+
+    &[data-position='right'] {
+        right: 1px;
+        --section-pointer-events: var(--input-right-section-pointer-events);
+        --section-size: var(--input-padding-right);
+    }
+
+    &[data-position='left'] {
+        left: 1px;
+        --section-pointer-events: var(--input-left-section-pointer-events);
+        --section-size: var(--input-padding-left);
+    }
+}
+
+.inputAddon {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-right: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #000;
+}
+
+.addon {
+    width: 20px;
+    font-size: 18px;
+    border-left: 1px solid #000;
+    text-align: center;
+    padding-left: 3px;
+    position: absolute;
+    padding-left: 3px;
+    left: 0;
+}
+
+.input-addon .addon {
+    margin-left: 0.5rem;
+    font-size: 1.4rem;
+    color: #666;
+}

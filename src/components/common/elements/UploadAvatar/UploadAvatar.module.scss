@@ -1,0 +1,65 @@
+.upload-thumbnail {
+    --border-color: #b8b8b8;
+    --root-bg: rgba(245, 245, 245, 0.6);
+    --thumbnail-wrapper-bg: #fff;
+    --text-color: #a7a7a7;
+    --placeholder-bg: #edf2f6;
+    &[data-error='true'] {
+        --border-color: #ef5350;
+        --root-bg: #edf2f6;
+
+        --thumbnail-wrapper-bg: #fde6e6;
+        --text-color: #d32f2f;
+        --placeholder-bg: #fde6e6;
+    }
+
+    border-radius: 10px;
+    border: 1px dashed var(--border-color);
+    background: var(--root-bg);
+
+    gap: 1.2rem;
+    cursor: pointer;
+    color: var(--text-color);
+    width: 100%;
+    width: 11.2rem;
+}
+
+.thumbnail-wrapper {
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--thumbnail-wrapper-bg);
+    width: 11rem;
+    height: 11rem;
+}
+
+.placeholder {
+    background: var(--placeholder-bg);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+    svg {
+        width: 3rem;
+        height: 3rem;
+        color: #8d98aa;
+    }
+}
+
+.thumbnail-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.description {
+    font-size: 1.2rem;
+
+    & > div {
+        font-size: 1.4rem;
+    }
+}

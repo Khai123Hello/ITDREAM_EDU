@@ -1,0 +1,17 @@
+.pageWrapper {
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    padding-top: 10px;
+
+    .pageHeader {
+        padding: 16px 20px;
+
+        &.hasTab {
+            padding-bottom: 0;
+        }
+    }
+
+    .pageContent {
+        padding: 16px 20px;
+    }
+}

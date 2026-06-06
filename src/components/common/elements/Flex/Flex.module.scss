@@ -1,0 +1,6 @@
+.root {
+    display: flex;
+    &[data-full-width="true"] {
+        width: 100%;
+    }
+}

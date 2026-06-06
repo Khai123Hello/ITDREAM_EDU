@@ -1,0 +1,18 @@
+.wrapper {
+    display: flex;
+    // gap: 8px;
+    align-items: center;
+
+    input[type='radio'] {
+        margin: 0;
+        accent-color: var(--primary-color);
+    }
+
+    label {
+        padding-left: 8px;
+        color: var(--text-color);
+        font-size: 1.6rem;
+        font-weight: 500;
+        line-height: 24px;
+    }
+}

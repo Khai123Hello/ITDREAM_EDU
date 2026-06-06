@@ -1,0 +1,53 @@
+export const STYlE_PROPS_DATA = {
+    m: { property: 'margin' },
+    mt: { property: 'marginTop' },
+    mb: { property: 'marginBottom' },
+    ml: { property: 'marginLeft' },
+    mr: { property: 'marginRight' },
+    mx: { property: [ 'marginRight', 'marginLeft' ] },
+    my: { property: [ 'marginTop', 'marginBottom' ] },
+
+    p: { property: 'padding' },
+    pt: { property: 'paddingTop' },
+    pb: { property: 'paddingBottom' },
+    pl: { property: 'paddingLeft' },
+    pr: { property: 'paddingRight' },
+    px: { property: [ 'paddingRight', 'paddingLeft' ] },
+    py: { property: [ 'paddingTop', 'paddingBottom' ] },
+
+    bg: { property: 'background' },
+    c: { property: 'color' },
+    opacity: { property: 'opacity' },
+
+    ff: { property: 'fontFamily' },
+    fz: { property: 'fontSize' },
+    fw: { property: 'fontWeight' },
+    lts: { property: 'letterSpacing' },
+    ta: { property: 'textAlign' },
+    lh: { property: 'lineHeight' },
+    fs: { property: 'fontStyle' },
+    tt: { property: 'textTransform' },
+    td: { property: 'textDecoration' },
+
+    w: { property: 'width' },
+    miw: { property: 'minWidth' },
+    maw: { property: 'maxWidth' },
+    h: { property: 'height' },
+    mih: { property: 'minHeight' },
+    mah: { property: 'maxHeight' },
+
+    bgsz: { property: 'backgroundSize' },
+    bgp: { property: 'backgroundPosition' },
+    bgr: { property: 'backgroundRepeat' },
+    bga: { property: 'backgroundAttachment' },
+
+    pos: { property: 'position' },
+    top: { property: 'top' },
+    left: { property: 'left' },
+    bottom: { property: 'bottom' },
+    right: { property: 'right' },
+    inset: { property: 'inset' },
+
+    display: { property: 'display' },
+    flex: { property: 'flex' },
+};

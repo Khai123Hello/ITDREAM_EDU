@@ -1,0 +1,32 @@
+{
+  "files": {
+    "main.css": "/static/css/main.1664f8e8.css",
+    "main.js": "/static/js/main.ad226449.js",
+    "static/js/206.165013e2.chunk.js": "/static/js/206.165013e2.chunk.js",
+    "static/media/SF-Pro-Display-Semibold.otf": "/static/media/SF-Pro-Display-Semibold.f50e0151c241f0e9d573.otf",
+    "static/media/SF-Pro-Display-Medium.otf": "/static/media/SF-Pro-Display-Medium.e1d844da0ee028d4e288.otf",
+    "static/media/SF-Pro-Display-Heavy.otf": "/static/media/SF-Pro-Display-Heavy.a48bcc073f92987abb91.otf",
+    "static/media/SF-Pro-Display-Bold.otf": "/static/media/SF-Pro-Display-Bold.170e68ac3f4c79ef407d.otf",
+    "static/media/SF-Pro-Display-Light.otf": "/static/media/SF-Pro-Display-Light.916b3ad9eb7cec3e03e2.otf",
+    "static/media/SF-Pro-Display-Ultralight.otf": "/static/media/SF-Pro-Display-Ultralight.8ce49c803289fc9283d8.otf",
+    "static/media/SF-Pro-Display-Thin.otf": "/static/media/SF-Pro-Display-Thin.c656fd92a4e16cd8b12c.otf",
+    "static/media/SF-Pro-Display-Regular.otf": "/static/media/SF-Pro-Display-Regular.d95919824936a9bf4051.otf",
+    "static/media/SF-Pro-Display-Black.otf": "/static/media/SF-Pro-Display-Black.760828725e5b5c720f8c.otf",
+    "static/media/imageLogin.png": "/static/media/imageLogin.806006c7926ec13a23cd.png",
+    "static/media/error_boundary.png": "/static/media/error_boundary.c38999c459289b9421c9.png",
+    "static/media/bg_404.png": "/static/media/bg_404.d56aa01a08f77e580fd7.png",
+    "static/media/google.png": "/static/media/google.87b5a2f98b2530958bb8.png",
+    "static/media/eye-slash.svg": "/static/media/eye-slash.fad1b465857232d2524d5d10bcf74d23.svg",
+    "static/media/eye.svg": "/static/media/eye.f340030e5b0a64254af1094d58755cc3.svg",
+    "index.html": "/index.html",
+    "static/media/avatar.svg": "/static/media/avatar.4825208ef200d50c0a7d5e3c77047ccf.svg",
+    "static/media/closeModal.svg": "/static/media/closeModal.b21c7968e3ac1e119067c71a46ad68c3.svg",
+    "static/media/facebook.png": "/static/media/facebook.1ba76a503df063cc5712.png",
+    "static/media/search-normal.svg": "/static/media/search-normal.f16304f6268c23f846c10284a4574db4.svg",
+    "static/media/line.png": "/static/media/line.b3e3eea74096e69d33c2.png"
+  },
+  "entrypoints": [
+    "static/css/main.1664f8e8.css",
+    "static/js/main.ad226449.js"
+  ]
+}

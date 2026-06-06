@@ -1,0 +1,13 @@
+.text {
+	display: var(--display);
+	text-overflow: var(--overflow-type, ellipsis);
+	white-space: var(--white-space);
+	-webkit-line-clamp: var(--line-clamp);
+	line-clamp: var(--line-clamp);
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	overflow-wrap: break-word;
+    font-size: var(--font-size);
+	line-height: var(--line-height);
+	height: var(--height);
+}

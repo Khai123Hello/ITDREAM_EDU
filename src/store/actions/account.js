@@ -1,0 +1,19 @@
+import { createAction, createSuccessActionType } from '@store/utils';
+
+export const login = createAction('account/LOGIN');
+export const loginSuccess = createAction(createSuccessActionType(login.type));
+export const logout = createAction('account/LOGOUT');
+export const getProfile = createAction('account/GET_PROFILE');
+export const getProfileSuccess = createAction(createSuccessActionType(getProfile.type));
+
+export const requestForget = createAction('account/REQUEST_FORGET');
+export const forgetPassword = createAction('account/FORGET_PASSWORD');
+export const actions = {
+    login,
+    loginSuccess,
+    getProfile,
+    logout,
+    getProfileSuccess,
+    requestForget,
+    forgetPassword,
+};

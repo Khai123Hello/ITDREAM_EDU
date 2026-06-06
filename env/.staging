@@ -1,0 +1,6 @@
+REACT_APP_API = http://localhost/8787/
+REACT_APP_ENV = staging
+GENERATE_SOURCEMAP = false
+CI = false
+IMAGE_INLINE_SIZE_LIMIT = 0
+REACT_APP_ENABLE_EXPOSURE = true

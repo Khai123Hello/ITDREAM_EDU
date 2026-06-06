@@ -1,0 +1,79 @@
+.basic-modal {
+    position: absolute;
+    padding: 1.5rem 1.5rem;
+    background-color: white;
+    border-radius: 10px;
+
+    .actionHeader {
+        display: flex;
+        justify-content: flex-end;
+
+        img {
+            width: 15px;
+            cursor: pointer;
+        }
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        // font-weight: bolder;
+        margin-bottom: 1rem;
+        font-size: 30px;
+        .title {
+            font-weight: bold;
+        }
+        button {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        img {
+            width: 10px;
+        }
+    }
+
+    .modal-content {
+        font-size: 16px;
+        // margin-bottom: 2.5rem;
+        overflow: auto;
+        max-height: 60vh;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+
+        button {
+            border-radius: 5px;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            background-color: #a63838;
+            color: white;
+            font-size: 16px;
+        }
+
+        .ok-button {
+            background: #15cca3;
+            border-radius: 8px;
+            color: white;
+            padding: 1rem 7rem;
+            font-size: 18px;
+        }
+    }
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.297);
+    z-index: 1000;
+}

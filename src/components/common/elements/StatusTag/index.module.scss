@@ -1,0 +1,31 @@
+.status-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 80px;
+    padding: 3px 16px;
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.88;
+    &.active {
+        color: #359f40;
+        background: #cef7d2;
+    }
+
+    &.lock {
+        color: #e85848;
+        background: #ffcec8;
+    }
+
+    &.incoming {
+        background-color: #ffeecc;
+        color: #fcaf17;
+    }
+
+    &.approve {
+        color: #359f40;
+        background: #cef7d2;
+    }
+}

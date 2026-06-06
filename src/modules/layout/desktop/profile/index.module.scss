@@ -1,0 +1,270 @@
+.wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    background-color: white;
+    .title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #38abf1;
+    }
+    .image-label {
+        font-family: Lexend;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 20px;
+        margin-bottom: 4px;
+    }
+    .form {
+        background-color: white;
+        box-shadow: 0px 10px 20px 4px #00000012;
+        padding: 20px 20px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+    }
+    .line {
+        margin: 30px 0;
+        border: 0;
+        border: 1px solid #e0e4ec;
+    }
+    .btn {
+        margin-top: 30px;
+        min-width: 200px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding-left: 5%;
+
+        .titleProfile {
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 36px;
+            letter-spacing: 0.2px;
+            padding-top: 20px;
+            text-align: center;
+            margin-bottom: 23px;
+            color: #0f172a;
+        }
+    }
+
+    .profileHero {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 24px;
+        padding: 24px 32px 32px;
+        margin-bottom: 28px;
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .heroSummary {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .heroAvatar {
+        min-width: 112px;
+        min-height: 112px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .heroAvatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .heroAvatarPlaceholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        font-weight: 700;
+        color: #475569;
+        background: #e2e8f0;
+    }
+
+    .heroDetails {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .heroTitle {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+        line-height: 1.2;
+    }
+
+    .heroOrganization {
+        font-size: 15px;
+        color: #475569;
+        line-height: 1.5;
+    }
+
+    .heroBadges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .profileBadge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .heroStatGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .heroStatCard {
+        padding: 18px 20px;
+        background: #f8fafc;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .heroStatLabel {
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+
+    .heroStatValue {
+        font-size: 16px;
+        font-weight: 600;
+        color: #0f172a;
+        word-break: break-word;
+    }
+
+    .body {
+        width: 100%;
+        padding: 0 5%;
+        .headerFullName {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5em;
+        }
+        .fullName {
+            max-width: 100%;
+            height: 100%;
+            margin: auto;
+            border-radius: 12px;
+            padding: 16px 32px;
+            gap: 24px;
+            border-width: 1px;
+            margin-bottom: 25px;
+            background-color: #fafbfc;
+        }
+        .title {
+            font-weight: 400;
+            font-size: 16px;
+            letter-spacing: 0.2px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        .shortDescription {
+            font-weight: 500;
+            font-size: 16px;
+            letter-spacing: 0.2px;
+            color: #0f172a;
+        }
+        .back {
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 22.4px;
+            letter-spacing: 0.2px;
+            color: #94a3b8;
+        }
+
+        .bodyFullName {
+            .btnUpdate {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 144px;
+                height: 50px;
+                font-size: 17px;
+                border-radius: 12px;
+                color: white;
+                background-color: #168e85;
+                margin-top: 10px;
+                cursor: pointer;
+            }
+        }
+        .middleFullName {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 100%;
+            height: 100%;
+            margin: auto;
+            border-radius: 12px;
+            padding: 16px 32px;
+            margin-bottom: 3.5em;
+            background-color: #fafbfc;
+        }
+        .footerFullName {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 100%;
+            height: 100%;
+            margin: auto;
+            border-radius: 12px;
+            padding: 16px 32px;
+            margin-bottom: 3.5em;
+            background-color: #fafbfc;
+        }
+    }
+}
+.timePicker {
+    [class~='rc-picker-input'] {
+        input {
+            width: 100%;
+        }
+    }
+    width: 100%;
+}
+.section {
+    font-size: 1.6rem;
+}
+.group {
+    padding: 24px;
+    border-radius: 6px;
+    border: 1px solid #e0e4ec;
+}

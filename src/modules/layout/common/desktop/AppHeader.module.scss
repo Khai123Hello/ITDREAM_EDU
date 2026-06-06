@@ -1,0 +1,164 @@
+// =============================================
+// VARIABLES (Các biến dùng cho Header)
+// =============================================
+$green-dark: #16a34a;
+$white: #ffffff;
+$gray-mid: #e5e7eb;
+$gray-text: #6b7280;
+$text-dark: #111827;
+
+// =============================================
+// CONTAINER
+// =============================================
+.appHeader {
+  width: 100%;
+}
+
+// =============================================
+// NAVBAR
+// =============================================
+.lp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: 60px;
+  border-bottom: 1px solid $gray-mid;
+  background: $white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.lp-nav__logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: $green-dark;
+  letter-spacing: -0.5px;
+}
+
+.lp-nav__links {
+  display: flex;
+  gap: 28px;
+
+  a {
+    font-size: 14px;
+    color: $gray-text;
+    text-decoration: none;
+    transition: color 0.2s;
+    &:hover { color: $text-dark; }
+    &.active {
+      color: $green-dark;
+      font-weight: 600;
+    }
+  }
+}
+
+.lp-nav__actions {
+  display: flex;
+  gap: 10px;
+}
+
+// =============================================
+// BUTTONS (Các nút được dùng trong Header)
+// =============================================
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.lp-btn--outline {
+  background: transparent;
+  border: 1.5px solid $gray-mid;
+  color: $text-dark;
+  &:hover { border-color: $gray-text; }
+}
+
+.lp-btn--ghost {
+   background: transparent;
+   border: 1.5px solid transparent;
+   color: $gray-text;
+   &:hover { color: $text-dark; }
+}
+
+// =============================================
+// USER MENU (Khi đã đăng nhập)
+// =============================================
+.userMenuTrigger {
+   display: inline-flex;
+   align-items: center;
+   gap: 8px;
+   padding: 6px 12px;
+   background: transparent;
+   border: 1px solid $gray-mid;
+   border-radius: 6px;
+   font-size: 14px;
+   color: $text-dark;
+   cursor: pointer;
+   transition: all 0.2s;
+
+   &:hover {
+     border-color: $gray-text;
+     background: #f9fafb;
+   }
+
+   img {
+     width: 24px;
+     height: 24px;
+     border-radius: 50%;
+     object-fit: cover;
+   }
+}
+
+.dropdownMenu {
+   position: absolute;
+   top: calc(100% + 8px);
+   right: 48px;
+   background: $white;
+   border: 1px solid $gray-mid;
+   border-radius: 8px;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+   min-width: 200px;
+   z-index: 1000;
+}
+
+.dropdownItem {
+   padding: 12px 16px;
+   border: none;
+   background: transparent;
+   width: 100%;
+   text-align: left;
+   font-size: 14px;
+   color: $text-dark;
+   cursor: pointer;
+   transition: background 0.2s;
+
+   &:hover {
+     background: #f3f4f6;
+   }
+
+   &:first-child {
+     border-radius: 8px 8px 0 0;
+   }
+
+   &:last-child {
+     border-radius: 0 0 8px 8px;
+     color: #dc2626;
+
+     &:hover {
+       background: #fee2e2;
+     }
+   }
+
+   &:not(:last-child) {
+     border-bottom: 1px solid $gray-mid;
+   }
+}

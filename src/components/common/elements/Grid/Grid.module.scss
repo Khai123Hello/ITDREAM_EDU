@@ -1,0 +1,20 @@
+.root {
+    --grid-gutter-x: 0px;
+    --grid-gutter-y: 0px;
+    --grid-overflow: visible;
+    --grid-margin-x: calc(var(--grid-gutter-x) / -2);
+    --grid-margin-y: calc(var(--grid-gutter-y) / -2);
+    --grid-col-padding-x: calc(var(--grid-gutter-x) / 2);
+    --grid-col-padding-y: calc(var(--grid-gutter-y) / 2);
+
+    overflow: var(--grid-overflow);
+}
+
+.inner {
+    width: calc(100% + var(--grid-gutter-x));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: var(--grid-justify);
+    align-items: var(--grid-align);
+    margin: var(--grid-margin-y) var(--grid-margin-x);
+}

@@ -1,0 +1,429 @@
+@import '@assets/scss';
+
+.loginPage {
+    min-height: 100%;
+    height: 100dvh;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    // background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.05)), url('../../assets/images/bgLogin.svg') ;
+    // background-image: url('../../../../assets/images/backgroundLogin.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: var(--white);
+    overflow: hidden;
+
+    .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex: 1;
+        width: 100%;
+        gap: 20px;
+        .swiper {
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            overflow: hidden;
+            list-style: none;
+            padding: 0;
+            z-index: 1;
+            display: block;
+            border-radius: 14px;
+        }
+
+        .swiper-slide {
+            border-radius: 8px;
+            width: 100% !important;
+        }
+        .left,
+        .right {
+            flex: 1;
+        }
+        .left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .loginForm {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                background-color: var(--white);
+                border-radius: 30px;
+                border: 1px solid var(--white);
+                padding: 57px 110px;
+                margin-bottom: 2.8rem;
+                width: 100%;
+                // box-shadow: 0px 8px 15px 5px var(--black);
+                .input {
+                    font-size: 16px;
+                    width: 100%;
+                    margin-top: 0px;
+                }
+
+                .passwordInput {
+                    margin-top: 0px;
+                }
+                h2 {
+                    margin-bottom: 20px;
+                }
+                h3 {
+                    margin-block-start: 0px;
+                }
+
+                h3,
+                button {
+                    text-align: center;
+                }
+
+                center {
+                    margin: 1rem 0 0.5rem;
+                }
+
+                .headerForm {
+                    gap: 18px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin-right: 6px;
+                    width: 100%;
+
+                    .logo {
+                        width: 120px;
+                        height: 120px;
+                    }
+
+                    .customTitle {
+                        font-size: 24px;
+                        font-weight: 600;
+                        line-height: 24px;
+                        letter-spacing: 0.01em;
+                        text-align: left;
+                        text-underline-position: from-font;
+                        text-decoration-skip-ink: none;
+                    }
+
+                    .description {
+                        font-size: 16px;
+                        font-weight: 400;
+                        line-height: 25.6px;
+                        letter-spacing: 0.01em;
+                        text-align: left;
+                        text-underline-position: from-font;
+                        text-decoration-skip-ink: none;
+                        color: var(--text-color);
+                        .shortDescription {
+                            margin-bottom: 20px;
+                        }
+                    }
+                }
+
+                .btn {
+                    width: 100%;
+                    height: 50px;
+                    border-radius: 12px;
+                    margin-top: 10px;
+                    font-size: 20px;
+                    line-height: 18px;
+                    font-weight: 300;
+                    cursor: pointer;
+                }
+                .typeLogin {
+                    margin-top: 30px;
+                    .google {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 388px;
+                        height: 52px;
+                        padding: 12px 9px 12px 9px;
+                        font-size: 16px;
+                        gap: 16px;
+                        border-radius: 12px;
+                        color: #313957;
+                        .googleImg {
+                            width: 32px;
+                            height: 32px;
+                        }
+                    }
+                    .facebook {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 388px;
+                        height: 52px;
+                        margin-top: 20px;
+                        font-size: 16px;
+                        padding: 12px 9px 12px 9px;
+                        gap: 16px;
+                        border-radius: 12px;
+                        .facebookImg {
+                            display: flex;
+                            margin-left: 20px;
+                        }
+                    }
+                }
+                .footer {
+                    display: flex;
+                    justify-content: center;
+                    font-size: 18px;
+                    font-weight: 350;
+                    line-height: 28.8px;
+                    letter-spacing: 0.01em;
+                    text-align: center;
+                    text-underline-position: from-font;
+                    text-decoration-skip-ink: none;
+                    color: var(--text-green);
+                    margin-top: 35px;
+                    .question {
+                        margin-right: 3px;
+                        color: var(--text-color);
+                    }
+                    .register {
+                        &:hover {
+                            cursor: pointer;
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+            .footerCopyRight {
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 16px;
+                letter-spacing: 0.01em;
+                text-align: center;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+                color: var(--text-color);
+                // padding-top: 200px;
+            }
+        }
+
+        .contentRight {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .imageLogin {
+                display: block;
+                max-width: 100%;
+                height: 600px;
+                object-fit: cover;
+            }
+
+            .paginationWrapper {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                // margin-top: -120px;
+                color: white;
+                width: 50%;
+                // height: 142vh;
+                position: relative;
+                z-index: 1;
+            }
+        }
+
+        .right {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            .imageLogin {
+                width: 672px;
+                height: 886px;
+                border-radius: 24px;
+                object-fit: contain;
+            }
+        }
+    }
+
+    .form {
+        margin-top: 17px;
+        width: 100%;
+        .label {
+            color: var(--text-color);
+        }
+        .forgotPassword {
+            letter-spacing: 0.01em;
+            padding: 6px 0px 16px 0px;
+            color: var(--text-secondary-color);
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 16px;
+            letter-spacing: 0.01em;
+            text-align: right;
+            margin-right: 0px;
+            margin-top: 24px;
+            cursor: pointer;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        .line {
+            display: flex;
+            margin-top: 60px;
+            justify-content: center;
+            align-items: center;
+            .or {
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 16px;
+                letter-spacing: 0.01em;
+                text-align: center;
+                padding: 0px 15px;
+                text-underline-position: from-font;
+                text-decoration-skip-ink: none;
+            }
+            .lineDevider {
+                width: 169.5px;
+                height: 2px;
+                gap: 0px;
+                border: 1px 0px 0px 0px;
+            }
+        }
+    }
+
+    .titleOTP {
+        color: var(--text-blue);
+        font-size: 34px;
+        font-weight: 700;
+        line-height: 42.5px;
+        text-align: start;
+        margin-bottom: 20px;
+    }
+
+    .qrUrl {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+        span {
+            max-width: 100%;
+        }
+    }
+
+    img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        // width: 240px;
+        // height: 240px;
+    }
+
+    .confirmOTP {
+        padding: 70px 110px;
+        border-radius: 50px;
+        background-color: var(--white);
+        border: 1px solid var(--white);
+        box-shadow: 0px 8px 15px 5px var(--black);
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 30px;
+            text-align: center;
+            color: var(--text-blue);
+        }
+        .note {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 21.94px;
+            margin: 10px 0px;
+            text-align: start;
+            max-width: 100%;
+        }
+        .otpInput {
+            width: 50px !important;
+            height: 50px;
+            border: 1px solid var(--text-gray);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 20px 2px;
+            &:focus {
+                outline: none;
+                border-color: var(--text-blue);
+                transition: border-color 0.3s;
+            }
+        }
+        .otpInput::-webkit-inner-spin-button,
+        .otpInput::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .otpInput[type='number'] {
+            -moz-appearance: textfield;
+        }
+        .btn {
+            width: 100% !important;
+            height: 50px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 18px;
+            cursor: pointer;
+            background-color: #168e85 !important;
+        }
+
+        .otpContainer {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .otpContainer > input:first-child {
+            margin-left: 0;
+        }
+
+        .otpContainer > input:last-child {
+            margin-right: 0;
+        }
+    }
+}
+
+.roleSelector {
+    display: flex;
+    background-color: #f3f4f6;
+    padding: 4px;
+    border-radius: 8px;
+    width: 100%;
+    margin: 16px 0;
+    box-sizing: border-box;
+
+    .roleBtn {
+        flex: 1;
+        padding: 8px 12px;
+        background: none;
+        border: none;
+        font-size: 14px;
+        font-weight: 500;
+        color: #4b5563;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            color: #111827;
+        }
+    }
+
+    .activeRoleBtn {
+        flex: 1;
+        padding: 8px 12px;
+        background-color: #ffffff;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        color: #38abf1;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+}

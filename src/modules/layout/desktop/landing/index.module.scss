@@ -1,0 +1,584 @@
+// =============================================
+// VARIABLES
+// =============================================
+$green: #22c55e;
+$green-dark: #16a34a;
+$navy: #1a2b4a;
+$navy-light: #243652;
+$white: #ffffff;
+$gray-light: #f8f9fa;
+$gray-mid: #e5e7eb;
+$gray-text: #6b7280;
+$text-dark: #111827;
+$font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+// =============================================
+// LANDING PAGE ROOT
+// =============================================
+.landingPage {
+  font-family: $font-sans;
+  color: $text-dark;
+  background: $white;
+  margin-bottom: 30px;
+}
+
+// =============================================
+// BUTTONS
+// =============================================
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.lp-btn--primary {
+  background: $green;
+  color: $white;
+  &:hover { background: $green-dark; }
+}
+
+.lp-btn--outline {
+  background: transparent;
+  border: 1.5px solid $gray-mid;
+  color: $text-dark;
+  &:hover { border-color: $gray-text; }
+}
+
+.lp-btn--ghost {
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: $gray-text;
+  &:hover { color: $text-dark; }
+}
+
+.lp-btn--white {
+  color: $white !important;
+  border-color: rgba($white, 0.5) !important;
+  &:hover { border-color: $white !important; }
+}
+
+.lp-btn--lg {
+  padding: 13px 28px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+// =============================================
+// HERO
+// =============================================
+.lp-hero {
+  text-align: center;
+  padding: 72px 48px 56px;
+  background: linear-gradient(180deg, #f0fdf4 0%, $white 100%);
+}
+
+.lp-hero__title {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: $navy;
+  margin: 0 0 20px;
+  letter-spacing: -1.5px;
+}
+
+.lp-hero__subtitle {
+  font-size: 17px;
+  color: $gray-text;
+  max-width: 520px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+}
+
+.lp-hero__featuring {
+  margin: 40px 0 18px;
+  font-size: 13px;
+  color: $gray-text;
+  letter-spacing: 0.3px;
+}
+
+.lp-hero__logos {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.lp-logo-pill {
+  font-size: 15px;
+  font-weight: 700;
+  color: $gray-text;
+  letter-spacing: 0.5px;
+}
+
+// =============================================
+// SECTION COMMON
+// =============================================
+.lp-section {
+  padding: 64px 80px;
+}
+
+.lp-section__title {
+  font-size: 30px;
+  font-weight: 700;
+  color: $navy;
+  text-align: center;
+  margin: 0 0 36px;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+}
+
+// =============================================
+// JOB SIM CARDS
+// =============================================
+.lp-sims {
+  position: relative;
+}
+
+.lp-sims-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.lp-sim-slider {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  gap: 20px;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lp-sim-card {
+  border: 1px solid $gray-mid;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+  flex: 0 0 320px;
+  min-width: 320px;
+  scroll-snap-align: start;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+}
+
+.lp-sim-card--cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 320px;
+  background: $gray-light;
+}
+
+.lp-sim-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.lp-sim-cta__icon {
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $white;
+  border: 1px solid $gray-mid;
+  transition: all 0.2s ease;
+}
+
+.lp-sim-cta__icon svg {
+  width: 32px;
+  height: 32px;
+  color: $navy;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.lp-sim-card--cta:hover .lp-sim-cta__icon {
+  background: $green;
+  border-color: transparent;
+}
+
+.lp-sim-card--cta:hover .lp-sim-cta__icon svg {
+  color: $white;
+  transform: translateX(2px);
+}
+
+.lp-sim-cta__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-dark;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.lp-sim-card__thumb {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, $navy-light, $navy);
+}
+
+.lp-sim-card__body {
+  padding: 14px 16px;
+}
+
+.lp-sim-card__company {
+  font-size: 11px;
+  font-weight: 600;
+  color: $gray-text;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px;
+}
+
+.lp-sim-card__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 10px;
+}
+
+.lp-sim-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-sim-card__duration {
+  font-size: 12px;
+  color: $gray-text;
+}
+
+.lp-sim-card__participants,
+.lp-sim-card__rating {
+  font-size: 12px;
+  color: $gray-text;
+}
+
+.lp-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: #dcfce7;
+  color: $green-dark;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.lp-sim-arrow {
+  background: $white;
+  border: 1px solid $gray-mid;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 12px;
+  transition: all 0.2s;
+}
+
+.lp-sim-arrow:hover {
+  background: $gray-light;
+}
+
+.lp-sim-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.lp-sim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid $gray-mid;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.lp-sim-dot--active {
+  background: $green;
+  border-color: $green;
+}
+
+.lp-sim-card--skeleton {
+  background: #f4f6f8;
+}
+
+.lp-skeleton-line {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+
+.lp-sim-error,
+.lp-sim-empty {
+  text-align: center;
+  color: $gray-text;
+  padding: 32px 0;
+}
+
+.lp-sim-error .lp-btn,
+.lp-sim-empty .lp-btn {
+  margin-top: 16px;
+}
+
+// =============================================
+// HOW IT WORKS
+// =============================================
+.lp-how {
+  background: $gray-light;
+  text-align: center;
+}
+
+.lp-how__sub {
+  font-size: 15px;
+  color: $gray-text;
+  max-width: 600px;
+  margin: -20px auto 36px;
+  line-height: 1.65;
+}
+
+.lp-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.lp-step {
+  background: $white;
+  border-radius: 10px;
+  padding: 24px 20px;
+  text-align: left;
+  border: 1px solid $gray-mid;
+}
+
+.lp-step__num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $green;
+  color: $white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.lp-step__text {
+  font-size: 14px;
+  color: $text-dark;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// =============================================
+// STATS BANNER
+// =============================================
+.lp-stats {
+  background: $navy;
+  color: $white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 72px 100px;
+  gap: 48px;
+}
+
+.lp-stats__left {
+  flex: 1;
+  max-width: 520px;
+}
+
+.lp-stats__highlight {
+  font-size: 48px;
+  font-weight: 800;
+  color: $green;
+  margin: 0 0 6px;
+  letter-spacing: -1px;
+}
+
+.lp-stats__big {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 18px 0 4px;
+  line-height: 1.2;
+}
+
+.lp-stats__sub {
+  font-size: 14px;
+  color: rgba($white, 0.65);
+  margin: 0 0 6px;
+}
+
+.lp-stats__photo {
+  width: 280px;
+  height: 260px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #2563eb 0%, #1a2b4a 100%);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(0deg, $navy 0%, transparent 100%);
+  }
+}
+
+// =============================================
+// EMPLOYERS
+// =============================================
+.lp-employers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.lp-employer-card {
+  border: 1px solid $gray-mid;
+  border-radius: 10px;
+  padding: 20px 20px 16px;
+  text-align: center;
+  transition: box-shadow 0.2s;
+
+  &:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+}
+
+.lp-employer-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 10px;
+}
+
+.lp-employer-card__link {
+  font-size: 11px;
+  font-weight: 700;
+  color: $green-dark;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+
+  &:hover { text-decoration: underline; }
+}
+
+// =============================================
+// TESTIMONIALS
+// =============================================
+.lp-testimonials-section {
+  background: $gray-light;
+  text-align: center;
+}
+
+.lp-testimonials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.lp-testimonial {
+  background: $white;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: left;
+  border: 1px solid $gray-mid;
+}
+
+.lp-testimonial__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $navy-light, $navy);
+  margin-bottom: 14px;
+}
+
+.lp-testimonial__text {
+  font-size: 14px;
+  color: $gray-text;
+  line-height: 1.65;
+  margin: 0 0 16px;
+  font-style: italic;
+}
+
+.lp-testimonial__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 2px;
+}
+
+.lp-testimonial__landed {
+  font-size: 12px;
+  color: $green-dark;
+  font-weight: 600;
+  margin: 0;
+}
+
+// =============================================
+// CTA BOTTOM
+// =============================================
+.lp-cta {
+  background: #f0fdf4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 72px 100px;
+  gap: 48px;
+}
+
+.lp-cta__content {
+  flex: 1;
+  max-width: 540px;
+}
+
+.lp-cta__title {
+  font-size: 34px;
+  font-weight: 800;
+  color: $navy;
+  margin: 0 0 16px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.lp-cta__sub {
+  font-size: 15px;
+  color: $gray-text;
+  margin: 0 0 28px;
+  line-height: 1.65;
+}
+
+.lp-cta__graphic {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+
+  svg { width: 100%; height: 100%; }
+}

@@ -1,0 +1,358 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap');
+
+$white:      #ffffff;
+$bg:         #f7f8fa;
+$border:     #e2e5eb;
+$text:       #0f1623;
+$text2:      #4a5568;
+$text3:      #8a94a6;
+$green:      #22c55e;
+$greenDark:  #16a34a;
+$greenBg:    #f0fdf4;
+$amber:      #f59e0b;
+$red:        #ef4444;
+$shadow:     0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.05);
+$shadowH:    0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
+$font:       'Plus Jakarta Sans', system-ui, sans-serif;
+$fontDisplay:'Bricolage Grotesque', system-ui, sans-serif;
+$radius:     12px;
+$radiusSm:   8px;
+
+.container {
+    background: $bg;
+    min-height: 100vh;
+    font-family: $font;
+    color: $text;
+}
+
+.main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+}
+
+.greeting {
+    font-family: $fontDisplay;
+    font-size: 32px;
+    font-weight: 800;
+    color: $text;
+    margin-bottom: 24px;
+}
+
+// TOP CARDS
+.topCards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.topCard {
+    background: $white;
+    border-radius: $radius;
+    padding: 18px;
+    box-shadow: $shadow;
+    border: 1px solid $border;
+}
+
+.badgeRow {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.badgeDot {
+    width: 28px;
+    height: 8px;
+    border-radius: 4px;
+}
+
+.dotFilled { background: $red; }
+.dotFilled2 { background: $amber; }
+.dotEmpty { background: $border; }
+
+.recommendedBadge {
+    font-size: 11px;
+    color: $text3;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    svg { color: $green; }
+}
+
+.companyName {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.companyBa { color: #012169; }
+.companySky { color: #0770CF; }
+.companyTata { color: #004B87; }
+.companyComcast { font-size: 13px; font-weight: 900; color: #be2bbb; }
+.companySiemens { font-size: 13px; font-weight: 900; color: #009999; letter-spacing: 1px; }
+
+.roleText {
+    font-size: 13px;
+    color: $text2;
+    margin-bottom: 14px;
+}
+
+.topCardTitle {
+    font-weight: 600;
+    font-size: 14px;
+    color: $text;
+    margin-bottom: 4px;
+}
+
+.topCardDesc {
+    font-size: 12px;
+    color: $text3;
+    margin-bottom: 12px;
+}
+
+.cardActions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.btnDismiss {
+    background: none;
+    border: none;
+    color: $text3;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.linkBtn {
+    background: none;
+    border: none;
+    color: $green;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+}
+
+.chevron::after { content: ' ›'; }
+
+// TWO COLUMN
+.twoCol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 17px;
+    color: $text;
+    margin-bottom: 16px;
+}
+
+.sectionIcon { font-size: 20px; }
+
+// SIM CARD
+.simCard {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: $shadow;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.simCardBody {
+    h4 { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    p { font-size: 12px; color: $text2; margin-bottom: 6px; line-height: 1.4; }
+}
+
+.tasksLeft {
+    font-size: 12px;
+    color: $text3;
+    margin-bottom: 12px;
+}
+
+.simLogo {
+    flex-shrink: 0;
+    margin-left: 16px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #004B87;
+}
+
+// RECOMMENDED SIM CARD
+.recSimCard {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: $shadow;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.recSimThumb {
+    width: 80px;
+    height: 60px;
+    border-radius: $radiusSm;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.thumbBa {
+    background: linear-gradient(135deg, #012169 0%, #c41e3a 100%);
+}
+
+.thumbSky {
+    background: linear-gradient(135deg, #0770CF 0%, #00b4d8 100%);
+}
+
+.recSimBody {
+    flex: 1;
+
+    .simTitle {
+        font-weight: 500;
+        font-size: 13px;
+        color: $text;
+        margin-bottom: 6px;
+    }
+}
+
+.recSimMeta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: $text3;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+
+    span { display: flex; align-items: center; gap: 3px; }
+}
+
+// VIEW ALL
+.viewAll {
+    color: $green;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+    display: block;
+    margin-top: 8px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+// ACHIEVEMENT
+.achievementCard {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    padding: 24px;
+    box-shadow: $shadow;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.trophyIcon {
+    width: 70px;
+    height: 70px;
+    background: $greenBg;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.achievementCard h4 {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.achievementDesc {
+    font-size: 13px;
+    color: $text2;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+// JOB CARD
+.jobCard {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    padding: 16px;
+    margin-bottom: 10px;
+    box-shadow: $shadow;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    h4 { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    p { font-size: 12px; color: $text2; margin-bottom: 10px; }
+}
+
+.closeDate {
+    font-size: 11px;
+    color: $text3;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.companyBadge {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.redbullBadge {
+    background: #cc1e2c;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 11px;
+}
+
+// STATES
+.loadingBox, .emptyBox {
+    background: $white;
+    border: 1px dashed $border;
+    border-radius: $radius;
+    padding: 32px;
+    text-align: center;
+    color: $text3;
+    font-size: 14px;
+    margin-bottom: 12px;
+}

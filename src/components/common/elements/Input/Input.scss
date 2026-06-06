@@ -1,0 +1,113 @@
+.wrapper {
+    --input-color: #1d1d1d;
+    --input-bd: #d6d6d6;
+    --input-bd-focus: var(--primary-color);
+    --input-bd-error: #d32f2f;
+    --input-height: 4.4rem;
+    --input-radius: 0.8rem;
+
+    --input-padding-left: 1.6rem;
+    --input-padding-right: 1.6rem;
+    --input-right-section-pointer-events: none;
+    --input-left-section-pointer-events: none;
+
+    position: relative;
+
+    &[data-with-left-section='true'] {
+        --input-padding-left: var(--input-left-section-width, calc(var(--input-height) - 0.2rem));
+    }
+
+    &[data-with-right-section='true'] {
+        --input-padding-right: var(--input-right-section-width, calc(var(--input-height) - 0.2rem));
+    }
+
+    &[data-with-search='true'] {
+        --input-height: 4.4rem;
+        --input-left-section-width: 5.2rem;
+
+        .section {
+            padding-left: 1.6rem;
+            padding-right: 1.2rem;
+            justify-content: unset;
+        }
+    }
+
+    &[data-variant='unstyled'] {
+        --input-bd: transparent;
+        --input-bd-focus: transparent;
+        --input-padding-left: 0;
+        --input-padding-right: 0;
+    }
+}
+
+.label {
+    color: #0c1421;
+    font-size: 15px;
+    font-weight: 400px;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.section {
+    pointer-events: var(--section-pointer-events);
+    position: absolute;
+    bottom: 1px;
+    top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--section-size);
+    border-radius: var(--input-radius);
+
+    &[data-position='right'] {
+        right: 1px;
+        --section-pointer-events: var(--input-right-section-pointer-events);
+        --section-size: var(--input-padding-right);
+    }
+
+    &[data-position='left'] {
+        left: 1px;
+        --section-pointer-events: var(--input-left-section-pointer-events);
+        --section-size: var(--input-padding-left);
+    }
+}
+
+.input-addon {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: var(--input-height);
+    transition: border-color 100ms ease;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1.8rem;
+    color: #1d1d1d;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: var(--input-radius);
+    border: 1px solid var(--input-bd);
+    background-color: #f7fbff;
+    .input {
+        border: none;
+    }
+    .addon {
+        width: 20px;
+        font-size: 18px;
+        border-left: 1px solid var(--input-bd);
+        text-align: center;
+        width: 10%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+.none-input {
+    border: none;
+    padding: 0 1.6rem;
+    color: #1d1d1d;
+    width: 90%;
+    background-color: #f7fbff;
+}

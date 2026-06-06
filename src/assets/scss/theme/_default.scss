@@ -1,0 +1,31 @@
+@use '../abstracts';
+
+html {
+    --secondary-600: #2484c2;
+    --Secondary-700: #1b6292a4;
+
+    --white: #fff;
+    --gray: #9b9b9b;
+    --black: #00000026;
+    --blue: #4419ff;
+    --brown: #8C9197;
+    --red: #fe2b2b;
+    --green: #00a51e;
+    //  ==================================================
+    --primary-color: #168E85;
+    --light-color: #e8f4f3;
+    --secondary-color: #d6e4ff;
+    --text-color: #484848;
+    --text-secondary-color: #8c9197;
+    --text-green: #00a51e;
+    --text-blue: #389cfb;
+    --text-gray: #c1c1c1;
+    --text-black: #313957;
+    --green-background: #f2faf4;
+    --footer-color: #3F3F3F;
+    --background-color: #f5f6fa;
+    --text-black-gray: #4A5660;
+    --light-green: #f2faf4;
+    --light-red: #fdeae5;
+    --light-gray: #d0d0d0;
+}

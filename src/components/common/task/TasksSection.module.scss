@@ -1,0 +1,33 @@
+.tasksSection {
+    width: 100%;
+}
+
+.tasksSectionTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #262626;
+    margin: 0 0 28px 0;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+}
+
+.tasksLayout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 28px;
+    align-items: flex-start;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 968px) {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+        gap: 16px;
+    }
+}

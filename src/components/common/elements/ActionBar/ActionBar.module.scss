@@ -1,0 +1,59 @@
+@mixin desktop {
+    @media screen and (min-width: 768px) {
+        @content;
+    }
+}
+
+@mixin lightMode {
+    :root {
+        @content;
+    }
+}
+
+@mixin darkMode {
+    body[data-theme='dark'] {
+        @content;
+    }
+}
+
+.actionBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left,
+.right {
+    display: flex;
+    align-items: center;
+}
+
+.delete-button,
+.create-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+
+    &.delete-button {
+        color: #ff4d4f;
+    }
+
+    &.create-button {
+        color: #1890ff;
+        font-weight: bold;
+    }
+
+    svg {
+        margin-right: 0.5rem;
+        font-size: 18px;
+    }
+}

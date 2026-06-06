@@ -1,0 +1,76 @@
+.root {
+    position: relative;
+    overflow: auto;
+}
+.content {
+    position: absolute;
+}
+.user-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 10px;
+
+    .avatar {
+        cursor: pointer;
+        img {
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            object-fit: contain;
+        }
+    }
+
+    .info {
+    }
+    .fullname {
+        font-size: 1.9rem;
+        color: #1d1d1d;
+        max-width: 8rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        font-size: 1.8rem;
+        font-weight: 600;
+        line-height: normal;
+    }
+
+    svg {
+        path,
+        g {
+            fill: var(--text-color);
+            stroke: var(--text-color);
+        }
+    }
+}
+
+.contentProfile {
+    // background-color: transparent !important;
+    // padding: 16px;
+    // padding: 0 0 16px 0;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    background: white;
+    border-radius: 16px;
+    .fullName {
+        font-size: 22px;
+        font-weight: 400;
+    }
+    .email {
+        font-size: 18px;
+        color: #868e96;
+    }
+    .item {
+        display: flex;
+        gap: 10px;
+        padding: 12px 10px;
+        font-size: 15px;
+        font-weight: 400;
+        min-width: 240px;
+        cursor: pointer;
+        .avatar {
+            width: 48px;
+            border-radius: 50%;
+        }
+    }
+}
