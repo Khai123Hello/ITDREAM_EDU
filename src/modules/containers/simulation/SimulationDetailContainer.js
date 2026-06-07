@@ -74,7 +74,7 @@ function SimulationDetailContainer() {
     const loading = isAuthenticated ? studentLoading : guestLoading;
     const error = isAuthenticated ? studentError : guestError;
 
-    // Fetch tasks for this simulation (guest or student view)
+    // Fetch tasks for this simulation (always guest view)
     const {
         data: guestTasksData,
         loading: guestTasksLoading,
@@ -88,22 +88,9 @@ function SimulationDetailContainer() {
         false,
     );
 
-    const {
-        data: studentTasksData,
-        loading: studentTasksLoading,
-        error: studentTasksError,
-        execute: fetchStudentTasks,
-    } = useFetch(
-        apiConfig.task.studentList,
-        {
-            mappingData: (res) => (res.data && res.data.content ? res.data.content : []),
-        },
-        false,
-    );
-
-    const tasks = isAuthenticated ? studentTasksData || [] : guestTasksData || [];
-    const tasksLoading = isAuthenticated ? studentTasksLoading : guestTasksLoading;
-    const tasksError = isAuthenticated ? studentTasksError : guestTasksError;
+    const tasks = guestTasksData || [];
+    const tasksLoading = guestTasksLoading;
+    const tasksError = guestTasksError;
 
     // Fetch simulation on mount
     React.useEffect(() => {
@@ -118,17 +105,13 @@ function SimulationDetailContainer() {
         }
     }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest ]);
 
-    // Fetch tasks when simulationId or auth changes
+    // Fetch tasks when simulationId changes
     React.useEffect(() => {
         if (!simulationId) return;
 
         const params = { simulationId: parseInt(simulationId) };
-        if (isAuthenticated) {
-            fetchStudentTasks({ params });
-        } else {
-            fetchGuestTasks({ params });
-        }
-    }, [ simulationId, isAuthenticated, fetchGuestTasks, fetchStudentTasks ]);
+        fetchGuestTasks({ params });
+    }, [ simulationId, fetchGuestTasks ]);
 
     // Check enrollment status on mount if authenticated
     React.useEffect(() => {

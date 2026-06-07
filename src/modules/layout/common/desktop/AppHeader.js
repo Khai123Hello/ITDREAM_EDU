@@ -48,7 +48,7 @@ const AppHeader = () => {
                 <div 
                     className={styles['lp-nav__logo']} 
                     onClick={() => {
-                        navigate('/dashboard');
+                        navigate('/');
                     }} 
                     style={{ cursor: 'pointer' }}
                 >
@@ -97,9 +97,18 @@ const AppHeader = () => {
                 <div className={styles['lp-nav__actions']}>
                     {isAuthenticated ? (
                         <div style={{ position: 'relative' }}>
-                            <button className={styles.userMenuTrigger} onClick={() => setDropdownOpen(!dropdownOpen)}>
-                                <span>{profile?.fullName || profile?.account?.fullName || 'Người dùng'}</span>
-                                <span>▼</span>
+                            <button className={styles.userAvatarTrigger} onClick={() => setDropdownOpen(!dropdownOpen)}>
+                                {profile?.avatar || profile?.avatarPath ? (
+                                    <img
+                                        src={profile.avatar || profile.avatarPath}
+                                        alt={profile?.fullName || 'User'}
+                                        className={styles.userAvatarImg}
+                                    />
+                                ) : (
+                                    <span className={styles.userAvatarInitials}>
+                                        {(profile?.fullName || profile?.account?.fullName || 'U').charAt(0).toUpperCase()}
+                                    </span>
+                                )}
                             </button>
                             {dropdownOpen && (
                                 <div className={styles.dropdownMenu}>

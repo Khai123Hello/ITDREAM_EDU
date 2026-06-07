@@ -19,7 +19,7 @@ const LoginPageContainer = () => {
     };
 
     const layout = {
-        defaultTheme: (props) => (
+        defaultTheme: () => (
             <LoginPageDesktop
                 onFinish={handleLogin}
                 handleForgotPasswordClick={handleForgotPasswordClick}

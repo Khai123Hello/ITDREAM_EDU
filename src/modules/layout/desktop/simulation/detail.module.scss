@@ -1,951 +1,791 @@
-// Variables - ITDream Colors with Forage-style UI
-$navy: #1a2b4a;
-$navy-light: #243652;
-$white: #ffffff;
-$gray-light: #f8f9fa;
-$gray-light-2: #f3f4f6;
-$gray-mid: #e5e7eb;
-$gray-text: #6b7280;
-$gray-text-light: #9ca3af;
-$text-dark: #111827;
-$blue-primary: #1d4ed8;
-$blue-light: #2563eb;
-$blue-lighter: #f0f4ff;
-$green: #22c55e;
-$green-dark: #16a34a;
-$border-color: #e5e7eb;
+// ═══════════════════════════════════════════
+// TOKENS
+// ═══════════════════════════════════════════
+$cream:       #faf9f6;
+$cream2:      #f3f1ec;
+$cream3:      #e8e4dc;
+$ink:         #1a1814;
+$ink2:        #45433e;
+$ink3:        #8a877f;
+$amber:       #d97706;
+$amber-soft:  rgba(217, 119, 6, 0.1);
+$amber-mid:   rgba(217, 119, 6, 0.18);
+$green:       #059669;
+$green-soft:  rgba(5, 150, 105, 0.1);
+$red:         #dc2626;
+$white:       #ffffff;
 
-// Container
-.container {
-    background: $white;
-    min-height: 100vh;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+$shadow-sm:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+$shadow-md:   0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+$shadow-lg:   0 12px 48px rgba(0,0,0,.14), 0 4px 16px rgba(0,0,0,.07);
+$shadow-card: 0 2px 12px rgba(0,0,0,.07), 0 1px 4px rgba(0,0,0,.05);
+
+$font-display: 'Lora', 'Georgia', serif;
+$font-body:    'DM Sans', 'Helvetica Neue', sans-serif;
+$font-mono:    'JetBrains Mono', monospace;
+
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$radius-xl: 22px;
+
+$max-w: 1160px;
+
+// ═══════════════════════════════════════════
+// MIXINS
+// ═══════════════════════════════════════════
+@mixin inner {
+  max-width: $max-w;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 
-.loadingContainer,
-.errorContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    flex-direction: column;
-    gap: 16px;
+@mixin card {
+  background: $white;
+  border: 1px solid $cream3;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+
+// ═══════════════════════════════════════════
+// BASE
+// ═══════════════════════════════════════════
+.page {
+  background: $cream;
+  min-height: 100vh;
+  font-family: $font-body;
+  color: $ink;
+}
+
+// ── State wrappers ──
+.stateWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
 }
 
 .retryBtn {
-    padding: 8px 20px;
-    background: $blue-primary;
-    color: $white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
+  margin-top: 8px;
+  padding: 8px 24px;
+  border-radius: $radius-md;
+  border: 1.5px solid $cream3;
+  background: $white;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 600;
+  color: $ink2;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
 
-    &:hover {
-        background: darken($blue-primary, 10%);
-    }
+  &:hover {
+    border-color: $amber;
+    color: $amber;
+  }
 }
 
-// ── HERO SECTION ──
+
+// ═══════════════════════════════════════════
+// HERO
+// ═══════════════════════════════════════════
 .hero {
-    position: relative;
-    overflow: hidden;
-    height: 260px;
-    display: flex;
-    align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  min-height: 460px;
+  display: flex;
+  align-items: center;
 }
 
-.heroBg,
-.heroBgFallback {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.heroBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
-.heroBgFallback {
-    background: linear-gradient(to right, rgba(20, 30, 50, 0.82) 48%, rgba(20, 30, 50, 0.35) 100%),
-        linear-gradient(135deg, $navy-light, $navy);
+.heroBgImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  filter: saturate(0.7) brightness(0.55);
 }
 
-.heroOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to right, rgba($navy, 0.82) 48%, rgba($navy, 0.35) 100%);
-    z-index: 1;
+.heroBgGradient {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d2418 0%, #1a1410 40%, #2a1f14 100%);
 }
 
-.heroContent {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    width: 100%;
-    padding: 36px 40px;
-    color: $white;
-    gap: 40px;
+.heroBgOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(20,16,10,.92) 0%, rgba(20,16,10,.55) 55%, rgba(20,16,10,.15) 100%),
+    linear-gradient(to top, rgba(20,16,10,.6) 0%, transparent 50%);
 }
 
+.heroInner {
+  @include inner;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+// LEFT
 .heroLeft {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-right: 40px;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.heroForageLogo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    color: $white;
+.orgBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 100px;
+  padding: 5px 12px 5px 6px;
+  backdrop-filter: blur(8px);
+  width: fit-content;
 }
 
-.forageLogoImg {
-    width: 26px;
-    height: 26px;
-    object-fit: contain;
+.orgLogo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: $white;
 }
 
-.forageLogoText {
-    font-size: 20px;
-    font-weight: 700;
+.orgName {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  letter-spacing: .02em;
 }
 
 .heroTitle {
-    font-size: 30px;
-    font-weight: 800;
-    margin-bottom: 8px;
-    line-height: 1.15;
-    color: $white;
-    letter-spacing: -0.5px;
+  font-family: $font-display;
+  font-size: clamp(26px, 3.5vw, 42px);
+  font-weight: 700;
+  color: $white;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  margin: 0;
 }
 
-.heroSub {
-    font-size: 13px;
-    color: rgba($white, 0.85);
-    margin-bottom: 14px;
-    line-height: 1.5;
+.heroNotice {
+  font-size: 16px;
+  color: rgba(255,255,255,.7);
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0;
 }
 
 .heroMeta {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    font-size: 12px;
-    color: rgba($white, 0.8);
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
 }
 
-.metaSep {
-    margin: 0 8px;
-    opacity: 0.5;
+.heroMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,.65);
 }
 
-// ── HERO CARD ──
-.heroCard {
-    background: $white;
-    border-radius: 10px;
-    padding: 20px 22px 22px;
-    width: 290px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
-    flex-shrink: 0;
-    align-self: center;
-    margin-right: 40px;
-    margin-left: auto;
+.heroMetaDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  flex-shrink: 0;
 }
 
-@media (max-width: 968px) {
-    .hero {
-        height: auto;
-    }
-
-    .heroContent {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 28px 24px;
-        gap: 24px;
-    }
-
-    .heroCard {
-        width: 100%;
-        max-width: 100%;
-        margin-right: 0;
-        margin-left: 0;
-    }
-
-    .heroTitle {
-        font-size: 26px;
-    }
-
-    .heroSub {
-        font-size: 14px;
-    }
-
-    .heroMeta {
-        gap: 10px;
-    }
+.heroStar {
+  color: #fbbf24;
 }
 
-.heroCardTitle {
-    font-size: 16px;
-    font-weight: 700;
-    color: $text-dark;
-    margin-bottom: 14px;
+// ENROLL CARD
+.enrollCard {
+  width: 340px;
+  flex-shrink: 0;
+  @include card;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: $shadow-lg;
 }
 
-.heroCardItem {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 13px;
-    color: $gray-text;
-    line-height: 1.55;
-    margin-bottom: 10px;
+.enrollCardBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: $amber-soft;
+  border: 1px solid $amber-mid;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  color: $amber;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  width: fit-content;
 }
 
-.heroCardCheck {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: $green;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-
-    svg {
-        width: 10px;
-        height: 10px;
-    }
+.enrollCardTitle {
+  font-family: $font-display;
+  font-size: 20px;
+  font-weight: 700;
+  color: $ink;
+  line-height: 1.25;
 }
 
-.heroCardRating {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid $gray-mid;
-}
+.enrollChecklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13.5px;
+  color: $ink2;
+  line-height: 1.5;
 
-.starsRow {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 2px;
-}
-
-.star {
-    color: #f59e0b;
-    font-size: 18px;
-}
-
-.ratingLabel {
-    font-size: 11px;
-    color: $gray-text;
-}
-
-.heroCtaBtn {
-    width: 100%;
-    padding: 12px;
-    background: $blue-primary;
-    color: $white;
-    font-size: 14px;
-    font-weight: 700;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    margin-top: 16px;
-    transition: background 0.18s;
-    letter-spacing: 0.01em;
-
-    &:hover:not(:disabled) {
-        background: darken($blue-primary, 8%);
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    &.enrolled {
-        background: $green;
-        
-        &:hover {
-            background: $green;
-        }
-    }
-}
-
-// ── TABS NAVIGATION ──
-.tabsNav {
-    border-bottom: 1px solid $border-color;
-    background: $white;
-    display: flex;
-    padding: 0 32px;
-}
-
-.tabNavItem {
-    padding: 14px 40px;
-    font-size: 14px;
-    font-weight: 500;
-    color: $gray-text;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-
-    &:hover:not(.active) {
-        color: $text-dark;
-    }
-
-    &.active {
-        color: $blue-primary;
-        font-weight: 600;
-        border-bottom-color: $blue-primary;
-    }
-}
-
-// ── MAIN WRAP ──
-.mainWrap {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 40px 24px;
-}
-
-// ── TWO COLUMN LAYOUT ──
-.twoCol {
-    display: grid;
-    grid-template-columns: 1fr 260px;
-    gap: 48px;
-    align-items: start;
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        gap: 32px;
-    }
-}
-
-// ── WHY SECTION ──
-.whyTitle {
-    font-size: 22px;
-    font-weight: 800;
-    color: $text-dark;
-    margin-bottom: 10px;
-}
-
-.whyBody {
-    font-size: 14px;
-    color: $gray-text;
-    line-height: 1.7;
-    margin-bottom: 12px;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
-}
-
-.whyTags {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0;
-    margin-bottom: 18px;
-}
-
-.whyTag {
-    font-size: 13px;
-    font-weight: 600;
-    color: $blue-light;
-    padding: 0;
-}
-
-.whyTagSep {
-    color: $gray-mid;
-    margin: 0 8px;
-    font-size: 13px;
-}
-
-.whyTagInfo {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    font-weight: 600;
-    color: $blue-light;
-
-    svg {
-        width: 13px;
-        height: 13px;
-        color: $gray-text-light;
-    }
-}
-
-.divider {
-    border: none;
-    border-top: 1px solid $border-color;
-    margin: 20px 0;
-}
-
-.viewAllLink {
-    color: $blue-light;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
-// ── HOW IT WORKS ──
-.how {
-    margin-top: 36px;
-}
-
-.howTitle {
-    font-size: 20px;
-    font-weight: 800;
-    color: $text-dark;
-    margin-bottom: 18px;
-}
-
-.howSteps {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.howStep {
+  li {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid $gray-light-2;
+    gap: 8px;
+  }
+}
 
-    &:last-child {
-        border-bottom: none;
+.checkIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: $green-soft;
+  color: $green;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+// CTA BUTTON
+.ctaBtn {
+  width: 100%;
+  height: 46px;
+  background: $amber;
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  letter-spacing: .01em;
+
+  &:hover:not(:disabled) {
+    background: darken(#d97706, 6%);
+    box-shadow: 0 4px 16px rgba(217,119,6,.35);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.ctaBtnSuccess {
+  background: $green;
+
+  &:hover:not(:disabled) {
+    background: darken(#059669, 6%);
+    box-shadow: 0 4px 16px rgba(5,150,105,.35);
+  }
+}
+
+.ctaBtnDisabled {
+  background: $cream3;
+  color: $ink3;
+  cursor: not-allowed;
+
+  &:hover {
+    background: $cream3;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+.ctaBtnIcon {
+  font-size: 11px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: $white;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.enrollNote {
+  font-size: 11.5px;
+  color: $ink3;
+  text-align: center;
+  margin: 0;
+}
+
+
+// ═══════════════════════════════════════════
+// TABS BAR
+// ═══════════════════════════════════════════
+.tabsBar {
+  position: sticky;
+  top: 0; // adjust if AppHeader has height, e.g. top: 60px
+  z-index: 50;
+  background: rgba(250,249,246,.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid $cream3;
+}
+
+.tabsInner {
+  @include inner;
+  display: flex;
+  gap: 0;
+}
+
+.tabBtn {
+  padding: 0 20px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  font-family: $font-body;
+  font-size: 14px;
+  font-weight: 500;
+  color: $ink3;
+  cursor: pointer;
+  position: relative;
+  transition: color .15s;
+  white-space: nowrap;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 20px; right: 20px;
+    height: 2px;
+    background: $amber;
+    border-radius: 2px 2px 0 0;
+    opacity: 0;
+    transform: scaleX(0);
+    transition: opacity .15s, transform .2s;
+  }
+
+  &:hover {
+    color: $ink2;
+  }
+}
+
+.tabBtnActive {
+  color: $ink;
+  font-weight: 700;
+
+  &::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+
+// ═══════════════════════════════════════════
+// MAIN
+// ═══════════════════════════════════════════
+.main {
+  @include inner;
+  padding-top: 48px;
+  padding-bottom: 80px;
+}
+
+
+// ═══════════════════════════════════════════
+// OVERVIEW TAB
+// ═══════════════════════════════════════════
+.overviewLayout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.overviewBody {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  & + .section {
+    padding-top: 40px;
+    border-top: 1px solid $cream3;
+  }
+}
+
+.sectionTitle {
+  font-family: $font-display;
+  font-size: 22px;
+  font-weight: 700;
+  color: $ink;
+  letter-spacing: -.01em;
+  margin: 0;
+}
+
+.bodyText {
+  font-size: 15px;
+  color: $ink2;
+  line-height: 1.75;
+  margin: 0;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background: $cream2;
+  border: 1px solid $cream3;
+  border-radius: 100px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: $ink2;
+}
+
+.tagOutline {
+  @extend .tag;
+  background: $amber-soft;
+  border-color: $amber-mid;
+  color: $amber;
+  font-weight: 700;
+}
+
+// Task preview list in overview
+.taskPreviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.taskPreviewItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: $radius-md;
+  cursor: default;
+  transition: background .12s;
+
+  &:hover {
+    background: $cream2;
+
+    .taskPreviewArrow {
+      color: $amber;
+      transform: translateX(2px);
     }
+  }
 }
 
-.howIcon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: $navy;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    svg {
-        width: 22px;
-        height: 22px;
-        color: $white;
-    }
+.taskPreviewNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $cream2;
+  border: 1.5px solid $cream3;
+  font-size: 12px;
+  font-weight: 700;
+  color: $ink3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.howText {
-    font-size: 13px;
-    color: $gray-text;
-    line-height: 1.65;
-    padding-top: 10px;
-    margin: 0;
+.taskPreviewInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-// ── SKILLS SIDEBAR ──
-.skillsBox {
-    padding: 0;
+.taskPreviewName {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ink;
 }
 
-.skillsBoxTitle {
-    font-size: 14px;
-    font-weight: 600;
-    color: $text-dark;
-    margin-bottom: 14px;
+.taskPreviewDuration {
+  font-size: 12px;
+  color: $ink3;
+}
+
+.taskPreviewArrow {
+  color: $ink3;
+  transition: color .12s, transform .12s;
+  flex-shrink: 0;
+}
+
+// Overview sidebar
+.overviewSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 72px; // tabsBar height + margin
+}
+
+.sideCard {
+  @include card;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sideCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: $ink;
+  text-transform: uppercase;
+  letter-spacing: .06em;
 }
 
 .skillPills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .skillPill {
-    font-size: 12px;
-    font-weight: 500;
-    border: 1px solid $border-color;
-    border-radius: 20px;
-    padding: 5px 12px;
-    color: $gray-text;
-    background: $white;
-    display: inline-block;
+  padding: 4px 11px;
+  background: $cream;
+  border: 1.5px solid $cream3;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $ink2;
+  transition: border-color .12s, color .12s;
+
+  &:hover {
+    border-color: $amber;
+    color: $amber;
+  }
 }
 
-.viewAllSkills {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: $blue-light;
-    text-decoration: none;
-    cursor: pointer;
+.sideCardLink {
+  background: none;
+  border: none;
+  font-family: $font-body;
+  font-size: 13px;
+  font-weight: 600;
+  color: $amber;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  transition: opacity .12s;
 
-    &:hover {
-        text-decoration: underline;
-    }
+  &:hover { opacity: .75; }
 }
 
-// ── TASKS SECTION ──
-.tasksSection {
-    width: 100%;
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.tasksSectionTitle {
-    font-size: 20px;
-    font-weight: 800;
-    color: $text-dark;
-    margin-bottom: 18px;
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
 }
 
+.infoLabel {
+  color: $ink3;
+}
+
+.infoVal {
+  font-weight: 600;
+  color: $ink;
+}
+
+
+// ═══════════════════════════════════════════
+// TASKS TAB
+// ═══════════════════════════════════════════
 .tasksLayout {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    border: 1px solid $border-color;
-    border-radius: 10px;
-    overflow: hidden;
-    max-height: 380px;
-
-    @media (max-width: 968px) {
-        max-height: none;
-    }
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-        max-height: none;
-    }
+  min-height: 500px;
+  width: 100%;
 }
 
-// ── TASK NAVIGATION ──
-.taskNav {
-    background: $white;
-    overflow-y: auto;
-
-    @media (max-width: 768px) {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        border-bottom: 1px solid $border-color;
-    }
-}
-
-.taskNavItem {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
-    cursor: pointer;
-    border-bottom: 1px solid $border-color;
-    font-size: 14px;
-    font-weight: 500;
-    color: $text-dark;
-    transition: background 0.15s, color 0.15s;
-    position: relative;
-
-    &:last-child {
-        border-bottom: none;
-    }
-
-    &.active {
-        background: $blue-lighter;
-        color: $blue-primary;
-        font-weight: 600;
-
-        .stepCircle,
-        .flagCircle {
-            border-color: $blue-primary;
-            color: $blue-primary;
-            background: $blue-light;
-        }
-
-        &::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: $blue-primary;
-        }
-    }
-
-    &:hover:not(.active) {
-        background: $gray-light-2;
-    }
-
-    @media (max-width: 768px) {
-        border-bottom: none;
-        border-right: 1px solid $border-color;
-
-        &:last-child {
-            border-right: none;
-        }
-
-        &.active::after {
-            width: 100%;
-            height: 3px;
-            right: 0;
-            bottom: 0;
-        }
-    }
-}
-
-.taskNavLabel {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.emptyWrap {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
 }
 
 
-.stepCircle {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 2px solid $border-color;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: $gray-text;
-    background: $white;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+// ═══════════════════════════════════════════
+// REVIEWS TAB
+// ═══════════════════════════════════════════
+.reviewsLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 720px;
 }
 
-.flagCircle {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 2px solid $border-color;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    background: $white;
-    color: $gray-text;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+.reviewsSummary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 32px;
+  @include card;
 }
 
-.taskNavItem.active {
-    .stepCircle,
-    .flagCircle {
-        border-color: $blue-primary;
-        color: $blue-primary;
-        background: $blue-light;
-    }
+.reviewsScore {
+  font-family: $font-display;
+  font-size: 52px;
+  font-weight: 700;
+  color: $ink;
+  line-height: 1;
+  letter-spacing: -.03em;
 }
 
-// ── TASK PANEL ──
-.taskPanel {
-    padding: 22px 26px;
-    border-left: 1px solid $border-color;
-    overflow-y: auto;
-
-    @media (max-width: 768px) {
-        border-left: none;
-        border-top: 1px solid $border-color;
-        padding: 20px;
-    }
+.reviewsStars {
+  display: flex;
+  gap: 3px;
+  font-size: 22px;
 }
 
-.taskPanelTitle {
-    font-size: 22px;
-    font-weight: 700;
-    color: $text-dark;
-    margin-bottom: 8px;
-    line-height: 1.2;
+.starFilled { color: #f59e0b; }
+.starEmpty  { color: $cream3; }
+
+.reviewsTotal {
+  font-size: 13px;
+  color: $ink3;
+  margin-top: 2px;
 }
 
-.taskPanelSub {
-    font-size: 14px;
-    color: $gray-text;
-    margin: 0;
-    line-height: 1.75;
+.reviewsCarousel {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 32px;
+  @include card;
 }
 
-.taskPanelMetaRow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: $blue-primary;
-    font-weight: 600;
+.reviewArrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid $cream3;
+  background: $white;
+  color: $ink2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .12s, color .12s;
+
+  &:hover {
+    border-color: $amber;
+    color: $amber;
+  }
 }
 
-.taskPanelMetaDot {
-    color: $gray-text;
-}
+.reviewQuote {
+  flex: 1;
+  font-style: normal;
+  text-align: center;
 
-.taskPanelMetaLevel {
-    color: $blue-primary;
-}
-
-.taskPanelActions {
-    margin-top: 10px;
-}
-
-.infoCard {
-    background: $white;
-    border: 1px solid $border-color;
-    border-radius: 12px;
-    padding: 18px 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-}
-
-.cardHeading {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    color: $text-dark;
-    margin-bottom: 12px;
-}
-
-.cardHeading svg {
-    flex-shrink: 0;
-    color: $gray-text;
-}
-
-.cardList {
-    list-style: disc;
-    margin: 0;
-    padding-left: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.cardList li {
-    font-size: 13px;
-    color: $gray-text;
-    line-height: 1.7;
-}
-
-.taskBlock {
-    margin-bottom: 16px;
-}
-
-.taskBlockLabel {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 13px;
-    font-weight: 700;
-    color: $text-dark;
-    margin-bottom: 10px;
-
-    svg {
-        width: 16px;
-        height: 16px;
-        color: $gray-text;
-    }
-}
-
-.taskBlock {
-    li {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        font-size: 13px;
-        color: $gray-text;
-        line-height: 1.6;
-        margin-bottom: 5px;
-        padding-left: 4px;
-
-        &::before {
-            content: '•';
-            color: $gray-text;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        strong {
-            color: $text-dark;
-        }
-    }
-
-    p {
-        font-size: 13px;
-        color: $gray-text;
-        line-height: 1.6;
-        margin: 0;
-    }
-}
-
-// ── REVIEWS SECTION ──
-.reviewsSection {
-    border-top: 1px solid $border-color;
-    padding: 48px 0;
-    width: 100%;
-}
-
-.reviewsWrap {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 0;
-    align-items: start;
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-    }
-}
-
-.reviewsLeft {
-    padding-right: 32px;
-    border-right: 1px solid $border-color;
-
-    @media (max-width: 768px) {
-        padding-right: 0;
-        padding-bottom: 32px;
-        border-right: none;
-        border-bottom: 1px solid $border-color;
-    }
-}
-
-.reviewsLabel {
-    font-size: 16px;
-    font-weight: 700;
-    color: $text-dark;
-    margin-bottom: 2px;
-}
-
-.reviewsCount {
-    font-size: 12px;
-    color: $gray-text;
-    margin-bottom: 6px;
-}
-
-.reviewsStarLabel {
-    font-size: 11px;
-    color: $gray-text;
-}
-
-.reviewsRight {
-    padding-left: 32px;
-    position: relative;
-
-    @media (max-width: 768px) {
-        padding-left: 0;
-        padding-top: 32px;
-    }
-}
-
-.reviewText {
-    font-size: 14px;
-    color: $gray-text;
-    line-height: 1.7;
+  p {
+    font-family: $font-display;
+    font-size: 17px;
+    color: $ink;
+    line-height: 1.65;
     font-style: italic;
-    margin-bottom: 12px;
-}
+  }
 
-.reviewAuthor {
+  footer {
+    margin-top: 12px;
     font-size: 13px;
-    color: $gray-text;
+    color: $ink3;
+  }
 }
 
-.reviewsRightInner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+
+// ═══════════════════════════════════════════
+// BOTTOM CTA
+// ═══════════════════════════════════════════
+.bottomCta {
+  border-top: 1px solid $cream3;
+  background: $white;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 14px;
+  color: $ink2;
 }
 
-.carouselArea {
-    flex: 1;
-}
+.bottomCtaLink {
+  font-size: 14px;
+  font-weight: 700;
+  color: $amber;
+  text-decoration: none;
+  transition: opacity .12s;
 
-.carouselArrows {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    justify-content: center;
-}
-
-.arrowBtn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid $border-color;
-    background: $white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s;
-
-    &:hover {
-        background: $gray-light-2;
-    }
-
-    svg {
-        width: 14px;
-        height: 14px;
-        color: $gray-text;
-    }
-}
-
-// ── CTA BAR ──
-.ctaBar {
-    background: $blue-lighter;
-    padding: 28px 48px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    border-top: 1px solid $border-color;
-
-    @media (max-width: 768px) {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 28px 24px;
-    }
-}
-
-.ctaBarText {
-    font-size: 20px;
-    font-weight: 800;
-    color: $text-dark;
-}
-
-.browseBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 20px;
-    border: 1.5px solid $gray-text;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 700;
-    color: $gray-text;
-    background: $white;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-    text-decoration: none;
-
-    &:hover {
-        background: $text-dark;
-        color: $white;
-        border-color: $text-dark;
-    }
+  &:hover { opacity: .75; }
 }
