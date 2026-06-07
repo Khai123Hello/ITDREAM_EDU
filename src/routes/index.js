@@ -55,12 +55,14 @@ const routes = {
         component: LoginPageContainer,
         auth: false,
         title: 'Đăng nhập',
+        layout: 'public',
     },
     registerPage: {
         path: '/register',
         component: RegisterContainer,
         auth: false,
         title: 'Đăng ký',
+        layout: 'public',
     },
     profilePage: {
         path: '/profile',
@@ -74,7 +76,7 @@ const routes = {
     simulationListPage: {
         path: '/simulations',
         component: SimulationListContainer,
-        auth: true,
+        auth: null,
         title: 'Các bài mô phỏng',
     },
     simulationDetailPage: {

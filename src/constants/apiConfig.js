@@ -73,6 +73,16 @@ const apiConfig = {
             method: 'POST',
             headers: baseHeader,
         },
+        verify: {
+            baseURL: `${apiUrl}v1/account/verify`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        resendVerify: {
+            baseURL: `${apiUrl}v1/account/resend_verify`,
+            method: 'POST',
+            headers: baseHeader,
+        },
         getProfile: {
             baseURL: `${apiUrl}v1/account/profile`,
             method: 'GET',
