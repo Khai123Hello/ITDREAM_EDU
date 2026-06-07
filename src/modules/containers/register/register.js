@@ -10,6 +10,7 @@ import useTranslate from '@hooks/useTranslate';
 import RegisterDesktop from '@modules/layout/desktop/register';
 import routes from '@routes';
 import { showErrorMessage } from '@services/notifyService';
+import dayjs from 'dayjs';
 import { useForm } from 'rc-field-form';
 import { toast } from 'sonner';
 
@@ -18,19 +19,20 @@ const messages = defineMessages({
     registrationFail: 'Error register',
 });
 const RegisterContainer = ({ title }) => {
-    const [ form ] = useForm();
+    const [form] = useForm();
 
     const translate = useTranslate();
     const navigate = useNavigate();
     const params = useParams();
     const notification = useNotification();
     const { execute: executeRegister, loading: loadingRegister } = useFetch({
-        ...apiConfig.user.register,
+        ...apiConfig.student.register,
     });
 
     const onFinish = (values) => {
         const loginData = {
             ...values,
+            birthday: values.birthday ? dayjs(values.birthday).startOf('day').format('DD/MM/YYYY HH:mm:ss') : null,
         };
         executeRegister({
             data: loginData,
