@@ -31,21 +31,10 @@ const DatePicker = ({
     required,
     ...props
 }) => {
-    const onSelect = (newValue) => {
+    const onSelect = () => {
         // console.log("Select:", newValue);
     };
     const pickerDate = [ 'time', 'date', 'month', 'year', 'timeShort', 'week' ].includes(picker) ? picker : undefined;
-    const formatConfig = (picker) => {
-        if (!picker) return { undefined: 'DD/MM/YYYY HH:mm:ss' };
-        return {
-            time: 'HH:mm',
-            timeShort: 'HH:mm',
-            date: 'DD/MM/YYYY',
-            month: 'MM/YYYY',
-            year: 'YYYY',
-            week: 'Wo/YYYY',
-        };
-    };
 
     const renderPickers = (picker) => {
         if (!picker) return 'date';
@@ -59,8 +48,8 @@ const DatePicker = ({
         };
     };
 
-    //const format = formatConfig(pickerDate)[pickerDate];
-    const pickerConfig = renderPickers(pickerDate)[pickerDate];
+    const pickerConfig = pickerDate ? renderPickers(pickerDate)[pickerDate] : undefined;
+    const pickerValue = value ?? date;
     const localeObject = {
         ...locale,
         shortMonths: [
@@ -93,7 +82,7 @@ const DatePicker = ({
         <div>
             {label && (
                 <label htmlFor={id} className={styles.label}>
-                    {label} {require && <span style={{ color: 'red' }}>*</span>}
+                    {label} {required && <span style={{ color: 'red' }}>*</span>}
                 </label>
             )}
             <Picker
@@ -116,12 +105,12 @@ const DatePicker = ({
                 superNextIcon={<span className={classNames(styles.superIcon, styles.superNextIcon)}></span>}
                 prevIcon={<span className={classNames(styles.icon, styles.prevIcon)}></span>}
                 nextIcon={<span className={classNames(styles.icon, styles.nextIcon)}></span>}
-                showToday
+                showToday={showToday}
                 showNow
-                value={value}
+                value={pickerValue}
                 allowClear={allowClear ? { clearIcon: <IconClear /> } : allowClear}
                 inputReadOnly={inputReadOnly}
-                // getPopupContainer={getPopupContainer ?? ((trigger) => trigger.parentElement)}
+                getPopupContainer={getPopupContainer ?? ((trigger) => trigger.parentElement || document.body)}
             />
         </div>
     );

@@ -1,9 +1,11 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import Button from '@components/common/elements/Button';
+import DatePickerField from '@components/common/elements/DatePicker/DatePickerField';
 import Flex from '@components/common/elements/Flex';
 import { Form } from '@components/common/elements/Form';
 import { InputField } from '@components/common/elements/Input';
+import { PasswordField } from '@components/common/elements/PasswordInput';
 import { commonMessage } from '@constants/intl';
 import useTranslate from '@hooks/useTranslate';
 import { Buffer } from 'buffer';
@@ -14,11 +16,11 @@ window.Buffer = window.Buffer || Buffer;
 
 const message = defineMessages({
     titleHello: 'Welcome to {objectName}',
-    placeholderFirstName: 'Enter first name',
-    placeholderLastName: 'Enter last name',
-    requiredFirstName: 'Please enter your first name',
-    requiredLastName: 'Please enter your last name',
-    requiredGender: 'Please select a gender',
+    placeholderUsername: 'Enter username',
+    placeholderFullName: 'Enter full name',
+    requiredUsername: 'Please enter your username',
+    requiredFullName: 'Please enter your full name',
+    requiredBirthday: 'Please enter your birthday',
     requiredEmail: 'Please enter your email',
     requiredPassword: 'Please enter your password',
     requiredPhone: 'Please enter your phone',
@@ -45,25 +47,25 @@ function RegisterDesktop({ onFinish, form, loading }) {
                             <Flex rowGap="24px" className={styles.flex}>
                                 <InputField
                                     className={styles.input}
-                                    name="firstName"
-                                    label={translate.formatMessage(commonMessage.firstName)}
-                                    placeholder={translate.formatMessage(message.placeholderFirstName)}
+                                    name="username"
+                                    label={translate.formatMessage(commonMessage.username)}
+                                    placeholder={translate.formatMessage(message.placeholderUsername)}
                                     rules={[
                                         {
                                             required: true,
-                                            message: translate.formatMessage(message.requiredFirstName),
+                                            message: translate.formatMessage(message.requiredUsername),
                                         },
                                     ]}
                                 />
                                 <InputField
                                     className={styles.input}
-                                    name="lastName"
-                                    label={translate.formatMessage(commonMessage.lastName)}
-                                    placeholder={translate.formatMessage(message.placeholderLastName)}
+                                    name="fullName"
+                                    label={translate.formatMessage(commonMessage.fullName)}
+                                    placeholder={translate.formatMessage(message.placeholderFullName)}
                                     rules={[
                                         {
                                             required: true,
-                                            message: translate.formatMessage(message.requiredLastName),
+                                            message: translate.formatMessage(message.requiredFullName),
                                         },
                                     ]}
                                 />
@@ -87,10 +89,9 @@ function RegisterDesktop({ onFinish, form, loading }) {
                                         },
                                     ]}
                                 />
-                                <InputField
+                                <PasswordField
                                     className={styles.input}
                                     name="password"
-                                    type="password"
                                     label={translate.formatMessage(commonMessage.password)}
                                     placeholder={translate.formatMessage(commonMessage.placeholderPassword)}
                                     rules={[
@@ -117,52 +118,17 @@ function RegisterDesktop({ onFinish, form, loading }) {
                                         },
                                     ]}
                                 />
-                                <div className={styles.sex}>
-                                    <div>
-                                        <span className={styles.label}>
-                                            {translate.formatMessage(commonMessage.gender)}
-                                        </span>
-                                        <Form.Item
-                                            name="gender"
-                                            label={translate.formatMessage(commonMessage.gender)}
-                                            initialValue="1"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: translate.formatMessage(message.requiredGender),
-                                                },
-                                            ]}
-                                        >
-                                            <div className={styles.sexInput}>
-                                                <div className={styles.radio}>
-                                                    <input
-                                                        type="radio"
-                                                        id="female"
-                                                        name="gender"
-                                                        value="1"
-                                                        defaultChecked
-                                                        className={styles.radioInput}
-                                                    />
-                                                    <label className={styles.customRadioLabel} htmlFor="female">
-                                                        {translate.formatMessage(commonMessage.female)}
-                                                    </label>
-                                                </div>
-                                                <div className={styles.radio}>
-                                                    <input
-                                                        type="radio"
-                                                        id="male"
-                                                        name="gender"
-                                                        value="0"
-                                                        className={styles.radioInput}
-                                                    />
-                                                    <label className={styles.customRadioLabel} htmlFor="male">
-                                                        {translate.formatMessage(commonMessage.male)}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </Form.Item>
-                                    </div>
-                                </div>
+                                <DatePickerField
+                                    className={styles.input}
+                                    name="birthday"
+                                    label={translate.formatMessage(commonMessage.birthday)}
+                                    required
+                                    requireMessage={translate.formatMessage(message.requiredBirthday)}
+                                    placeholder="DD/MM/YYYY"
+                                    format="DD/MM/YYYY"
+                                    picker="date"
+                                    showTime={false}
+                                />
                             </Flex>
 
                             <div className={styles.description}>
