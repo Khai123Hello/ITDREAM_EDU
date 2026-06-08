@@ -18,11 +18,9 @@ import './TaskDoingPage.scss';
  * This component bridges the gap between API data and TheForagePage UI
  */
 
-
-
 function FileDropzone({ onFileChange = () => {} }) {
-    const [ dragging, setDragging ] = useState(false);
-    const [ file, setFile ] = useState(null);
+    const [dragging, setDragging] = useState(false);
+    const [file, setFile] = useState(null);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -87,12 +85,14 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
     return (
         <footer className="tfo-footer-nav">
             <div className="tfo-footer-inner">
-                <button className="tfo-btn-back" onClick={onBack} disabled={!canGoBack}>
-                    Quay lại
-                </button>
-                <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>
-                    Tiếp theo
-                </button>
+                <div className="tfo-footer-buttons">
+                    <button className="tfo-btn-back" onClick={onBack} disabled={!canGoBack}>
+                        Back
+                    </button>
+                    <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>
+                        Next
+                    </button>
+                </div>
             </div>
         </footer>
     );
@@ -148,7 +148,7 @@ export default function TaskDoingPage({
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
         const ext = mediaPath.split('.').pop().toLowerCase();
 
-        if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -156,7 +156,7 @@ export default function TaskDoingPage({
                     </div>
                 </div>
             );
-        } else if ([ 'mp4', 'webm', 'ogg' ].includes(ext)) {
+        } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -231,7 +231,8 @@ export default function TaskDoingPage({
 
     // Calculate progress
     const activeSubtaskIndex = subtasks.findIndex((s) => s.id === selectedSubtaskId);
-    const progressPercentage = subtasks.length > 0 && selectedSubtaskId ? ((activeSubtaskIndex + 1) / subtasks.length) * 100 : 0;
+    const progressPercentage =
+        subtasks.length > 0 && selectedSubtaskId ? ((activeSubtaskIndex + 1) / subtasks.length) * 100 : 0;
 
     // Khi chọn parent task, cập nhật ID parent task được chọn
     const handleSelectParentTask = (taskId) => {
@@ -264,12 +265,27 @@ export default function TaskDoingPage({
 
                             {/* Right pane with layout columns */}
                             <main className="tfo-pane">
-                                <div className="tfo-pane-layout" style={{ display: 'flex', gap: '32px', width: '100%' }}>
-                                    
+                                <div className="tfo-pane-layout" style={{ width: '100%' }}>
                                     {/* Left pane column (Content) */}
-                                    <div className="tfo-pane-left" style={{ flex: 1, minWidth: 0 }}>
+                                    <div className="tfo-pane-left" style={{ width: '100%' }}>
                                         <div className="tfo-pane-topbar">
                                             <div className="tfo-pane-title">{pageTitle}</div>
+                                            {subtasks && subtasks.length > 0 && (
+                                                <div className="tfo-step-pagination">
+                                                    {subtasks.map((st, index) => {
+                                                        const isActive = st.id === selectedSubtaskId;
+                                                        return (
+                                                            <button
+                                                                key={st.id}
+                                                                className={`tfo-step-btn${isActive ? ' active' : ''}`}
+                                                                onClick={() => onSelectSubtask(st.id)}
+                                                            >
+                                                                {index + 1}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="tfo-separator" />
@@ -320,7 +336,9 @@ export default function TaskDoingPage({
 
                                                     {taskStatus === 'completed' && (
                                                         <>
-                                                            <div className="tfo-action-completed">✓ Nhiệm vụ đã Hoàn thành</div>
+                                                            <div className="tfo-action-completed">
+                                                                ✓ Nhiệm vụ đã Hoàn thành
+                                                            </div>
                                                             <button
                                                                 className="tfo-action-btn tfo-action-btn-secondary"
                                                                 onClick={onResetTask}
@@ -336,33 +354,6 @@ export default function TaskDoingPage({
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    {/* Right pane column (Subtask list numbered boxes) */}
-                                    <div className="tfo-pane-right" style={{ width: '240px', flexShrink: 0 }}>
-                                        {subtasks && subtasks.length > 0 ? (
-                                            <div className="tfo-subtask-nav-box">
-                                                <div className="tfo-subtask-nav-title">Nhiệm vụ phụ</div>
-                                                <div className="tfo-subtask-grid">
-                                                    {subtasks.map((st, index) => {
-                                                        const isActive = st.id === selectedSubtaskId;
-                                                        return (
-                                                            <button
-                                                                key={st.id}
-                                                                className={`tfo-subtask-box${isActive ? ' active' : ''}`}
-                                                                onClick={() => onSelectSubtask(st.id)}
-                                                            >
-                                                                {index + 1}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="tfo-subtask-nav-empty">
-                                                Không có nhiệm vụ phụ
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </main>

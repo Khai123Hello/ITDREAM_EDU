@@ -6,7 +6,7 @@ import { ReactComponent as IconClose } from '@assets/icons/closeModal.svg';
 import { Form } from '@components/common/elements/Form';
 import Grid from '@components/common/elements/Grid';
 import { InputField } from '@components/common/elements/Input';
-import { AppConstants,MALE } from '@constants';
+import { AppConstants, MALE } from '@constants';
 import apiConfig from '@constants/apiConfig';
 import { commonMessage } from '@constants/intl';
 import useAuth from '@hooks/useAuth';
@@ -65,8 +65,8 @@ const ProfileComponent = (props) => {
         user?.gender === MALE
             ? translate.formatMessage(commonMessage.male)
             : user?.gender
-                ? translate.formatMessage(commonMessage.female)
-                : '';
+              ? translate.formatMessage(commonMessage.female)
+              : '';
     const navigation = useNavigate();
     const params = useParams();
 
@@ -77,7 +77,7 @@ const ProfileComponent = (props) => {
         setIsChangedFormValues,
     });
 
-    const [ imageUrl, setImageUrl ] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
 
@@ -122,7 +122,7 @@ const ProfileComponent = (props) => {
         if (imageUrl) {
             form.setFieldValue('avatarPath', imageUrl);
         }
-    }, [ imageUrl ]);
+    }, [imageUrl]);
 
     const onFinish = () => {
         const values = form.getFieldsValue();
@@ -140,7 +140,7 @@ const ProfileComponent = (props) => {
     };
 
     const editingFieldRef = useRef(null);
-    const [ editingField, setEditingField ] = useState(null);
+    const [editingField, setEditingField] = useState(null);
 
     useEffect(() => {
         if (user) {
@@ -159,7 +159,7 @@ const ProfileComponent = (props) => {
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
         }
-    }, [ user, form, editingField ]);
+    }, [user, form, editingField]);
 
     const handleSetEditingField = (field) => {
         if (editingFieldRef.current === field) {
@@ -212,7 +212,11 @@ const ProfileComponent = (props) => {
 
                 <div className={styles.profileHero}>
                     <div className={styles.heroSummary}>
-                        <div className={styles.heroAvatar} onClick={handleAvatarClick} title="Nhấp để thay đổi ảnh đại diện">
+                        <div
+                            className={styles.heroAvatar}
+                            onClick={handleAvatarClick}
+                            title="Nhấp để thay đổi ảnh đại diện"
+                        >
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt={fullName || 'Avatar'} />
                             ) : (
@@ -231,21 +235,21 @@ const ProfileComponent = (props) => {
                             </div>
                             {organizationName ? (
                                 <div className={styles.heroOrganization}>
-                                    <TbBriefcase style={{ marginRight: '6px', fontSize: '15px', verticalAlign: 'middle' }} />
+                                    <TbBriefcase
+                                        style={{ marginRight: '6px', fontSize: '15px', verticalAlign: 'middle' }}
+                                    />
                                     <span>{organizationName}</span>
                                 </div>
                             ) : null}
                             <div className={styles.heroBadges}>
                                 {reviewStatus !== undefined ? (
-                                    <span className={`${styles.profileBadge} ${reviewStatus ? styles.badgeSuccess : styles.badgeWarning}`}>
+                                    <span
+                                        className={`${styles.profileBadge} ${reviewStatus ? styles.badgeSuccess : styles.badgeWarning}`}
+                                    >
                                         {reviewStatus ? 'Đã duyệt' : 'Chờ duyệt'}
                                     </span>
                                 ) : null}
-                                {genderLabel ? (
-                                    <span className={styles.profileBadge}>
-                                        {genderLabel}
-                                    </span>
-                                ) : null}
+                                {genderLabel ? <span className={styles.profileBadge}>{genderLabel}</span> : null}
                             </div>
                         </div>
                     </div>
@@ -262,7 +266,9 @@ const ProfileComponent = (props) => {
                         {phone ? (
                             <div className={styles.heroStatCard}>
                                 <div className={styles.heroStatLabel}>
-                                    <TbPhone style={{ marginRight: '6px', fontSize: '13px', verticalAlign: 'middle' }} />
+                                    <TbPhone
+                                        style={{ marginRight: '6px', fontSize: '13px', verticalAlign: 'middle' }}
+                                    />
                                     <span>{translate.formatMessage(messages.phone)}</span>
                                 </div>
                                 <div className={styles.heroStatValue}>{phone}</div>
@@ -296,7 +302,9 @@ const ProfileComponent = (props) => {
                             <div className={styles.fieldLabelSection}>
                                 <div className={styles.fieldIconTitle}>
                                     <TbUser className={styles.fieldIcon} />
-                                    <span className={styles.fieldTitle}>{translate.formatMessage(messages.fullName)}</span>
+                                    <span className={styles.fieldTitle}>
+                                        {translate.formatMessage(messages.fullName)}
+                                    </span>
                                 </div>
                                 {editingField === 'fullName' ? (
                                     <div className={styles.fieldEditor}>

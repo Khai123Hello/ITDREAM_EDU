@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { sendRequest } from '@services/api';
 
 const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, pathParams = {}, dataBody = {} } = {}) => {
-    const [ loading, setLoading ] = useState(false);
-    const [ data, setData ] = useState(null);
-    const [ error, setError ] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
     const initialized = useRef(false);
 
     const execute = useCallback(
@@ -31,7 +31,7 @@ const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, path
                 !cancelType && setLoading(false);
             }
         },
-        [ apiConfig ],
+        [apiConfig],
     );
 
     useEffect(() => {
@@ -42,7 +42,7 @@ const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, path
                 execute();
             }
         }
-    }, [ execute, immediate ]);
+    }, [execute, immediate]);
 
     return { loading, execute, data, error, setData };
 };

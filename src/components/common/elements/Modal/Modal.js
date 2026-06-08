@@ -32,7 +32,7 @@ const Modal = ({
     showHeader = true,
     clickOutsideToClose = false,
 }) => {
-    const [ _open, _onOpenChange ] = useUncontrolled({ value: open, onChange: onOpenChange });
+    const [_open, _onOpenChange] = useUncontrolled({ value: open, onChange: onOpenChange });
     const translate = useTranslate();
     return (
         <Dialog.Root open={_open} onOpenChange={(value) => _onOpenChange?.(value)}>

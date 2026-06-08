@@ -14,7 +14,7 @@ const AppHeader = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, profile } = useAuth();
-    const [ dropdownOpen, setDropdownOpen ] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const { execute: executeLogoutApi } = useFetch(apiConfig.account.logout);
 
     const isActive = (path) => (location.pathname === path ? styles.active : '');
@@ -45,11 +45,11 @@ const AppHeader = () => {
     return (
         <div className={styles.appHeader} id="">
             <nav className={styles['lp-nav']}>
-                <div 
-                    className={styles['lp-nav__logo']} 
+                <div
+                    className={styles['lp-nav__logo']}
                     onClick={() => {
                         navigate('/');
-                    }} 
+                    }}
                     style={{ cursor: 'pointer' }}
                 >
                     💡 ITDream
@@ -106,7 +106,9 @@ const AppHeader = () => {
                                     />
                                 ) : (
                                     <span className={styles.userAvatarInitials}>
-                                        {(profile?.fullName || profile?.account?.fullName || 'U').charAt(0).toUpperCase()}
+                                        {(profile?.fullName || profile?.account?.fullName || 'U')
+                                            .charAt(0)
+                                            .toUpperCase()}
                                     </span>
                                 )}
                             </button>

@@ -36,10 +36,8 @@ const useTaskHierarchy = (taskListData, selectedParentTaskId) => {
         });
 
         // Convert map to array and sort by orderInParent
-        return Array.from(parentMap.values()).sort(
-            (a, b) => (a.orderInParent || 0) - (b.orderInParent || 0),
-        );
-    }, [ taskListData ]);
+        return Array.from(parentMap.values()).sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0));
+    }, [taskListData]);
 
     // Determine the active parent ID (fallback to the first parent in the list if none selected)
     const defaultSelectedParentId = useMemo(() => {
@@ -47,7 +45,7 @@ const useTaskHierarchy = (taskListData, selectedParentTaskId) => {
             return parentTasks[0].id;
         }
         return selectedParentTaskId;
-    }, [ parentTasks, selectedParentTaskId ]);
+    }, [parentTasks, selectedParentTaskId]);
 
     // Filter subtasks (kind === 2) belonging to the active parent task
     const subtasks = useMemo(() => {
@@ -65,7 +63,7 @@ const useTaskHierarchy = (taskListData, selectedParentTaskId) => {
                         t.taskId === defaultSelectedParentId),
             )
             .sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0));
-    }, [ taskListData, defaultSelectedParentId ]);
+    }, [taskListData, defaultSelectedParentId]);
 
     return { parentTasks, defaultSelectedParentId, subtasks };
 };

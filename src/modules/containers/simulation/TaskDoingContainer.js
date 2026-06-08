@@ -22,8 +22,8 @@ function TaskDoingContainer() {
     const companyLogo = location.state?.companyLogo;
 
     // State management
-    const [ selectedParentTaskId, setSelectedParentTaskId ] = useState(null);
-    const [ selectedSubtaskId, setSelectedSubtaskId ] = useState(null);
+    const [selectedParentTaskId, setSelectedParentTaskId] = useState(null);
+    const [selectedSubtaskId, setSelectedSubtaskId] = useState(null);
 
     // Load task list for sidebar
     const {
@@ -54,8 +54,6 @@ function TaskDoingContainer() {
         },
         false, // Don't auto-fetch
     );
-
-
 
     // Create task progress when starting a new task
     const { execute: createTaskProgress } = useFetch(
@@ -107,7 +105,7 @@ function TaskDoingContainer() {
                 params: { simulationId: parseInt(simulationId) },
             });
         }
-    }, [ simulationId, fetchTaskList ]);
+    }, [simulationId, fetchTaskList]);
 
     // Load task progress on mount
     React.useEffect(() => {
@@ -116,7 +114,7 @@ function TaskDoingContainer() {
                 params: { simulationEnrollmentId },
             });
         }
-    }, [ simulationEnrollmentId, refetchProgress ]);
+    }, [simulationEnrollmentId, refetchProgress]);
 
     // Map task progress by task ID
     const taskProgressMap = useMemo(() => {
@@ -134,13 +132,10 @@ function TaskDoingContainer() {
         });
 
         return progressMap;
-    }, [ taskProgressData ]);
+    }, [taskProgressData]);
 
     // Get parent tasks and subtasks for the selected parent task
-    const { parentTasks, defaultSelectedParentId, subtasks } = useTaskHierarchy(
-        taskListData,
-        selectedParentTaskId,
-    );
+    const { parentTasks, defaultSelectedParentId, subtasks } = useTaskHierarchy(taskListData, selectedParentTaskId);
 
     // eslint-disable-next-line no-console
     console.log('Danh sách Task Con (Subtasks):', subtasks);
@@ -170,7 +165,7 @@ function TaskDoingContainer() {
                 setSelectedSubtaskId(null);
             }
         }
-    }, [ defaultSelectedParentId, subtasks, selectedSubtaskId ]);
+    }, [defaultSelectedParentId, subtasks, selectedSubtaskId]);
 
     // Fetch selected subtask details when selectedSubtaskId changes
     React.useEffect(() => {
@@ -182,13 +177,13 @@ function TaskDoingContainer() {
         } else {
             setSubtaskDetail(null);
         }
-    }, [ selectedSubtaskId, fetchSubtaskDetail, setSubtaskDetail ]);
+    }, [selectedSubtaskId, fetchSubtaskDetail, setSubtaskDetail]);
 
     // Get current subtask progress info
     const currentSubtaskProgress = useMemo(() => {
         if (!selectedSubtaskId) return null;
         return taskProgressMap[selectedSubtaskId] || null;
-    }, [ selectedSubtaskId, taskProgressMap ]);
+    }, [selectedSubtaskId, taskProgressMap]);
 
     // Handle parent task selection
     const handleSelectParentTask = useCallback((parentTaskId) => {
@@ -198,7 +193,7 @@ function TaskDoingContainer() {
     // Calculate active index and canGoBack / canGoNext
     const activeSubtaskIndex = useMemo(() => {
         return subtasks.findIndex((s) => s.id === selectedSubtaskId);
-    }, [ subtasks, selectedSubtaskId ]);
+    }, [subtasks, selectedSubtaskId]);
 
     const canGoBack = activeSubtaskIndex > 0;
     const canGoNext = activeSubtaskIndex >= 0 && activeSubtaskIndex < subtasks.length - 1;
@@ -208,14 +203,14 @@ function TaskDoingContainer() {
         if (canGoBack) {
             setSelectedSubtaskId(subtasks[activeSubtaskIndex - 1].id);
         }
-    }, [ canGoBack, subtasks, activeSubtaskIndex ]);
+    }, [canGoBack, subtasks, activeSubtaskIndex]);
 
     // Handle next button
     const handleNext = useCallback(() => {
         if (canGoNext) {
             setSelectedSubtaskId(subtasks[activeSubtaskIndex + 1].id);
         }
-    }, [ canGoNext, subtasks, activeSubtaskIndex ]);
+    }, [canGoNext, subtasks, activeSubtaskIndex]);
 
     // Handle start task
     const handleStartTask = useCallback(async () => {
@@ -244,7 +239,7 @@ function TaskDoingContainer() {
         } catch (err) {
             message.error('Có lỗi xảy ra. Vui lòng thử lại');
         }
-    }, [ selectedSubtaskId, simulationEnrollmentId, createTaskProgress, refetchProgress ]);
+    }, [selectedSubtaskId, simulationEnrollmentId, createTaskProgress, refetchProgress]);
 
     // Handle complete task
     const handleCompleteTask = useCallback(async () => {
@@ -270,7 +265,7 @@ function TaskDoingContainer() {
         } catch (err) {
             message.error('Có lỗi xảy ra. Vui lòng thử lại');
         }
-    }, [ selectedSubtaskId, simulationEnrollmentId, completeTaskProgress, refetchProgress ]);
+    }, [selectedSubtaskId, simulationEnrollmentId, completeTaskProgress, refetchProgress]);
 
     // Handle reset task
     const handleResetTask = useCallback(async () => {
@@ -296,7 +291,7 @@ function TaskDoingContainer() {
         } catch (err) {
             message.error('Có lỗi xảy ra. Vui lòng thử lại');
         }
-    }, [ selectedSubtaskId, simulationEnrollmentId, resetTaskProgress, refetchProgress ]);
+    }, [selectedSubtaskId, simulationEnrollmentId, resetTaskProgress, refetchProgress]);
 
     // Handle file upload
     const handleFileUpload = useCallback(() => {
@@ -306,7 +301,7 @@ function TaskDoingContainer() {
     // Get selected parent task details
     const selectedParentTask = useMemo(() => {
         return parentTasks.find((t) => t.id === defaultSelectedParentId);
-    }, [ parentTasks, defaultSelectedParentId ]);
+    }, [parentTasks, defaultSelectedParentId]);
 
     // Determine task status display
     const getTaskStatus = () => {
@@ -331,7 +326,7 @@ function TaskDoingContainer() {
 
         // Content
         pageTitle: selectedParentTask?.title || 'Nhiệm vụ',
-        taskHeading: subtaskDetail?.title || 'Đang tải...',
+        taskHeading: subtasks.length > 0 ? subtaskDetail?.title || 'Đang tải...' : 'Không Có Bài Học',
         taskBody: subtaskDetail?.content || '',
         taskDescriptionContent: subtaskDetail?.description || '',
         mediaPath: subtaskDetail?.imagePath || subtaskDetail?.videoPath || subtaskDetail?.filePath,

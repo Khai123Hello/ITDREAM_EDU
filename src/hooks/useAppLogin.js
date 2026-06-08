@@ -22,14 +22,14 @@ const useAppLogin = (role = 'student') => {
     const translate = useTranslate();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [ loadingProfileFetch, setLoadingProfileFetch ] = useState(false);
+    const [loadingProfileFetch, setLoadingProfileFetch] = useState(false);
 
     const base64Credentials = useMemo(() => {
         return typeof window !== 'undefined' && typeof window.btoa === 'function'
             ? window.btoa(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`)
             : typeof Buffer !== 'undefined'
-                ? Buffer.from(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`).toString('base64')
-                : '';
+              ? Buffer.from(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`).toString('base64')
+              : '';
     }, []);
 
     const { execute: executeLogin, loading: loadingLogin } = useFetch(apiConfig.account.loginOAuth);
@@ -57,7 +57,7 @@ const useAppLogin = (role = 'student') => {
                 setLoadingProfileFetch(true);
 
                 const profileConfig = apiConfig.account.getProfileStudent;
-                
+
                 const apiFetchProfile = {
                     baseURL: profileConfig.baseURL,
                     method: profileConfig.method,
@@ -74,7 +74,7 @@ const useAppLogin = (role = 'student') => {
                         headers: apiFetchProfile.headers,
                     });
                     const profileData = await profileRes.json();
-                    
+
                     setLoadingProfileFetch(false);
                     if (profileData && (profileData.result === true || profileData.data !== undefined)) {
                         const payload = profileData.data !== undefined ? profileData : { data: profileData };

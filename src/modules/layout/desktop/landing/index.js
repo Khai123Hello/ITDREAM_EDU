@@ -5,7 +5,7 @@ import SliderScroll from '@components/common/elements/SliderScroll';
 
 import styles from './index.module.scss';
 
-const companies = [ 'FPT Software', 'VNG Corporation', 'Tiki', 'Grab Vietnam', 'Momo' ];
+const companies = ['FPT Software', 'VNG Corporation', 'Tiki', 'Grab Vietnam', 'Momo'];
 
 const levelText = {
     1: 'Cơ bản',
@@ -52,9 +52,9 @@ const testimonials = [
 function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
     const navigate = useNavigate();
     const sliderRef = useRef(null);
-    const [ activeIndex, setActiveIndex ] = useState(0);
+    const [activeIndex, setActiveIndex] = useState(0);
 
-    const cards = useMemo(() => simulations || [], [ simulations ]);
+    const cards = useMemo(() => simulations || [], [simulations]);
     const totalCards = cards.length + 1;
 
     const handleSelectCard = (id) => {
@@ -150,8 +150,8 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
                     Bước vào nghề nghiệp mơ ước.
                 </h1>
                 <p className={styles['lp-hero__subtitle']}>
-                    Trải nghiệm thực tế tại các công ty công nghệ hàng đầu Việt Nam với hàng trăm bài mô phỏng miễn
-                    phí — không cần kinh nghiệm để bắt đầu.
+                    Trải nghiệm thực tế tại các công ty công nghệ hàng đầu Việt Nam với hàng trăm bài mô phỏng miễn phí
+                    — không cần kinh nghiệm để bắt đầu.
                 </p>
                 <button className={`${styles['lp-btn']} ${styles['lp-btn--primary']} ${styles['lp-btn--lg']}`}>
                     Bắt Đầu Ngay →
@@ -218,8 +218,8 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
                     ITDream — Cầu nối từ sinh viên đến kỹ sư IT chuyên nghiệp
                 </h2>
                 <p className={styles['lp-how__sub']}>
-                    Các bài mô phỏng xây dựng kỹ năng thực tế trong môi trường doanh nghiệp, giúp bạn hiểu rõ công
-                    việc hàng ngày. Hoàn toàn miễn phí, linh hoạt theo thời gian của bạn.
+                    Các bài mô phỏng xây dựng kỹ năng thực tế trong môi trường doanh nghiệp, giúp bạn hiểu rõ công việc
+                    hàng ngày. Hoàn toàn miễn phí, linh hoạt theo thời gian của bạn.
                 </p>
                 <div className={styles['lp-steps']}>
                     {steps.map((s) => (
