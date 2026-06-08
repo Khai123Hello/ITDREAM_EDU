@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { AppConstants } from '@constants';
 import AppFooter from '@modules/layout/common/AppFooter';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
@@ -6,6 +7,60 @@ import { Empty, Spin } from 'antd';
 import TaskPanel from './TaskPanel';
 
 import styles from './detail.module.scss';
+
+const parseOverviewData = (overviewStr) => {
+    const fallbackTemplate = {
+        introduction: '',
+        bager: [ 'Tự học theo tốc độ riêng', '1–2 giờ', 'Không có điểm số', 'Không có bài kiểm tra nào', 'Giới thiệu' ],
+        content: '',
+        skills: [ 'Chú ý chi tiết', 'Giải quyết vấn đề', 'Giao tiếp', 'Tư duy phản biện', 'Làm việc nhóm' ],
+    };
+    if (!overviewStr) return fallbackTemplate;
+    if (typeof overviewStr === 'object') {
+        return {
+            introduction: overviewStr.introduction || '',
+            bager: Array.isArray(overviewStr.bager) ? overviewStr.bager : (Array.isArray(overviewStr.barger) ? overviewStr.barger : fallbackTemplate.bager),
+            content: overviewStr.content || '',
+            skills: Array.isArray(overviewStr.skills) ? overviewStr.skills : fallbackTemplate.skills,
+        };
+    }
+    try {
+        const parsed = JSON.parse(overviewStr);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            return {
+                introduction: parsed.introduction || parsed.hero?.description || '',
+                bager: Array.isArray(parsed.bager)
+                    ? parsed.bager
+                    : (Array.isArray(parsed.barger)
+                        ? parsed.barger
+                        : (Array.isArray(parsed.hero?.badges) ? parsed.hero.badges : fallbackTemplate.bager)),
+                content: parsed.content || parsed.intro?.content || '',
+                skills: Array.isArray(parsed.skills)
+                    ? parsed.skills
+                    : fallbackTemplate.skills,
+            };
+        }
+    } catch (e) {
+        // ignore
+    }
+    return { ...fallbackTemplate, content: overviewStr };
+};
+
+const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:image')) {
+        return path;
+    }
+    return `${AppConstants.contentRootUrl}${path}`;
+};
+
+const getVideoUrl = (path) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+    }
+    return `${AppConstants.contentRootUrl}${path}`;
+};
 
 function SimulationDetailDesktop({
     simulation = {},
@@ -24,10 +79,34 @@ function SimulationDetailDesktop({
     const [ activeTab, setActiveTab ] = useState('overview');
     const [ activeTaskId, setActiveTaskId ] = useState(null);
 
+    // ✅ FIX: chỉ lấy id của subtask đầu tiên (kind=2), không dùng task cha (kind=1)
     const defaultActiveTaskId = useMemo(() => {
-        if (tasks.length > 0 && !activeTaskId) return tasks[0].id;
-        return activeTaskId;
+        if (activeTaskId) return activeTaskId;
+        if (!tasks.length) return null;
+
+        // Tìm task cha đầu tiên (kind=1), sắp xếp theo orderInParent
+        const firstParent = tasks
+            .filter((t) => t.kind === 1)
+            .sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0))[0];
+
+        if (!firstParent) return null;
+
+        // Tìm subtask đầu tiên (kind=2) thuộc task cha đó
+        const firstSub = tasks
+            .filter((t) => t.kind === 2 && t.parent?.id === firstParent.id)
+            .sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0))[0];
+
+        // Trả về id subtask đầu tiên; fallback về task cha nếu không có sub
+        return firstSub?.id ?? firstParent.id;
     }, [ tasks, activeTaskId ]);
+
+    // ✅ FIX: đếm task cha (kind=1) để hiển thị số nhiệm vụ đúng
+    const parentTaskCount = useMemo(
+        () => tasks.filter((t) => t.kind === 1).length,
+        [ tasks ],
+    );
+
+    const overviewData = useMemo(() => parseOverviewData(simulation.overview), [ simulation.overview ]);
 
     const handleTaskSelect = (taskId) => setActiveTaskId(taskId);
 
@@ -88,7 +167,8 @@ function SimulationDetailDesktop({
 
     const TABS = [
         { key: 'overview', label: 'Tổng quan' },
-        { key: 'tasks',    label: `Nhiệm vụ${tasks.length ? ` (${tasks.length})` : ''}` },
+        // ✅ FIX: dùng parentTaskCount thay vì tasks.length
+        { key: 'tasks',    label: `Nhiệm vụ${parentTaskCount ? ` (${parentTaskCount})` : ''}` },
         { key: 'reviews',  label: 'Đánh giá' },
     ];
 
@@ -99,17 +179,15 @@ function SimulationDetailDesktop({
 
                 {/* ══ HERO ══ */}
                 <section className={styles.hero}>
-                    {/* background */}
                     <div className={styles.heroBg}>
                         {simulation.thumbnail
-                            ? <img src={simulation.thumbnail} alt="" className={styles.heroBgImg} />
+                            ? <img src={getImageUrl(simulation.thumbnail)} alt="" className={styles.heroBgImg} />
                             : <div className={styles.heroBgGradient} />
                         }
                         <div className={styles.heroBgOverlay} />
                     </div>
 
                     <div className={styles.heroInner}>
-                        {/* LEFT */}
                         <div className={styles.heroLeft}>
                             {simulation?.educator?.organization?.logoUrl && (
                                 <div className={styles.orgBadge}>
@@ -129,10 +207,22 @@ function SimulationDetailDesktop({
                             </h1>
 
                             <p className={styles.heroNotice}>
-                                {simulation?.notice || 'Trải nghiệm các tình huống công việc thực tế'}
+                                {simulation?.description || simulation?.notice || 'Trải nghiệm các tình huống công việc thực tế'}
                             </p>
 
                             <div className={styles.heroMeta}>
+                                {(simulation.category?.name || simulation.category?.label) && (
+                                    <>
+                                        <span className={styles.heroMetaItem}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}>
+                                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                            </svg>
+                                            {simulation.category?.name || simulation.category?.label}
+                                        </span>
+                                        <span className={styles.heroMetaDot} />
+                                    </>
+                                )}
                                 <span className={styles.heroMetaItem}>
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                         <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.4"/>
@@ -196,7 +286,8 @@ function SimulationDetailDesktop({
 
                             <p className={styles.enrollNote}>
                                 {isEnrolled
-                                    ? `${tasks.length} nhiệm vụ · ${simulation?.duration || ''}`
+                                    // ✅ FIX: hiển thị số task cha, không phải tổng tasks
+                                    ? `${parentTaskCount} nhiệm vụ · ${simulation?.duration || ''}`
                                     : 'Hoàn toàn miễn phí · Không cần thẻ tín dụng'}
                             </p>
                         </div>
@@ -226,39 +317,58 @@ function SimulationDetailDesktop({
                         <div className={styles.overviewLayout}>
                             <div className={styles.overviewBody}>
                                 <section className={styles.section}>
-                                    <h2 className={styles.sectionTitle}>
-                                        Tại sao nên hoàn thành bài mô phỏng này?
+                                    <h2 className={styles.sectionTitle} style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                                        Tại sao nên hoàn thành bài mô phỏng công việc này?
                                     </h2>
-                                    <p className={styles.bodyText}>
-                                        {simulation.notice || 'Một cơ hội hoàn hảo để trải nghiệm các công việc thực tế. Thực hành kỹ năng với các nhiệm vụ thực tiễn và tự tin ứng tuyển.'}
-                                    </p>
+                                    {overviewData.introduction && (
+                                        <div
+                                            className={styles.bodyText}
+                                            dangerouslySetInnerHTML={{ __html: overviewData.introduction }}
+                                        />
+                                    )}
 
                                     <div className={styles.tagRow}>
-                                        <span className={styles.tag}>
-                                            ⏱ {simulation.duration || '3–4 giờ'}
-                                        </span>
-                                        <span className={styles.tag}>Không tính điểm</span>
-                                        <span className={styles.tag}>Không áp lực</span>
-                                        <span className={styles.tagOutline}>
-                                            {getLevelLabel(simulation.level)}
-                                        </span>
+                                        {overviewData.bager && overviewData.bager.length > 0 ? (
+                                            overviewData.bager.map((badge, idx) => (
+                                                <span key={idx} className={styles.tagOutline}>
+                                                    {badge}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <>
+                                                <span className={styles.tag}>⏱ {simulation.duration || '3–4 giờ'}</span>
+                                                <span className={styles.tag}>Không tính điểm</span>
+                                                <span className={styles.tag}>Không áp lực</span>
+                                                <span className={styles.tagOutline}>{getLevelLabel(simulation.level)}</span>
+                                            </>
+                                        )}
                                     </div>
                                 </section>
 
-                                {simulation.description && (
+                                {overviewData.content && (
                                     <section className={styles.section}>
-                                        <h2 className={styles.sectionTitle}>Mô tả</h2>
-                                        <p className={styles.bodyText}>{simulation.description}</p>
+                                        <div
+                                            className={styles.bodyText}
+                                            dangerouslySetInnerHTML={{ __html: overviewData.content }}
+                                        />
                                     </section>
                                 )}
 
-                                {simulation?.overview && (
+                                {simulation.videoPath && (
                                     <section className={styles.section}>
-                                        <h2 className={styles.sectionTitle}>Nội dung bạn sẽ học</h2>
-                                        <p className={styles.bodyText}>{simulation.overview}</p>
+                                        <h2 className={styles.sectionTitle}>Video giới thiệu</h2>
+                                        <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+                                            <video
+                                                controls
+                                                style={{ width: '100%', display: 'block' }}
+                                                key={simulation.videoPath}
+                                            >
+                                                <source src={getVideoUrl(simulation.videoPath)} />
+                                                Trình duyệt của bạn không hỗ trợ phát video.
+                                            </video>
+                                        </div>
                                     </section>
                                 )}
-
                             </div>
 
                             {/* SKILLS SIDEBAR */}
@@ -266,11 +376,17 @@ function SimulationDetailDesktop({
                                 <div className={styles.sideCard}>
                                     <div className={styles.sideCardTitle}>Kỹ năng bạn sẽ thực hành</div>
                                     <div className={styles.skillPills}>
-                                        {[ 'Chú ý chi tiết', 'Giải quyết vấn đề', 'Giao tiếp', 'Tư duy phản biện', 'Làm việc nhóm' ].map((s) => (
-                                            <span key={s} className={styles.skillPill}>{s}</span>
-                                        ))}
+                                        {overviewData.skills && overviewData.skills.length > 0 ? (
+                                            overviewData.skills.map((s) => (
+                                                <span key={s} className={styles.skillPill}>{s}</span>
+                                            ))
+                                        ) : (
+                                            <span style={{ opacity: 0.5, fontSize: 13 }}>Chưa có kỹ năng nào.</span>
+                                        )}
                                     </div>
-                                    <button className={styles.sideCardLink}>Xem tất cả kỹ năng →</button>
+                                    {overviewData.skills && overviewData.skills.length > 5 && (
+                                        <button className={styles.sideCardLink}>Xem tất cả kỹ năng →</button>
+                                    )}
                                 </div>
 
                                 <div className={styles.sideCard}>
@@ -280,6 +396,12 @@ function SimulationDetailDesktop({
                                             <span className={styles.infoLabel}>Thời gian</span>
                                             <span className={styles.infoVal}>{simulation?.duration || '—'}</span>
                                         </div>
+                                        {(simulation.category?.name || simulation.category?.label) && (
+                                            <div className={styles.infoRow}>
+                                                <span className={styles.infoLabel}>Chuyên ngành</span>
+                                                <span className={styles.infoVal}>{simulation.category?.name || simulation.category?.label}</span>
+                                            </div>
+                                        )}
                                         <div className={styles.infoRow}>
                                             <span className={styles.infoLabel}>Cấp độ</span>
                                             <span className={styles.infoVal}>{getLevelLabel(simulation.level)}</span>
@@ -290,7 +412,8 @@ function SimulationDetailDesktop({
                                         </div>
                                         <div className={styles.infoRow}>
                                             <span className={styles.infoLabel}>Nhiệm vụ</span>
-                                            <span className={styles.infoVal}>{tasks.length}</span>
+                                            {/* ✅ FIX: hiển thị số task cha */}
+                                            <span className={styles.infoVal}>{parentTaskCount}</span>
                                         </div>
                                     </div>
                                 </div>

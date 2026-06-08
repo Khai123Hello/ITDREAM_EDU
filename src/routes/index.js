@@ -82,7 +82,7 @@ const routes = {
     simulationDetailPage: {
         path: '/simulations/:id',
         component: SimulationDetailContainer,
-        auth: true,
+        auth: null,
         title: 'Chi tiết bài mô phỏng',
     },
     taskDoingPage: {
