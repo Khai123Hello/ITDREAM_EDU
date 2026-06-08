@@ -233,6 +233,11 @@ export default function TaskDoingPage({
     const activeSubtaskIndex = subtasks.findIndex((s) => s.id === selectedSubtaskId);
     const progressPercentage = subtasks.length > 0 && selectedSubtaskId ? ((activeSubtaskIndex + 1) / subtasks.length) * 100 : 0;
 
+    // Khi chọn parent task, cập nhật ID parent task được chọn
+    const handleSelectParentTask = (taskId) => {
+        onSelectParentTask(taskId);
+    };
+
     return (
         <>
             <AppHeader />
@@ -254,7 +259,7 @@ export default function TaskDoingPage({
                                 companyLogo={companyLogo}
                                 parentTasks={parentTasks}
                                 selectedParentTaskId={selectedParentTaskId}
-                                onSelectParentTask={onSelectParentTask}
+                                onSelectParentTask={handleSelectParentTask}
                             />
 
                             {/* Right pane with layout columns */}

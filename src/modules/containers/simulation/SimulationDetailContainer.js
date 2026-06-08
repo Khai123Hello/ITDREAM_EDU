@@ -218,9 +218,12 @@ function SimulationDetailContainer() {
 
         // Navigate to task doing page with simulationEnrollmentId
         navigate(`/simulations/${simulationId}/task`, {
-            state: { simulationEnrollmentId },
+            state: {
+                simulationEnrollmentId,
+                companyLogo: simulationData?.educator?.organization?.logoUrl,
+            },
         });
-    }, [ simulationId, isAuthenticated, isEnrolled, simulationEnrollmentId, navigate ]);
+    }, [ simulationId, isAuthenticated, isEnrolled, simulationEnrollmentId, navigate, simulationData ]);
 
     return (
         <SimulationDetailDesktop

@@ -43,134 +43,147 @@
   flex-direction: column;
   overflow-y: auto;
 }
+/* ── Sidebar logo ── */
 .tfo-sidebar-logo-area {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 24px 0 20px 20px;
-  border-radius: 4px;
+  padding: 20px 20px 16px;
 }
 .tfo-sidebar-logo-img {
-  height: 40px;
+  height: 44px;
   width: auto;
   object-fit: contain;
 }
 .tfo-sidebar-logo-fallback {
   font-size: 20px;
   font-weight: 700;
-  color: #0770E3;
+  color: #c8102e;
   letter-spacing: -0.5px;
 }
+
+/* ── Task list (timeline layout) ── */
 .tfo-task-list {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 8px;
-  gap: 4px;
-}
-.tfo-task-list-item {
-  padding: 12px 16px;
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: #3f3f3f;
-  transition: background 0.15s;
-  text-align: left;
-}
-.tfo-task-list-item:hover {
-  background-color: #f0f0f0;
-}
-.tfo-task-list-item.active {
-  background-color: #e7f5ff;
-  color: #0870e3;
-  font-weight: 600;
+  padding: 8px 16px 16px;
 }
 
-.tfo-task-card {
-  background-color: #f7f7f7;
-  padding: 24px 0 16px 24px;
+.tfo-task-list-row {
   display: flex;
   align-items: flex-start;
+  gap: 12px;
 }
-.tfo-task-number-badge {
-  width: 32px;
-  height: 32px;
-  background-color: #0870e3;
-  border-radius: 16px;
-  border: 2px solid #0870e3;
+
+/* Timeline column */
+.tfo-task-timeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.tfo-task-circle {
+  all: unset;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #c8102e;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #c8102e;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
   z-index: 1;
 }
-.tfo-task-number-badge span {
-  font-weight: 700;
+.tfo-task-circle.active {
+  background: #c8102e;
   color: #ffffff;
-  font-size: 18px;
-  line-height: 26px;
 }
-.tfo-task-card-body {
-  padding: 0 8px 0 16px;
-  flex: 1;
-}
-.tfo-task-label {
-  font-weight: 700;
-  color: #0870e3;
-  font-size: 14px;
-  line-height: 20px;
-}
-.tfo-task-desc {
-  font-weight: 300;
-  color: #3f3f3f;
-  font-size: 12px;
-  line-height: 14px;
-  margin-top: 8px;
-}
-.tfo-task-meta {
-  border-top: 2px dashed #d7d7d7;
-  margin-top: 10px;
-  padding-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.tfo-meta-item {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-weight: 300;
-  color: #3f3f3f;
-  font-size: 12px;
-  line-height: 14px;
-}
-.tfo-meta-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  background: #ccc;
-  border-radius: 2px;
+.tfo-task-circle:hover:not(.active) {
+  background: #fff0f2;
 }
 
+.tfo-task-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 24px;
+  background-color: #e4e4e4;
+  margin: 4px 0;
+}
+
+/* Content column */
+.tfo-task-content-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 20px;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+}
+.tfo-task-content-btn:hover .tfo-task-title:not(.active) {
+  color: #c8102e;
+}
+
+.tfo-task-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.3;
+  transition: color 0.15s;
+}
+.tfo-task-title.active {
+  color: #c8102e;
+}
+
+.tfo-task-short-desc {
+  font-size: 12px;
+  font-weight: 400;
+  color: #555555;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.tfo-task-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #888888;
+  margin-top: 6px;
+}
+.tfo-task-time-icon {
+  flex-shrink: 0;
+}
+
+/* ── Achievements section ── */
 .tfo-achievements {
-  margin: 16px;
+  margin: 8px 16px 16px;
   border-radius: 8px;
   box-shadow: 0px 1px 3px #0000000d;
   background-color: #ffffff;
   overflow: hidden;
+  border: 1px solid #e4e4e4;
 }
 .tfo-achievements-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 12px;
+  padding: 14px 12px;
   background-color: #fbfbfb;
-  border-radius: 8px 8px 0 0;
-  border: 2px solid #e4e4e4;
   cursor: pointer;
+  border-bottom: 1px solid #e4e4e4;
 }
 .tfo-achievements-title {
   font-weight: 700;
@@ -179,21 +192,29 @@
   line-height: 16px;
 }
 .tfo-achievements-body {
-  padding: 10px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-right: 2px solid #e4e4e4;
-  border-bottom: 2px solid #e4e4e4;
-  border-left: 2px solid #e4e4e4;
-  border-radius: 0 0 8px 8px;
+  justify-content: space-between;
+  gap: 8px;
 }
 .tfo-achievements-hint {
-  font-weight: 700;
-  color: #3e3e3e;
-  font-size: 10px;
+  font-weight: 500;
+  color: #555;
+  font-size: 12px;
   line-height: 14px;
 }
+
+/* Legacy classes kept for backward compat */
+.tfo-task-card { display: none; }
+.tfo-task-number-badge { display: none; }
+.tfo-task-card-body { display: none; }
+.tfo-task-label { display: none; }
+.tfo-task-desc { display: none; }
+.tfo-task-meta { display: none; }
+.tfo-meta-item { display: none; }
+.tfo-meta-icon { display: none; }
+.tfo-task-list-item { display: none; }
 
 .tfo-pane {
   flex: 1;

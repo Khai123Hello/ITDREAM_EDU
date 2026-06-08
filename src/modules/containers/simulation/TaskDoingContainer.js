@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
+import useTaskHierarchy from '@hooks/useTaskHierarchy';
 import TaskDoingPage from '@modules/layout/desktop/simulation/TaskDoingPage';
 import { message } from 'antd';
 
@@ -18,6 +19,7 @@ function TaskDoingContainer() {
     const location = useLocation();
     // Get simulationEnrollmentId from location state or route
     const simulationEnrollmentId = location.state?.simulationEnrollmentId;
+    const companyLogo = location.state?.companyLogo;
 
     // State management
     const [ selectedParentTaskId, setSelectedParentTaskId ] = useState(null);
@@ -53,20 +55,7 @@ function TaskDoingContainer() {
         false, // Don't auto-fetch
     );
 
-    // Fetch subtasks of a parent task
-    const {
-        data: subtaskListData,
-        loading: subtaskListLoading,
-        error: subtaskListError,
-        execute: fetchSubtasks,
-    } = useFetch(
-        apiConfig.task.studentList,
-        {
-            params: {},
-            mappingData: (res) => res.data || {},
-        },
-        false, // Don't auto-fetch
-    );
+
 
     // Create task progress when starting a new task
     const { execute: createTaskProgress } = useFetch(
@@ -101,6 +90,7 @@ function TaskDoingContainer() {
         loading: detailLoading,
         error: detailError,
         execute: fetchSubtaskDetail,
+        setData: setSubtaskDetail,
     } = useFetch(
         apiConfig.task.studentGet,
         {
@@ -128,18 +118,10 @@ function TaskDoingContainer() {
         }
     }, [ simulationEnrollmentId, refetchProgress ]);
 
-    // Filter parent tasks from simulation tasks list
-    const { parentTasks, taskProgressMap } = useMemo(() => {
-        const taskList = taskListData?.content || [];
+    // Map task progress by task ID
+    const taskProgressMap = useMemo(() => {
         const progressList = taskProgressData?.content || [];
-        const parents = [];
         const progressMap = {};
-
-        taskList.forEach((task) => {
-            if (task.kind === 1) {
-                parents.push(task);
-            }
-        });
 
         progressList.forEach((progress) => {
             const task = progress.task || {};
@@ -151,57 +133,56 @@ function TaskDoingContainer() {
             };
         });
 
-        return {
-            parentTasks: parents.sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0)),
-            taskProgressMap: progressMap,
-        };
-    }, [ taskListData, taskProgressData ]);
+        return progressMap;
+    }, [ taskProgressData ]);
 
-    // Auto-select first parent task on load
-    const defaultSelectedParentId = useMemo(() => {
-        if (!selectedParentTaskId && parentTasks.length > 0) {
-            return parentTasks[0].id;
-        }
-        return selectedParentTaskId;
-    }, [ parentTasks, selectedParentTaskId ]);
+    // Get parent tasks and subtasks for the selected parent task
+    const { parentTasks, defaultSelectedParentId, subtasks } = useTaskHierarchy(
+        taskListData,
+        selectedParentTaskId,
+    );
 
-    // Fetch subtasks list when parent task changes
+    // eslint-disable-next-line no-console
+    console.log('Danh sách Task Con (Subtasks):', subtasks);
+
+    // Handle subtask selection automatically on parent task or subtasks list changes
+    const prevParentIdRef = React.useRef(defaultSelectedParentId);
     React.useEffect(() => {
-        if (simulationId && defaultSelectedParentId) {
-            fetchSubtasks({
-                params: {
-                    simulationId: parseInt(simulationId),
-                    parentId: defaultSelectedParentId,
-                },
-            });
-        }
-    }, [ simulationId, defaultSelectedParentId, fetchSubtasks ]);
+        const parentChanged = prevParentIdRef.current !== defaultSelectedParentId;
+        prevParentIdRef.current = defaultSelectedParentId;
 
-    // Filter and sort subtasks kind = 2
-    const subtasks = useMemo(() => {
-        const list = subtaskListData?.content || [];
-        return list
-            .filter((t) => t.kind === 2)
-            .sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0));
-    }, [ subtaskListData ]);
-
-    // Auto-select first subtask when subtasks list changes
-    React.useEffect(() => {
-        if (subtasks.length > 0) {
-            setSelectedSubtaskId(subtasks[0].id);
+        if (parentChanged) {
+            // Reset and select the first subtask of the new parent
+            if (subtasks.length > 0) {
+                setSelectedSubtaskId(subtasks[0].id);
+            } else {
+                setSelectedSubtaskId(null);
+            }
         } else {
-            setSelectedSubtaskId(null);
+            // If parent didn't change but subtask list updated (e.g. initial load)
+            // or if there is no current selection, or the selection is not in the subtasks list
+            if (subtasks.length > 0) {
+                const exists = subtasks.some((s) => s.id === selectedSubtaskId);
+                if (!selectedSubtaskId || !exists) {
+                    setSelectedSubtaskId(subtasks[0].id);
+                }
+            } else {
+                setSelectedSubtaskId(null);
+            }
         }
-    }, [ subtasks ]);
+    }, [ defaultSelectedParentId, subtasks, selectedSubtaskId ]);
 
     // Fetch selected subtask details when selectedSubtaskId changes
     React.useEffect(() => {
         if (selectedSubtaskId) {
+            setSubtaskDetail(null);
             fetchSubtaskDetail({
                 pathParams: { id: selectedSubtaskId },
             });
+        } else {
+            setSubtaskDetail(null);
         }
-    }, [ selectedSubtaskId, fetchSubtaskDetail ]);
+    }, [ selectedSubtaskId, fetchSubtaskDetail, setSubtaskDetail ]);
 
     // Get current subtask progress info
     const currentSubtaskProgress = useMemo(() => {
@@ -341,7 +322,7 @@ function TaskDoingContainer() {
         taskNumber: parentTasks.indexOf(selectedParentTask) + 1,
         taskLabel: selectedParentTask?.title || 'Nhiệm vụ',
         taskDescription: selectedParentTask?.description || '',
-        companyLogo: selectedParentTask?.simulation?.educator?.organization?.logoUrl,
+        companyLogo: companyLogo || selectedParentTask?.simulation?.educator?.organization?.logoUrl,
 
         // Subtask navigation
         subtasks: subtasks,
@@ -372,8 +353,8 @@ function TaskDoingContainer() {
         onResetTask: handleResetTask,
     };
 
-    const loading = progressLoading || detailLoading || taskListLoading || subtaskListLoading;
-    const error = progressError || detailError || taskListError || subtaskListError;
+    const loading = progressLoading || detailLoading || taskListLoading;
+    const error = progressError || detailError || taskListError;
 
     // Show error if no simulationEnrollmentId
     if (!simulationEnrollmentId) {
@@ -402,14 +383,6 @@ function TaskDoingContainer() {
                 refetchProgress({
                     params: { simulationEnrollmentId },
                 });
-                if (defaultSelectedParentId) {
-                    fetchSubtasks({
-                        params: {
-                            simulationId: parseInt(simulationId),
-                            parentId: defaultSelectedParentId,
-                        },
-                    });
-                }
                 if (selectedSubtaskId) {
                     fetchSubtaskDetail({
                         pathParams: { id: selectedSubtaskId },

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════
-// TOKENS (Green brand aesthetic)
+// TOKENS (Unified with detail.module.scss)
 // ═══════════════════════════════════════════
 $cream:       #faf9f6;
 $cream2:      #f3f1ec;
@@ -9,15 +9,19 @@ $ink2:        #45433e;
 $ink3:        #8a877f;
 $white:       #ffffff;
 
-$green-brand: #22c55e;
+$green:       #059669;
 $green-dark:  #0f2810;
-$green-light: #f0fdf4;
-$green-soft:  rgba(34, 197, 94, 0.1);
-$green-border:rgba(34, 197, 94, 0.18);
+$green-light: #f2faf4;
+$green-soft:  rgba(5, 150, 105, 0.1);
+$green-border:rgba(5, 150, 105, 0.18);
 
 $font-display: 'Lora', 'Georgia', serif;
 $font-body:    'DM Sans', 'Helvetica Neue', sans-serif;
 $font-mono:    'JetBrains Mono', monospace;
+
+$radius-sm:   6px;
+$radius-md:   10px;
+$radius-lg:   16px;
 
 // ═══════════════════════════════════════════
 // MAIN PANEL
@@ -42,7 +46,7 @@ $font-mono:    'JetBrains Mono', monospace;
     background: $white;
     padding: 16px;
     border: 1px solid $cream3;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
@@ -54,7 +58,7 @@ $font-mono:    'JetBrains Mono', monospace;
     padding: 12px 14px;
     border: 1px solid transparent;
     background: transparent;
-    border-radius: 10px;
+    border-radius: $radius-md;
     cursor: pointer;
     text-align: left;
     font-family: $font-body;
@@ -66,7 +70,7 @@ $font-mono:    'JetBrains Mono', monospace;
     }
 
     &:focus-visible {
-        outline: 2px solid $green-brand;
+        outline: 2px solid $green;
         outline-offset: 2px;
     }
 }
@@ -74,7 +78,7 @@ $font-mono:    'JetBrains Mono', monospace;
 .sidebarItemActive {
     background: $green-light;
     border-color: $green-border;
-    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.06);
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.06);
 
     &:hover {
         background: $green-light;
@@ -99,8 +103,8 @@ $font-mono:    'JetBrains Mono', monospace;
 }
 
 .sidebarBadgeActive {
-    background: $green-brand;
-    border-color: $green-brand;
+    background: $green;
+    border-color: $green;
     color: $white;
 }
 
@@ -111,7 +115,7 @@ $font-mono:    'JetBrains Mono', monospace;
 
     &.sidebarBadgeActive {
         background: $green-soft;
-        color: $green-brand;
+        color: $green;
         border-color: $green-border;
     }
 }
@@ -145,7 +149,7 @@ $font-mono:    'JetBrains Mono', monospace;
     min-width: 0;
     background: $white;
     border: 1px solid $cream3;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     padding: 32px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
 }
@@ -268,7 +272,7 @@ $font-mono:    'JetBrains Mono', monospace;
         }
 
         a {
-            color: $green-brand;
+            color: $green;
             text-decoration: underline;
             font-weight: 600;
 
@@ -295,7 +299,7 @@ $font-mono:    'JetBrains Mono', monospace;
                 content: "•";
                 position: absolute;
                 left: 6px;
-                color: $green-brand;
+                color: $green;
                 font-weight: bold;
             }
 
@@ -313,7 +317,7 @@ $font-mono:    'JetBrains Mono', monospace;
             }
 
             a {
-                color: $green-brand;
+                color: $green;
                 text-decoration: underline;
                 font-weight: 600;
 
@@ -356,7 +360,7 @@ $font-mono:    'JetBrains Mono', monospace;
 .blockSection {
     background: $white;
     border: 1px solid $cream3;
-    border-radius: 12px;
+    border-radius: $radius-lg;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
@@ -397,7 +401,7 @@ $font-mono:    'JetBrains Mono', monospace;
             content: "✓";
             position: absolute;
             left: 0;
-            color: $green-brand;
+            color: $green;
             font-weight: bold;
             font-size: 12px;
         }
@@ -439,12 +443,12 @@ $font-mono:    'JetBrains Mono', monospace;
 }
 
 .blockBulletDot {
-    color: $green-brand;
+    color: $green;
     font-weight: bold;
 }
 
 .blockNumLabel {
-    color: $green-brand;
+    color: $green;
     font-weight: 700;
     font-size: 14px;
 }
@@ -467,7 +471,7 @@ $font-mono:    'JetBrains Mono', monospace;
     align-items: flex-start;
     background: $green-light;
     border: 1px solid $green-border;
-    border-radius: 10px;
+    border-radius: $radius-md;
     padding: 16px;
 }
 
@@ -485,7 +489,7 @@ $font-mono:    'JetBrains Mono', monospace;
 .blockCode {
     background: #0f172a;
     padding: 16px;
-    border-radius: 8px;
+    border-radius: $radius-md;
     overflow-x: auto;
 
     pre {
@@ -515,4 +519,163 @@ $font-mono:    'JetBrains Mono', monospace;
     font-size: 14.5px;
     color: $ink3;
     font-style: italic;
+}
+
+/* ── Sidebar timeline layout ── */
+.sidebarRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sidebarTimeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.sidebarCircle {
+  all: unset;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #c8102e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #c8102e;
+  background: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.sidebarCircleActive {
+  background: #c8102e;
+  color: #ffffff;
+}
+
+.sidebarCircle:hover:not(.sidebarCircleActive) {
+  background: #fff0f2;
+}
+
+.sidebarConnector {
+  width: 2px;
+  flex: 1;
+  min-height: 24px;
+  background-color: #e4e4e4;
+  margin: 4px 0;
+}
+
+/* ── Sidebar content button ── */
+.sidebarContentBtn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 20px;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+}
+
+.sidebarContentBtn:hover .sidebarTitle:not(.sidebarTitleActive) {
+  color: #c8102e;
+}
+
+.sidebarTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.3;
+  transition: color 0.15s;
+}
+
+.sidebarTitleActive {
+  color: #c8102e;
+}
+
+.sidebarDesc {
+  font-size: 12px;
+  font-weight: 400;
+  color: #555555;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.sidebarTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #888888;
+  margin-top: 4px;
+}
+
+/* ── Detail topbar ── */
+.detailTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.detailTopbarLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: #5f5e5e;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 12px;
+}
+
+/* ── Subtask pagination ── */
+.subtaskPagination {
+  display: inline-flex;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e4e4e4;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.subtaskPageBtn {
+  all: unset;
+  box-sizing: border-box;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  background-color: #efefef;
+  font-weight: 500;
+  color: #5f5e5e;
+  font-size: 15px;
+  cursor: pointer;
+  border-right: 1px solid #e4e4e4;
+  transition: background 0.15s;
+}
+
+.subtaskPageBtn:last-child {
+  border-right: none;
+}
+
+.subtaskPageBtn:hover:not(.subtaskPageBtnActive) {
+  background-color: #e0e0e0;
+}
+
+.subtaskPageBtnActive {
+  background-color: #ffffff;
+  color: #0870e3;
+  font-weight: 700;
 }
