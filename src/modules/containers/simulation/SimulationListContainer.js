@@ -12,12 +12,12 @@ import SimulationListDesktop from '@modules/layout/desktop/simulation/Simulation
  */
 function SimulationListContainer() {
     const { params, setQueryParams, deserializeParams } = useQueryParams();
-    const [filters, setFilters] = useState({
+    const [ filters, setFilters ] = useState({
         title: params.get('title') || '',
         level: params.get('level') ? parseInt(params.get('level'), 10) : undefined,
         categoryId: params.get('categoryId') ? parseInt(params.get('categoryId'), 10) : undefined,
     });
-    const [pagination, setPagination] = useState({
+    const [ pagination, setPagination ] = useState({
         pageNumber: params.get('pageNumber') ? parseInt(params.get('pageNumber'), 10) : 0,
         pageSize: params.get('pageSize') ? parseInt(params.get('pageSize'), 10) : 16,
     });
@@ -33,7 +33,7 @@ function SimulationListContainer() {
             ...(filters.level !== undefined && { level: filters.level }),
             ...(filters.categoryId !== undefined && { categoryId: filters.categoryId }),
         }),
-        [pagination, filters],
+        [ pagination, filters ],
     );
 
     const {
@@ -65,7 +65,7 @@ function SimulationListContainer() {
                 pageSize: String(pagination.pageSize),
             });
         },
-        [pagination.pageSize, setQueryParams],
+        [ pagination.pageSize, setQueryParams ],
     );
 
     const handlePaginationChange = useCallback(
@@ -77,17 +77,17 @@ function SimulationListContainer() {
                 pageSize: String(pageSize),
             });
         },
-        [params, setQueryParams],
+        [ params, setQueryParams ],
     );
 
     const handleRetry = useCallback(() => {
         refetchSim();
-    }, [refetchSim]);
+    }, [ refetchSim ]);
 
     // Fetch simulation list on mount and when filters change
     React.useEffect(() => {
         refetchSim();
-    }, [queryParams, refetchSim]);
+    }, [ queryParams, refetchSim ]);
 
     return (
         <>

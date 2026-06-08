@@ -74,7 +74,7 @@ function ActionBar({
             </div>
             <div className={styles.right}>
                 <Link to={createLink} state={{ action: 'create', prevPath: location.pathname }}>
-                    <HasPermission requiredPermissions={[createPermission]}>
+                    <HasPermission requiredPermissions={[ createPermission ]}>
                         <Button className={isMobile ? `${styles.hamburger}` : ''} type="primary" style={style}>
                             <FiPlus /> {intl.formatMessage(message.create, { objectName })}
                         </Button>

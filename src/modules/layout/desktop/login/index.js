@@ -65,7 +65,7 @@ function LoginPageDesktop({
     fieldName = 'email',
     fieldLabel = 'E-mail',
 }) {
-    const [otp, setOtpLocal] = useState('');
+    const [ otp, setOtpLocal ] = useState('');
     const translate = useTranslate();
 
     // Fetch simulations from simulation/guest_list

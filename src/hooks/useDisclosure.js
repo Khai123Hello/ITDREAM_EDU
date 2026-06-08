@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 const useDisclosure = (initialState = false, callbacks) => {
     const { onOpen, onClose } = callbacks || {};
-    const [opened, setOpened] = useState(initialState);
+    const [ opened, setOpened ] = useState(initialState);
 
     const open = useCallback(() => {
         setOpened((isOpened) => {
@@ -12,7 +12,7 @@ const useDisclosure = (initialState = false, callbacks) => {
             }
             return isOpened;
         });
-    }, [onOpen]);
+    }, [ onOpen ]);
 
     const close = useCallback(() => {
         setOpened((isOpened) => {
@@ -22,13 +22,13 @@ const useDisclosure = (initialState = false, callbacks) => {
             }
             return isOpened;
         });
-    }, [onClose]);
+    }, [ onClose ]);
 
     const toggle = useCallback(() => {
         opened ? close() : open();
-    }, [close, open, opened]);
+    }, [ close, open, opened ]);
 
-    return [opened, { open, close, toggle }];
+    return [ opened, { open, close, toggle } ];
 };
 
 export default useDisclosure;

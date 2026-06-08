@@ -1,10 +1,225 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
 import TaskDoingSidebar from './TaskDoingSidebar';
 
 import './TaskDoingPage.scss';
+
+function detectContentType(content) {
+    if (!content || typeof content !== 'string') return 'empty';
+    const trimmed = content.trim();
+    if (trimmed.startsWith('[')) {
+        try {
+            const p = JSON.parse(trimmed);
+            if (Array.isArray(p)) return 'blocks';
+        } catch (e) {
+            // ignore
+        }
+    }
+    if (/^#{1,3}\s|^\*\s|\*\*/m.test(trimmed)) return 'markdown';
+    return 'text';
+}
+
+function parseInline(text) {
+    if (!text) return '';
+    return text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+
+function PlainTextContent({ text }) {
+    return (
+        <div className="tfo-plain-text">
+            {text.split('\n\n').map((para, i) => (
+                <p key={i}>{para.trim()}</p>
+            ))}
+        </div>
+    );
+}
+
+function MarkdownContent({ text }) {
+    const lines = text.split('\n');
+    const elements = [];
+    let listItems = [];
+    let key = 0;
+
+    const flushList = () => {
+        if (listItems.length) {
+            elements.push(
+                <ul key={key++} className="tfo-md-list">
+                    {listItems.map((li, i) => (
+                        <li key={i} dangerouslySetInnerHTML={{ __html: parseInline(li) }} />
+                    ))}
+                </ul>,
+            );
+            listItems = [];
+        }
+    };
+
+    lines.forEach((line) => {
+        const h3 = line.match(/^###\s+(.+)/);
+        const h2 = line.match(/^##\s+(.+)/);
+        const h1 = line.match(/^#\s+(.+)/);
+        const li = line.match(/^\*\s+(.+)/);
+        const blank = line.trim() === '';
+
+        if (h1) {
+            flushList();
+            elements.push(
+                <h2 key={key++} className="tfo-block-h1">
+                    {h1[1]}
+                </h2>,
+            );
+            return;
+        }
+        if (h2) {
+            flushList();
+            elements.push(
+                <h2 key={key++} className="tfo-block-h2">
+                    {h2[1]}
+                </h2>,
+            );
+            return;
+        }
+        if (h3) {
+            flushList();
+            elements.push(
+                <h3 key={key++} className="tfo-block-h3">
+                    {h3[1]}
+                </h3>,
+            );
+            return;
+        }
+        if (li) {
+            listItems.push(li[1]);
+            return;
+        }
+        if (blank) {
+            flushList();
+            return;
+        }
+        flushList();
+        elements.push(
+            <p key={key++} className="tfo-block-text" dangerouslySetInnerHTML={{ __html: parseInline(line) }} />,
+        );
+    });
+    flushList();
+    return <div className="tfo-markdown-content">{elements}</div>;
+}
+
+function BlocksContent({ blocksJson }) {
+    const blocks = useMemo(() => {
+        try {
+            return JSON.parse(blocksJson);
+        } catch {
+            return [];
+        }
+    }, [ blocksJson ]);
+
+    return (
+        <div className="tfo-blocks-content">
+            {blocks.map((block, idx) => (
+                <BlockItem key={idx} block={block} idx={idx} allBlocks={blocks} />
+            ))}
+        </div>
+    );
+}
+
+function BlockItem({ block, idx, allBlocks }) {
+    switch (block.type) {
+                    case 'meta':
+                        return (
+                            <div className="tfo-block-meta">
+                                <span className="tfo-block-meta-val">{block.duration}</span>
+                                <span className="tfo-block-meta-dot">·</span>
+                                <span className="tfo-block-meta-val">{block.level}</span>
+                            </div>
+                        );
+                    case 'section':
+                        return (
+                            <div className="tfo-block-section">
+                                <div className="tfo-block-section-header">
+                                    <span className="tfo-block-section-icon">{block.icon}</span>
+                                    <span className="tfo-block-section-title">{block.title}</span>
+                                </div>
+                                <ul className="tfo-block-section-list">
+                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
+                                        <li key={i}>{b}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    case 'text':
+                        return <p className="tfo-block-text">{block.content}</p>;
+                    case 'h1':
+                        return <h2 className="tfo-block-h1">{block.content}</h2>;
+                    case 'h2':
+                        return <h3 className="tfo-block-h2">{block.content}</h3>;
+                    case 'h3':
+                        return <h4 className="tfo-block-h3">{block.content}</h4>;
+                    case 'bullet':
+                        return (
+                            <div className="tfo-block-bullet-wrap">
+                                <span className="tfo-block-bullet-dot">•</span>
+                                <span className="tfo-block-bullet-text">{block.content}</span>
+                            </div>
+                        );
+                    case 'numbered': {
+                        const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
+                        return (
+                            <div className="tfo-block-bullet-wrap">
+                                <span className="tfo-block-num-label">{num}.</span>
+                                <span className="tfo-block-bullet-text">{block.content}</span>
+                            </div>
+                        );
+                    }
+                    case 'divider':
+                        return <hr className="tfo-block-divider" />;
+                    case 'callout':
+                        return (
+                            <div className="tfo-block-callout">
+                                <span className="tfo-block-callout-icon">{block.icon}</span>
+                                <span className="tfo-block-callout-text">{block.content}</span>
+                            </div>
+                        );
+                    case 'code':
+                        return (
+                            <div className="tfo-block-code">
+                                <pre>{block.content}</pre>
+                            </div>
+                        );
+                    case 'step': {
+                        const renderStepBody = (text) => {
+                            if (!text) return '';
+                            const parts = text.split(/(`[^`]+`)/g);
+                            return parts.map((part, pi) => {
+                                if (part.startsWith('`') && part.endsWith('`')) {
+                                    return <code key={pi}>{part.slice(1, -1)}</code>;
+                                }
+                                return part;
+                            });
+                        };
+                        return (
+                            <div className="tfo-block-step">
+                                <span className="tfo-block-step-label">{block.label}:</span>
+                                <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                            </div>
+                        );
+                    }
+                    default:
+                        return null;
+    }
+}
+
+function ContentRenderer({ content }) {
+    const type = useMemo(() => detectContentType(content), [ content ]);
+    if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
+    if (type === 'blocks') return <BlocksContent blocksJson={content} />;
+    if (type === 'markdown') return <MarkdownContent text={content} />;
+    return <PlainTextContent text={content} />;
+}
 
 /**
  * TaskDoingPage
@@ -19,8 +234,8 @@ import './TaskDoingPage.scss';
  */
 
 function FileDropzone({ onFileChange = () => {} }) {
-    const [dragging, setDragging] = useState(false);
-    const [file, setFile] = useState(null);
+    const [ dragging, setDragging ] = useState(false);
+    const [ file, setFile ] = useState(null);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -148,7 +363,7 @@ export default function TaskDoingPage({
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
         const ext = mediaPath.split('.').pop().toLowerCase();
 
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -156,7 +371,7 @@ export default function TaskDoingPage({
                     </div>
                 </div>
             );
-        } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+        } else if ([ 'mp4', 'webm', 'ogg' ].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -301,11 +516,7 @@ export default function TaskDoingPage({
                                                     </p>
                                                 )}
 
-                                                {taskBody && (
-                                                    <p className="tfo-body-text" style={{ whiteSpace: 'pre-line' }}>
-                                                        {taskBody}
-                                                    </p>
-                                                )}
+                                                {taskBody && <ContentRenderer content={taskBody} />}
 
                                                 {renderMedia()}
 

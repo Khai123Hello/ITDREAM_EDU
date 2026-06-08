@@ -81,7 +81,7 @@ function VideoPlayer({ url, width, height, style, autoPlay = true, muted = false
                 <NotificationElement />
             </>
         );
-    }, [url]);
+    }, [ url ]);
 
     return <>{renderPlayer}</>;
 }

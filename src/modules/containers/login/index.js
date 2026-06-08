@@ -7,7 +7,7 @@ import useForm from 'rc-field-form/lib/useForm';
 
 const LoginPageContainer = () => {
     const navigate = useNavigate();
-    const [form] = useForm();
+    const [ form ] = useForm();
     const { loading, handleLogin } = useAppLogin('student');
 
     const handleForgotPasswordClick = () => {

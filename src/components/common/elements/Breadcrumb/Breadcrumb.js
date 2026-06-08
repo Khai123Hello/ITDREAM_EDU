@@ -43,7 +43,7 @@ function Breadcrumb({
 }) {
     const dropdownContainer = useRef();
 
-    const roleBasedBreadcrumb = [data?.find((item) => item)];
+    const roleBasedBreadcrumb = [ data?.find((item) => item) ];
 
     const breadcrumb = roleBasedBreadcrumb?.data || data;
 

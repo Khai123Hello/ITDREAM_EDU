@@ -3,11 +3,11 @@ import createCtx from '@utils/create-ctx';
 
 import ConfirmModal from './Modal/ConfirmModal';
 
-export const [ConfirmModalProvider, useConfirmModal] = createCtx('ConfirmModal');
+export const [ ConfirmModalProvider, useConfirmModal ] = createCtx('ConfirmModal');
 
 const ConfirmModalWrapper = ({ children }) => {
-    const [open, setModalVisible] = useState(false);
-    const [modalProps, setModalProps] = useState({});
+    const [ open, setModalVisible ] = useState(false);
+    const [ modalProps, setModalProps ] = useState({});
     const showModal = (props) => {
         setModalProps(props);
         setModalVisible(true);

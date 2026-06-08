@@ -4,7 +4,7 @@ import styles from './index.module.scss';
 
 const TOP_CARDS = [
     {
-        badgeDots: ['filled', 'filled2', 'empty', 'empty', 'empty'],
+        badgeDots: [ 'filled', 'filled2', 'empty', 'empty', 'empty' ],
         title: 'Hồ sơ của bạn chưa hoàn thiện',
         description: 'Hồ sơ đầy đủ giúp bạn có cơ hội kết nối với nhà tuyển dụng.',
         link: '/profile',
@@ -38,7 +38,7 @@ const MOCK_RECOMMENDED_SIMS = [
         company: 'BRITISH AIRWAYS',
         companyClass: 'companyBa',
         title: 'Data Science',
-        meta: ['📊 Data & Analytics', '● Trung cấp', '🕐 3–4 giờ'],
+        meta: [ '📊 Data & Analytics', '● Trung cấp', '🕐 3–4 giờ' ],
     },
     {
         id: 2,
@@ -47,7 +47,7 @@ const MOCK_RECOMMENDED_SIMS = [
         company: 'Skyscanner',
         companyClass: 'companySky',
         title: 'Front-End Software Engineering',
-        meta: ['💻 Software Engineering', '● Cơ bản', '🕐 1–2 giờ'],
+        meta: [ '💻 Software Engineering', '● Cơ bản', '🕐 1–2 giờ' ],
     },
 ];
 

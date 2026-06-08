@@ -45,14 +45,14 @@ function RegisterDesktop({ form }) {
     const { getUsernameRules, getFullNameRules, getEmailRules, getPasswordRules, getPhoneRules } =
         useRegisterValidation();
 
-    const [step, setStep] = useState(1);
-    const [idHash, setIdHash] = useState('');
-    const [email, setEmail] = useState('');
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [resendTimer, setResendTimer] = useState(0);
-    const [redirectTimer, setRedirectTimer] = useState(0);
+    const [ step, setStep ] = useState(1);
+    const [ idHash, setIdHash ] = useState('');
+    const [ email, setEmail ] = useState('');
+    const [ otp, setOtp ] = useState([ '', '', '', '', '', '' ]);
+    const [ resendTimer, setResendTimer ] = useState(0);
+    const [ redirectTimer, setRedirectTimer ] = useState(0);
 
-    const otpRefs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
+    const otpRefs = [ useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null) ];
 
     const { execute: executeRegister, loading: loadingRegister } = useFetch(apiConfig.student.register);
     const { execute: executeVerify, loading: loadingVerify } = useFetch(apiConfig.account.verify);
@@ -69,7 +69,7 @@ function RegisterDesktop({ form }) {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [resendTimer]);
+    }, [ resendTimer ]);
 
     // Countdown for login redirect
     useEffect(() => {
@@ -89,7 +89,7 @@ function RegisterDesktop({ form }) {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [step, redirectTimer, navigate]);
+    }, [ step, redirectTimer, navigate ]);
 
     // Auto-focus first input when entering step 2
     useEffect(() => {
@@ -100,7 +100,7 @@ function RegisterDesktop({ form }) {
                 }
             }, 100);
         }
-    }, [step]);
+    }, [ step ]);
 
     const handleRegisterSubmit = (values) => {
         const payload = {
@@ -185,7 +185,7 @@ function RegisterDesktop({ form }) {
                 if (returnedIdHash) {
                     setIdHash(returnedIdHash);
                     setResendTimer(60);
-                    setOtp(['', '', '', '', '', '']);
+                    setOtp([ '', '', '', '', '', '' ]);
                     setTimeout(() => {
                         if (otpRefs[0]?.current) {
                             otpRefs[0].current.focus();
@@ -205,7 +205,7 @@ function RegisterDesktop({ form }) {
 
     const handleOtpChange = (e, index) => {
         const val = e.target.value.replace(/\D/g, '');
-        const newOtp = [...otp];
+        const newOtp = [ ...otp ];
         newOtp[index] = val;
         setOtp(newOtp);
 

@@ -76,13 +76,13 @@ export const oldPasswordValidator = async (_, value, form, translate) => {
                 form.setFields([
                     {
                         name: 'password',
-                        errors: [translate.formatMessage(commonMessage.required)],
+                        errors: [ translate.formatMessage(commonMessage.required) ],
                     },
                 ]);
             }, 0);
         } else {
             setTimeout(() => {
-                form.setFields([{ name: 'password', errors: [] }]);
+                form.setFields([ { name: 'password', errors: [] } ]);
             }, 0);
         }
 
@@ -99,7 +99,7 @@ export const passwordValidatorWithOldPassword = async (_, value, form, translate
                 form.setFields([
                     {
                         name: 'oldPassword',
-                        errors: [translate.formatMessage(commonMessage.required)],
+                        errors: [ translate.formatMessage(commonMessage.required) ],
                     },
                 ]);
             }, 0);
@@ -115,7 +115,7 @@ export const passwordValidatorWithOldPassword = async (_, value, form, translate
         }
 
         setTimeout(() => {
-            form.setFields([{ name: 'oldPassword', errors: [] }]);
+            form.setFields([ { name: 'oldPassword', errors: [] } ]);
         }, 0);
 
         resolve();

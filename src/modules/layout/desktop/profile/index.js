@@ -65,8 +65,8 @@ const ProfileComponent = (props) => {
         user?.gender === MALE
             ? translate.formatMessage(commonMessage.male)
             : user?.gender
-              ? translate.formatMessage(commonMessage.female)
-              : '';
+                ? translate.formatMessage(commonMessage.female)
+                : '';
     const navigation = useNavigate();
     const params = useParams();
 
@@ -77,7 +77,7 @@ const ProfileComponent = (props) => {
         setIsChangedFormValues,
     });
 
-    const [imageUrl, setImageUrl] = useState(null);
+    const [ imageUrl, setImageUrl ] = useState(null);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
 
@@ -122,7 +122,7 @@ const ProfileComponent = (props) => {
         if (imageUrl) {
             form.setFieldValue('avatarPath', imageUrl);
         }
-    }, [imageUrl]);
+    }, [ imageUrl ]);
 
     const onFinish = () => {
         const values = form.getFieldsValue();
@@ -140,7 +140,7 @@ const ProfileComponent = (props) => {
     };
 
     const editingFieldRef = useRef(null);
-    const [editingField, setEditingField] = useState(null);
+    const [ editingField, setEditingField ] = useState(null);
 
     useEffect(() => {
         if (user) {
@@ -159,7 +159,7 @@ const ProfileComponent = (props) => {
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
         }
-    }, [user, form, editingField]);
+    }, [ user, form, editingField ]);
 
     const handleSetEditingField = (field) => {
         if (editingFieldRef.current === field) {

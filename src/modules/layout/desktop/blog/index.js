@@ -3,18 +3,18 @@ import React, { useMemo, useState } from 'react';
 import styles from './index.module.scss';
 
 function BlogListDesktop({ categories, blogs, loading, selectedCategory, onCategoryChange }) {
-    const [currentPage, setCurrentPage] = useState(0);
+    const [ currentPage, setCurrentPage ] = useState(0);
     const itemsPerPage = 8;
 
     const filteredBlogs = useMemo(() => {
         if (!selectedCategory) return blogs;
         return blogs.filter((blog) => blog.category?.id === selectedCategory);
-    }, [blogs, selectedCategory]);
+    }, [ blogs, selectedCategory ]);
 
     const paginatedBlogs = useMemo(() => {
         const start = currentPage * itemsPerPage;
         return filteredBlogs.slice(start, start + itemsPerPage);
-    }, [filteredBlogs, currentPage]);
+    }, [ filteredBlogs, currentPage ]);
 
     const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
 
