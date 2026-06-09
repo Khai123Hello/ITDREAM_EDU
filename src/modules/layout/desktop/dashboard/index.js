@@ -88,7 +88,7 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
     return (
         <div className={styles.container}>
             <main className={styles.main}>
-                <h1 className={styles.greeting}>Xin chào{name ? `, ${name.split(' ')[0]}!` : '!'}</h1>
+                <h1 className={styles.greeting}>Xin chào{name ? `, ${name}!` : '!'}</h1>
 
                 <div className={styles.topCards}>
                     {TOP_CARDS.map((card, idx) => (
