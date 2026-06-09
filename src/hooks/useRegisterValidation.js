@@ -11,7 +11,8 @@ const messages = defineMessages({
     errorPassword: 'Mật khẩu phải chứa ít nhất 6 ký tự!',
     errorPhone: 'Số điện thoại phải bắt đầu bằng số 0 và có đúng 10 chữ số!',
     errorEmail: 'Email không đúng định dạng! Vui lòng kiểm tra lại.',
-    errorUsernamePattern: 'Tên đăng nhập phải từ 8-20 ký tự, không bắt đầu/kết thúc bằng ký tự đặc biệt và không chứa ký tự đặc biệt đứng liền nhau.',
+    errorUsernamePattern:
+        'Tên đăng nhập phải từ 8-20 ký tự, không bắt đầu/kết thúc bằng ký tự đặc biệt và không chứa ký tự đặc biệt đứng liền nhau.',
 });
 
 export default function useRegisterValidation() {

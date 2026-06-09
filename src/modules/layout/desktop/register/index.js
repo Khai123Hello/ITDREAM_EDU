@@ -42,13 +42,8 @@ const message = defineMessages({
 function RegisterDesktop({ form }) {
     const translate = useTranslate();
     const navigate = useNavigate();
-    const {
-        getUsernameRules,
-        getFullNameRules,
-        getEmailRules,
-        getPasswordRules,
-        getPhoneRules,
-    } = useRegisterValidation();
+    const { getUsernameRules, getFullNameRules, getEmailRules, getPasswordRules, getPhoneRules } =
+        useRegisterValidation();
 
     const [ step, setStep ] = useState(1);
     const [ idHash, setIdHash ] = useState('');
@@ -57,14 +52,7 @@ function RegisterDesktop({ form }) {
     const [ resendTimer, setResendTimer ] = useState(0);
     const [ redirectTimer, setRedirectTimer ] = useState(0);
 
-    const otpRefs = [
-        useRef(null),
-        useRef(null),
-        useRef(null),
-        useRef(null),
-        useRef(null),
-        useRef(null),
-    ];
+    const otpRefs = [ useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null) ];
 
     const { execute: executeRegister, loading: loadingRegister } = useFetch(apiConfig.student.register);
     const { execute: executeVerify, loading: loadingVerify } = useFetch(apiConfig.account.verify);
@@ -140,7 +128,10 @@ function RegisterDesktop({ form }) {
                 }
             },
             onError: (err) => {
-                const errMsg = err?.response?.data?.message || err?.message || 'Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.';
+                const errMsg =
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    'Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.';
                 toast.error(errMsg);
             },
         });
@@ -172,7 +163,8 @@ function RegisterDesktop({ form }) {
                 }
             },
             onError: (err) => {
-                const errMsg = err?.response?.data?.message || err?.message || 'Xác thực không thành công. Vui lòng thử lại.';
+                const errMsg =
+                    err?.response?.data?.message || err?.message || 'Xác thực không thành công. Vui lòng thử lại.';
                 toast.error(errMsg);
             },
         });

@@ -57,7 +57,7 @@ const useAppLogin = (role = 'student') => {
                 setLoadingProfileFetch(true);
 
                 const profileConfig = apiConfig.account.getProfileStudent;
-                
+
                 const apiFetchProfile = {
                     baseURL: profileConfig.baseURL,
                     method: profileConfig.method,
@@ -74,7 +74,7 @@ const useAppLogin = (role = 'student') => {
                         headers: apiFetchProfile.headers,
                     });
                     const profileData = await profileRes.json();
-                    
+
                     setLoadingProfileFetch(false);
                     if (profileData && (profileData.result === true || profileData.data !== undefined)) {
                         const payload = profileData.data !== undefined ? profileData : { data: profileData };

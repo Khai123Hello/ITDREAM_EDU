@@ -36,9 +36,7 @@ const useTaskHierarchy = (taskListData, selectedParentTaskId) => {
         });
 
         // Convert map to array and sort by orderInParent
-        return Array.from(parentMap.values()).sort(
-            (a, b) => (a.orderInParent || 0) - (b.orderInParent || 0),
-        );
+        return Array.from(parentMap.values()).sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0));
     }, [ taskListData ]);
 
     // Determine the active parent ID (fallback to the first parent in the list if none selected)

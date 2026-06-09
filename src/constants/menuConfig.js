@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiShield, FiSliders,FiTrendingUp, FiUser, FiUserCheck, FiUsers } from 'react-icons/fi';
+import { FiShield, FiSliders, FiTrendingUp, FiUser, FiUserCheck, FiUsers } from 'react-icons/fi';
 import { FormattedMessage } from 'react-intl';
 import { ReactComponent as Colection } from '@assets/icons/colection.svg';
 import { ReactComponent as Order } from '@assets/icons/order.svg';

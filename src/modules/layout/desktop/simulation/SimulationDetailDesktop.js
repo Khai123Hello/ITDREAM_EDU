@@ -19,7 +19,11 @@ const parseOverviewData = (overviewStr) => {
     if (typeof overviewStr === 'object') {
         return {
             introduction: overviewStr.introduction || '',
-            bager: Array.isArray(overviewStr.bager) ? overviewStr.bager : (Array.isArray(overviewStr.barger) ? overviewStr.barger : fallbackTemplate.bager),
+            bager: Array.isArray(overviewStr.bager)
+                ? overviewStr.bager
+                : Array.isArray(overviewStr.barger)
+                    ? overviewStr.barger
+                    : fallbackTemplate.bager,
             content: overviewStr.content || '',
             skills: Array.isArray(overviewStr.skills) ? overviewStr.skills : fallbackTemplate.skills,
         };
@@ -31,13 +35,13 @@ const parseOverviewData = (overviewStr) => {
                 introduction: parsed.introduction || parsed.hero?.description || '',
                 bager: Array.isArray(parsed.bager)
                     ? parsed.bager
-                    : (Array.isArray(parsed.barger)
+                    : Array.isArray(parsed.barger)
                         ? parsed.barger
-                        : (Array.isArray(parsed.hero?.badges) ? parsed.hero.badges : fallbackTemplate.bager)),
+                        : Array.isArray(parsed.hero?.badges)
+                            ? parsed.hero.badges
+                            : fallbackTemplate.bager,
                 content: parsed.content || parsed.intro?.content || '',
-                skills: Array.isArray(parsed.skills)
-                    ? parsed.skills
-                    : fallbackTemplate.skills,
+                skills: Array.isArray(parsed.skills) ? parsed.skills : fallbackTemplate.skills,
             };
         }
     } catch (e) {
@@ -101,62 +105,66 @@ function SimulationDetailDesktop({
     }, [ tasks, activeTaskId ]);
 
     // ✅ FIX: đếm task cha (kind=1) để hiển thị số nhiệm vụ đúng
-    const parentTaskCount = useMemo(
-        () => tasks.filter((t) => t.kind === 1).length,
-        [ tasks ],
-    );
+    const parentTaskCount = useMemo(() => tasks.filter((t) => t.kind === 1).length, [ tasks ]);
 
     const overviewData = useMemo(() => parseOverviewData(simulation.overview), [ simulation.overview ]);
 
     const handleTaskSelect = (taskId) => setActiveTaskId(taskId);
 
     const getLevelLabel = (level) =>
-        ({ 0: 'Giới thiệu', 1: 'Cơ bản', 2: 'Trung cấp', 3: 'Nâng cao' }[level] ?? 'Giới thiệu');
+        ({ 0: 'Giới thiệu', 1: 'Cơ bản', 2: 'Trung cấp', 3: 'Nâng cao' })[level] ?? 'Giới thiệu';
 
     const getStarCount = (avgStar) => Math.round(avgStar || 0);
 
     /* ── Loading ── */
-    if (loading) return (
-        <>
-            <AppHeader />
-            <div className={styles.stateWrap}>
-                <Spin size="large" />
-            </div>
-            <AppFooter />
-        </>
-    );
+    if (loading)
+        return (
+            <>
+                <AppHeader />
+                <div className={styles.stateWrap}>
+                    <Spin size="large" />
+                </div>
+                <AppFooter />
+            </>
+        );
 
     /* ── Error ── */
-    if (error) return (
-        <>
-            <AppHeader />
-            <div className={styles.stateWrap}>
-                <Empty description="Không tải được dữ liệu" />
-                <button className={styles.retryBtn} onClick={onRetry}>Thử lại</button>
-            </div>
-            <AppFooter />
-        </>
-    );
+    if (error)
+        return (
+            <>
+                <AppHeader />
+                <div className={styles.stateWrap}>
+                    <Empty description="Không tải được dữ liệu" />
+                    <button className={styles.retryBtn} onClick={onRetry}>
+                        Thử lại
+                    </button>
+                </div>
+                <AppFooter />
+            </>
+        );
 
     /* ── CTA button logic ── */
     const renderCtaButton = () => {
-        if (isEnrolled) return (
-            <button className={`${styles.ctaBtn} ${styles.ctaBtnSuccess}`} onClick={onStartTask}>
-                <span className={styles.ctaBtnIcon}>▶</span>
-                Tiếp tục học
-            </button>
-        );
-        if (!isAuthenticated) return (
-            <button className={styles.ctaBtn} onClick={onLogin} disabled={enrollmentLoading}>
-                {enrollmentLoading ? <span className={styles.spinner} /> : null}
-                Đăng nhập để tham gia
-            </button>
-        );
-        if (!isStudent) return (
-            <button className={`${styles.ctaBtn} ${styles.ctaBtnDisabled}`} disabled>
-                Chỉ dành cho học viên
-            </button>
-        );
+        if (isEnrolled)
+            return (
+                <button className={`${styles.ctaBtn} ${styles.ctaBtnSuccess}`} onClick={onStartTask}>
+                    <span className={styles.ctaBtnIcon}>▶</span>
+                    Tiếp tục học
+                </button>
+            );
+        if (!isAuthenticated)
+            return (
+                <button className={styles.ctaBtn} onClick={onLogin} disabled={enrollmentLoading}>
+                    {enrollmentLoading ? <span className={styles.spinner} /> : null}
+                    Đăng nhập để tham gia
+                </button>
+            );
+        if (!isStudent)
+            return (
+                <button className={`${styles.ctaBtn} ${styles.ctaBtnDisabled}`} disabled>
+                    Chỉ dành cho học viên
+                </button>
+            );
         return (
             <button className={styles.ctaBtn} onClick={onEnroll} disabled={enrollmentLoading}>
                 {enrollmentLoading ? <span className={styles.spinner} /> : null}
@@ -168,22 +176,22 @@ function SimulationDetailDesktop({
     const TABS = [
         { key: 'overview', label: 'Tổng quan' },
         // ✅ FIX: dùng parentTaskCount thay vì tasks.length
-        { key: 'tasks',    label: `Nhiệm vụ${parentTaskCount ? ` (${parentTaskCount})` : ''}` },
-        { key: 'reviews',  label: 'Đánh giá' },
+        { key: 'tasks', label: `Nhiệm vụ${parentTaskCount ? ` (${parentTaskCount})` : ''}` },
+        { key: 'reviews', label: 'Đánh giá' },
     ];
 
     return (
         <>
             <AppHeader />
             <div className={styles.page}>
-
                 {/* ══ HERO ══ */}
                 <section className={styles.hero}>
                     <div className={styles.heroBg}>
-                        {simulation.thumbnail
-                            ? <img src={getImageUrl(simulation.thumbnail)} alt="" className={styles.heroBgImg} />
-                            : <div className={styles.heroBgGradient} />
-                        }
+                        {simulation.thumbnail ? (
+                            <img src={getImageUrl(simulation.thumbnail)} alt="" className={styles.heroBgImg} />
+                        ) : (
+                            <div className={styles.heroBgGradient} />
+                        )}
                         <div className={styles.heroBgOverlay} />
                     </div>
 
@@ -197,24 +205,35 @@ function SimulationDetailDesktop({
                                         className={styles.orgLogo}
                                     />
                                     <span className={styles.orgName}>
-                                        {simulation.educator.organization.shortName || simulation.educator.organization.name}
+                                        {simulation.educator.organization.shortName ||
+                                            simulation.educator.organization.name}
                                     </span>
                                 </div>
                             )}
 
-                            <h1 className={styles.heroTitle}>
-                                {simulation?.title || 'Bài mô phỏng'}
-                            </h1>
+                            <h1 className={styles.heroTitle}>{simulation?.title || 'Bài mô phỏng'}</h1>
 
                             <p className={styles.heroNotice}>
-                                {simulation?.description || simulation?.notice || 'Trải nghiệm các tình huống công việc thực tế'}
+                                {simulation?.description ||
+                                    simulation?.notice ||
+                                    'Trải nghiệm các tình huống công việc thực tế'}
                             </p>
 
                             <div className={styles.heroMeta}>
                                 {(simulation.category?.name || simulation.category?.label) && (
                                     <>
                                         <span className={styles.heroMetaItem}>
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}>
+                                            <svg
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                style={{ marginRight: 4 }}
+                                            >
                                                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                                                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                                             </svg>
@@ -225,23 +244,38 @@ function SimulationDetailDesktop({
                                 )}
                                 <span className={styles.heroMetaItem}>
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.4"/>
-                                        <path d="M7 4.5V7l1.5 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                                        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.4" />
+                                        <path
+                                            d="M7 4.5V7l1.5 1.5"
+                                            stroke="currentColor"
+                                            strokeWidth="1.4"
+                                            strokeLinecap="round"
+                                        />
                                     </svg>
                                     {simulation?.duration || 'Tự hoàn thành'}
                                 </span>
                                 <span className={styles.heroMetaDot} />
                                 <span className={styles.heroMetaItem}>
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                        <path d="M7 1.5l1.5 3 3.5.5-2.5 2.5.5 3.5L7 9.5l-3 1.5.5-3.5L2 5l3.5-.5z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+                                        <path
+                                            d="M7 1.5l1.5 3 3.5.5-2.5 2.5.5 3.5L7 9.5l-3 1.5.5-3.5L2 5l3.5-.5z"
+                                            stroke="currentColor"
+                                            strokeWidth="1.3"
+                                            strokeLinejoin="round"
+                                        />
                                     </svg>
                                     Miễn phí
                                 </span>
                                 <span className={styles.heroMetaDot} />
                                 <span className={styles.heroMetaItem}>
                                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                        <path d="M2 11c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-                                        <circle cx="7" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.4"/>
+                                        <path
+                                            d="M2 11c0-2.2 2.2-4 5-4s5 1.8 5 4"
+                                            stroke="currentColor"
+                                            strokeWidth="1.4"
+                                            strokeLinecap="round"
+                                        />
+                                        <circle cx="7" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.4" />
                                     </svg>
                                     {simulation?.totalParticipant?.toLocaleString() || 0} học viên
                                 </span>
@@ -286,8 +320,8 @@ function SimulationDetailDesktop({
 
                             <p className={styles.enrollNote}>
                                 {isEnrolled
-                                    // ✅ FIX: hiển thị số task cha, không phải tổng tasks
-                                    ? `${parentTaskCount} nhiệm vụ · ${simulation?.duration || ''}`
+                                    ? // ✅ FIX: hiển thị số task cha, không phải tổng tasks
+                                    `${parentTaskCount} nhiệm vụ · ${simulation?.duration || ''}`
                                     : 'Hoàn toàn miễn phí · Không cần thẻ tín dụng'}
                             </p>
                         </div>
@@ -311,13 +345,15 @@ function SimulationDetailDesktop({
 
                 {/* ══ CONTENT ══ */}
                 <main className={styles.main}>
-
                     {/* OVERVIEW */}
                     {activeTab === 'overview' && (
                         <div className={styles.overviewLayout}>
                             <div className={styles.overviewBody}>
                                 <section className={styles.section}>
-                                    <h2 className={styles.sectionTitle} style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                                    <h2
+                                        className={styles.sectionTitle}
+                                        style={{ fontSize: '24px', fontWeight: 'bold' }}
+                                    >
                                         Tại sao nên hoàn thành bài mô phỏng công việc này?
                                     </h2>
                                     {overviewData.introduction && (
@@ -336,10 +372,14 @@ function SimulationDetailDesktop({
                                             ))
                                         ) : (
                                             <>
-                                                <span className={styles.tag}>⏱ {simulation.duration || '3–4 giờ'}</span>
+                                                <span className={styles.tag}>
+                                                    ⏱ {simulation.duration || '3–4 giờ'}
+                                                </span>
                                                 <span className={styles.tag}>Không tính điểm</span>
                                                 <span className={styles.tag}>Không áp lực</span>
-                                                <span className={styles.tagOutline}>{getLevelLabel(simulation.level)}</span>
+                                                <span className={styles.tagOutline}>
+                                                    {getLevelLabel(simulation.level)}
+                                                </span>
                                             </>
                                         )}
                                     </div>
@@ -357,7 +397,15 @@ function SimulationDetailDesktop({
                                 {simulation.videoPath && (
                                     <section className={styles.section}>
                                         <h2 className={styles.sectionTitle}>Video giới thiệu</h2>
-                                        <div style={{ position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+                                        <div
+                                            style={{
+                                                position: 'relative',
+                                                width: '100%',
+                                                borderRadius: 12,
+                                                overflow: 'hidden',
+                                                boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                                            }}
+                                        >
                                             <video
                                                 controls
                                                 style={{ width: '100%', display: 'block' }}
@@ -378,7 +426,9 @@ function SimulationDetailDesktop({
                                     <div className={styles.skillPills}>
                                         {overviewData.skills && overviewData.skills.length > 0 ? (
                                             overviewData.skills.map((s) => (
-                                                <span key={s} className={styles.skillPill}>{s}</span>
+                                                <span key={s} className={styles.skillPill}>
+                                                    {s}
+                                                </span>
                                             ))
                                         ) : (
                                             <span style={{ opacity: 0.5, fontSize: 13 }}>Chưa có kỹ năng nào.</span>
@@ -399,7 +449,9 @@ function SimulationDetailDesktop({
                                         {(simulation.category?.name || simulation.category?.label) && (
                                             <div className={styles.infoRow}>
                                                 <span className={styles.infoLabel}>Chuyên ngành</span>
-                                                <span className={styles.infoVal}>{simulation.category?.name || simulation.category?.label}</span>
+                                                <span className={styles.infoVal}>
+                                                    {simulation.category?.name || simulation.category?.label}
+                                                </span>
                                             </div>
                                         )}
                                         <div className={styles.infoRow}>
@@ -408,7 +460,9 @@ function SimulationDetailDesktop({
                                         </div>
                                         <div className={styles.infoRow}>
                                             <span className={styles.infoLabel}>Học viên</span>
-                                            <span className={styles.infoVal}>{simulation?.totalParticipant?.toLocaleString() || 0}</span>
+                                            <span className={styles.infoVal}>
+                                                {simulation?.totalParticipant?.toLocaleString() || 0}
+                                            </span>
                                         </div>
                                         <div className={styles.infoRow}>
                                             <span className={styles.infoLabel}>Nhiệm vụ</span>
@@ -442,32 +496,57 @@ function SimulationDetailDesktop({
                     {activeTab === 'reviews' && (
                         <div className={styles.reviewsLayout}>
                             <div className={styles.reviewsSummary}>
-                                <div className={styles.reviewsScore}>
-                                    {simulation?.avgStar?.toFixed(1) || '—'}
-                                </div>
+                                <div className={styles.reviewsScore}>{simulation?.avgStar?.toFixed(1) || '—'}</div>
                                 <div className={styles.reviewsStars}>
-                                    {[ 1,2,3,4,5 ].map((n) => (
+                                    {[ 1, 2, 3, 4, 5 ].map((n) => (
                                         <span
                                             key={n}
-                                            className={n <= getStarCount(simulation?.avgStar) ? styles.starFilled : styles.starEmpty}
-                                        >★</span>
+                                            className={
+                                                n <= getStarCount(simulation?.avgStar)
+                                                    ? styles.starFilled
+                                                    : styles.starEmpty
+                                            }
+                                        >
+                                            ★
+                                        </span>
                                     ))}
                                 </div>
-                                <div className={styles.reviewsTotal}>
-                                    {simulation?.totalParticipant || 0} đánh giá
-                                </div>
+                                <div className={styles.reviewsTotal}>{simulation?.totalParticipant || 0} đánh giá</div>
                             </div>
 
                             <div className={styles.reviewsCarousel}>
                                 <button className={styles.reviewArrow}>
-                                    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11L5 7l4-4"/></svg>
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 14 14"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                    >
+                                        <path d="M9 11L5 7l4-4" />
+                                    </svg>
                                 </button>
                                 <blockquote className={styles.reviewQuote}>
-                                    <p>&quot;Bài mô phỏng rất hấp dẫn và thực tế. Tôi đã học được nhiều kỹ năng quý giá áp dụng trực tiếp vào công việc.&quot;</p>
-                                    <footer>— Học viên từ {simulation.educator?.organization?.name || 'cộng đồng'}</footer>
+                                    <p>
+                                        &quot;Bài mô phỏng rất hấp dẫn và thực tế. Tôi đã học được nhiều kỹ năng quý giá
+                                        áp dụng trực tiếp vào công việc.&quot;
+                                    </p>
+                                    <footer>
+                                        — Học viên từ {simulation.educator?.organization?.name || 'cộng đồng'}
+                                    </footer>
                                 </blockquote>
                                 <button className={styles.reviewArrow}>
-                                    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 3l4 4-4 4"/></svg>
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 14 14"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                    >
+                                        <path d="M5 3l4 4-4 4" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -477,7 +556,9 @@ function SimulationDetailDesktop({
                 {/* ══ BOTTOM CTA ══ */}
                 <div className={styles.bottomCta}>
                     <span>Chưa tìm thấy bài mô phỏng phù hợp?</span>
-                    <a href="/" className={styles.bottomCtaLink}>Xem các bài khác →</a>
+                    <a href="/" className={styles.bottomCtaLink}>
+                        Xem các bài khác →
+                    </a>
                 </div>
             </div>
             <AppFooter />

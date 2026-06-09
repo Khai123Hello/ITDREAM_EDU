@@ -99,8 +99,8 @@ function SimulationListDesktop({
                 <p className={styles.heroLabel}>Nền tảng học tập</p>
                 <h1 className={styles.heroTitle}>Các bài mô phỏng</h1>
                 <p className={styles.heroSubtitle}>
-                    Khám phá các bài mô phỏng thực tế từ doanh nghiệp hàng đầu để rèn luyện kỹ năng và nổi bật với nhà tuyển
-                    dụng.
+                    Khám phá các bài mô phỏng thực tế từ doanh nghiệp hàng đầu để rèn luyện kỹ năng và nổi bật với nhà
+                    tuyển dụng.
                 </p>
 
                 {/* SEARCH BAR */}

@@ -23,10 +23,21 @@ const message = defineMessages({
 
 const getCategoryInfo = (title, index) => {
     const lowerTitle = (title || '').toLowerCase();
-    if (lowerTitle.includes('data') || lowerTitle.includes('analyst') || lowerTitle.includes('analytics') || lowerTitle.includes('chart')) {
+    if (
+        lowerTitle.includes('data') ||
+        lowerTitle.includes('analyst') ||
+        lowerTitle.includes('analytics') ||
+        lowerTitle.includes('chart')
+    ) {
         return { label: 'Data Analyst', icon: <TbChartDots /> };
     }
-    if (lowerTitle.includes('security') || lowerTitle.includes('pentest') || lowerTitle.includes('audit') || lowerTitle.includes('shield') || lowerTitle.includes('hack')) {
+    if (
+        lowerTitle.includes('security') ||
+        lowerTitle.includes('pentest') ||
+        lowerTitle.includes('audit') ||
+        lowerTitle.includes('shield') ||
+        lowerTitle.includes('hack')
+    ) {
         return { label: 'Security', icon: <TbShieldLock /> };
     }
     if (index === 1) return { label: 'Data Analyst', icon: <TbChartDots /> };
@@ -141,9 +152,7 @@ function LoginPageDesktop({
                             </div>
                         </div>
 
-                        <div className={styles.copyright}>
-                            © 2026 ITDream — Nền tảng mô phỏng ngành nghề IT
-                        </div>
+                        <div className={styles.copyright}>© 2026 ITDream — Nền tảng mô phỏng ngành nghề IT</div>
                     </div>
 
                     <div className={styles.right}>
@@ -157,7 +166,7 @@ function LoginPageDesktop({
                             Trải nghiệm thực tế tại các công ty công nghệ hàng đầu Việt Nam.
                         </div>
                         <div className={styles.rightDivider} />
-                        
+
                         {displaySimulations.length > 0 ? (
                             displaySimulations.slice(0, 3).map((item, index) => {
                                 const cat = getCategoryInfo(item.title, index);
@@ -179,15 +188,14 @@ function LoginPageDesktop({
                             <div className={styles.rightInfoBlock}>
                                 <div className={styles.rightInfoTitle}>💡 Học qua trải nghiệm</div>
                                 <div className={styles.rightInfoText}>
-                                    Thực hành các dự án mô phỏng thực tế từ doanh nghiệp. Rèn luyện kỹ năng chuyên môn, quy trình làm việc thực tế và sẵn sàng cho sự nghiệp IT.
+                                    Thực hành các dự án mô phỏng thực tế từ doanh nghiệp. Rèn luyện kỹ năng chuyên môn,
+                                    quy trình làm việc thực tế và sẵn sàng cho sự nghiệp IT.
                                 </div>
                             </div>
                         )}
 
                         <div className={styles.rightDivider} />
-                        <div className={styles.rightMotto}>
-                            Thực học · Thực hành · Thực nghiệp
-                        </div>
+                        <div className={styles.rightMotto}>Thực học · Thực hành · Thực nghiệp</div>
                     </div>
                 </div>
             ) : (
@@ -215,11 +223,7 @@ function LoginPageDesktop({
                             />
                         </div>
                         <Flex gap={15}>
-                            <Button
-                                loading={loading}
-                                className={styles.btn}
-                                buttonType="submit"
-                            >
+                            <Button loading={loading} className={styles.btn} buttonType="submit">
                                 {translate.formatMessage(message.continue)}
                             </Button>
                         </Flex>

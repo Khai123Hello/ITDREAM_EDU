@@ -69,13 +69,45 @@ function MarkdownContent({ text }) {
         const li = line.match(/^\*\s+(.+)/);
         const blank = line.trim() === '';
 
-        if (h1) { flushList(); elements.push(<h2 key={key++} className={styles.mdH1}>{h1[1]}</h2>); return; }
-        if (h2) { flushList(); elements.push(<h2 key={key++} className={styles.mdH2}>{h2[1]}</h2>); return; }
-        if (h3) { flushList(); elements.push(<h3 key={key++} className={styles.mdH3}>{h3[1]}</h3>); return; }
-        if (li) { listItems.push(li[1]); return; }
-        if (blank) { flushList(); return; }
+        if (h1) {
+            flushList();
+            elements.push(
+                <h2 key={key++} className={styles.mdH1}>
+                    {h1[1]}
+                </h2>,
+            );
+            return;
+        }
+        if (h2) {
+            flushList();
+            elements.push(
+                <h2 key={key++} className={styles.mdH2}>
+                    {h2[1]}
+                </h2>,
+            );
+            return;
+        }
+        if (h3) {
+            flushList();
+            elements.push(
+                <h3 key={key++} className={styles.mdH3}>
+                    {h3[1]}
+                </h3>,
+            );
+            return;
+        }
+        if (li) {
+            listItems.push(li[1]);
+            return;
+        }
+        if (blank) {
+            flushList();
+            return;
+        }
         flushList();
-        elements.push(<p key={key++} className={styles.mdPara} dangerouslySetInnerHTML={{ __html: parseInline(line) }} />);
+        elements.push(
+            <p key={key++} className={styles.mdPara} dangerouslySetInnerHTML={{ __html: parseInline(line) }} />,
+        );
     });
     flushList();
     return <div className={styles.markdownContent}>{elements}</div>;
@@ -86,7 +118,11 @@ function MarkdownContent({ text }) {
 // ─────────────────────────────────────────
 function BlocksContent({ blocksJson }) {
     const blocks = useMemo(() => {
-        try { return JSON.parse(blocksJson); } catch { return []; }
+        try {
+            return JSON.parse(blocksJson);
+        } catch {
+            return [];
+        }
     }, [ blocksJson ]);
 
     return (
@@ -116,14 +152,20 @@ function BlockItem({ block, idx, allBlocks }) {
                                     <span className={styles.blockSectionTitle}>{block.title}</span>
                                 </div>
                                 <ul className={styles.blockSectionList}>
-                                    {(block.bullets || []).filter(Boolean).map((b, i) => <li key={i}>{b}</li>)}
+                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
+                                        <li key={i}>{b}</li>
+                                    ))}
                                 </ul>
                             </div>
                         );
-                    case 'text': return <p className={styles.blockText}>{block.content}</p>;
-                    case 'h1':   return <h2 className={styles.blockH1}>{block.content}</h2>;
-                    case 'h2':   return <h3 className={styles.blockH2}>{block.content}</h3>;
-                    case 'h3':   return <h4 className={styles.blockH3}>{block.content}</h4>;
+                    case 'text':
+                        return <p className={styles.blockText}>{block.content}</p>;
+                    case 'h1':
+                        return <h2 className={styles.blockH1}>{block.content}</h2>;
+                    case 'h2':
+                        return <h3 className={styles.blockH2}>{block.content}</h3>;
+                    case 'h3':
+                        return <h4 className={styles.blockH3}>{block.content}</h4>;
                     case 'bullet':
                         return (
                             <div className={styles.blockBulletWrap}>
@@ -140,7 +182,8 @@ function BlockItem({ block, idx, allBlocks }) {
                             </div>
                         );
                     }
-                    case 'divider': return <hr className={styles.blockDivider} />;
+                    case 'divider':
+                        return <hr className={styles.blockDivider} />;
                     case 'callout':
                         return (
                             <div className={styles.blockCallout}>
@@ -149,7 +192,11 @@ function BlockItem({ block, idx, allBlocks }) {
                             </div>
                         );
                     case 'code':
-                        return <div className={styles.blockCode}><pre>{block.content}</pre></div>;
+                        return (
+                            <div className={styles.blockCode}>
+                                <pre>{block.content}</pre>
+                            </div>
+                        );
                     case 'step':
                         return (
                             <div className={styles.blockStep}>
@@ -157,7 +204,8 @@ function BlockItem({ block, idx, allBlocks }) {
                                 <span className={styles.blockStepBody}>{block.body}</span>
                             </div>
                         );
-                    default: return null;
+                    default:
+                        return null;
     }
 }
 
@@ -166,8 +214,8 @@ function BlockItem({ block, idx, allBlocks }) {
 // ─────────────────────────────────────────
 function ContentRenderer({ content }) {
     const type = useMemo(() => detectContentType(content), [ content ]);
-    if (type === 'empty')   return <p className={styles.emptyContent}>Không có nội dung.</p>;
-    if (type === 'blocks')  return <BlocksContent blocksJson={content} />;
+    if (type === 'empty') return <p className={styles.emptyContent}>Không có nội dung.</p>;
+    if (type === 'blocks') return <BlocksContent blocksJson={content} />;
     if (type === 'markdown') return <MarkdownContent text={content} />;
     return <PlainTextContent text={content} />;
 }
@@ -187,9 +235,7 @@ function ContentRenderer({ content }) {
 function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
     // Tách task cha (kind=1) và subtask (kind=2)
     const parentTasks = useMemo(
-        () => tasks
-            .filter((t) => t.kind === 1)
-            .sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0)),
+        () => tasks.filter((t) => t.kind === 1).sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0)),
         [ tasks ],
     );
 
@@ -213,9 +259,7 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
 
     // Task cha đang active — dùng activeTaskId từ prop (trỏ đến kind=1)
     // hoặc fallback về task cha đầu tiên
-    const [ activeParentId, setActiveParentId ] = useState(
-        () => activeTaskId ?? parentTasks[0]?.id ?? null,
-    );
+    const [ activeParentId, setActiveParentId ] = useState(() => activeTaskId ?? parentTasks[0]?.id ?? null);
 
     // Subtask đang active (kind=2)
     const [ activeSubId, setActiveSubId ] = useState(() => {
@@ -244,7 +288,7 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
 
     // Subtasks của task cha đang chọn
     const currentSubTasks = useMemo(
-        () => (activeParentId != null ? subTaskMap[activeParentId] ?? [] : []),
+        () => (activeParentId != null ? (subTaskMap[activeParentId] ?? []) : []),
         [ activeParentId, subTaskMap ],
     );
 
@@ -312,7 +356,13 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
                                     <span className={styles.sidebarTime}>
                                         <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                                             <circle cx="7" cy="7" r="6" stroke="#888" strokeWidth="1.2" />
-                                            <path d="M7 4v3.5l2 1.5" stroke="#888" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path
+                                                d="M7 4v3.5l2 1.5"
+                                                stroke="#888"
+                                                strokeWidth="1.2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
                                         </svg>
                                         {task.estimatedTime}
                                     </span>
@@ -330,9 +380,9 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
                         {/* Topbar: tên task cha + pagination subtasks */}
                         <div className={styles.detailTopbar}>
                             <span className={styles.detailTopbarLabel}>
-                                {parentTasks.find((p) => p.id === activeParentId)?.title
-                                    || parentTasks.find((p) => p.id === activeParentId)?.name
-                                    || ''}
+                                {parentTasks.find((p) => p.id === activeParentId)?.title ||
+                                    parentTasks.find((p) => p.id === activeParentId)?.name ||
+                                    ''}
                             </span>
 
                             {currentSubTasks.length > 1 && (
@@ -358,9 +408,7 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
 
                         {/* Subtask content */}
                         <div className={styles.detailContent}>
-                            <h1 className={styles.detailTitle}>
-                                {activeSubTask.title || activeSubTask.name}
-                            </h1>
+                            <h1 className={styles.detailTitle}>{activeSubTask.title || activeSubTask.name}</h1>
                             {activeSubTask.description && (
                                 <p className={styles.detailDescription}>{activeSubTask.description}</p>
                             )}
@@ -374,9 +422,7 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
                         return parent ? (
                             <div className={styles.detailContent}>
                                 <h1 className={styles.detailTitle}>{parent.title || parent.name}</h1>
-                                {parent.description && (
-                                    <p className={styles.detailDescription}>{parent.description}</p>
-                                )}
+                                {parent.description && <p className={styles.detailDescription}>{parent.description}</p>}
                                 <ContentRenderer content={parent.content} />
                             </div>
                         ) : (

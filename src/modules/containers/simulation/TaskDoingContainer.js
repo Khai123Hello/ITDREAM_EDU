@@ -55,8 +55,6 @@ function TaskDoingContainer() {
         false, // Don't auto-fetch
     );
 
-
-
     // Create task progress when starting a new task
     const { execute: createTaskProgress } = useFetch(
         apiConfig.taskProgress.create,
@@ -137,10 +135,7 @@ function TaskDoingContainer() {
     }, [ taskProgressData ]);
 
     // Get parent tasks and subtasks for the selected parent task
-    const { parentTasks, defaultSelectedParentId, subtasks } = useTaskHierarchy(
-        taskListData,
-        selectedParentTaskId,
-    );
+    const { parentTasks, defaultSelectedParentId, subtasks } = useTaskHierarchy(taskListData, selectedParentTaskId);
 
     // eslint-disable-next-line no-console
     console.log('Danh sách Task Con (Subtasks):', subtasks);
@@ -331,7 +326,7 @@ function TaskDoingContainer() {
 
         // Content
         pageTitle: selectedParentTask?.title || 'Nhiệm vụ',
-        taskHeading: subtaskDetail?.title || 'Đang tải...',
+        taskHeading: subtasks.length > 0 ? subtaskDetail?.title || 'Đang tải...' : 'Không Có Bài Học',
         taskBody: subtaskDetail?.content || '',
         taskDescriptionContent: subtaskDetail?.description || '',
         mediaPath: subtaskDetail?.imagePath || subtaskDetail?.videoPath || subtaskDetail?.filePath,
