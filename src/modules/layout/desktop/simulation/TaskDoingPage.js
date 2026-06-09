@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
@@ -294,38 +294,69 @@ function ContentRenderer({ content }) {
 
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
 
-function FileDropzone({ onFileChange = () => {} }) {
+function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
     const [ dragging, setDragging ] = useState(false);
     const [ file, setFile ]         = useState(null);
 
+    useEffect(() => {
+        setFile(null);
+    }, [ previousFile ]);
+
     const handleDrop = (e) => {
         e.preventDefault();
+        if (disabled) return;
         setDragging(false);
         const f = e.dataTransfer.files?.[0];
         if (f) { setFile(f); onFileChange(f); }
     };
 
     const handleChange = (e) => {
+        if (disabled) return;
         const f = e.target.files?.[0];
         if (f) { setFile(f); onFileChange(f); }
     };
 
+    const getFileName = (path) => {
+        if (!path) return '';
+        const parts = path.split('/');
+        return decodeURIComponent(parts[parts.length - 1]);
+    };
+
+    const displayFileName = file ? file.name : (previousFile ? getFileName(previousFile) : '');
+
     return (
-        <div className="tfo-upload-card">
+        <div className={`tfo-upload-card${disabled ? ' disabled' : ''}`}>
             <div className="tfo-upload-label">Nộp Bài Làm Của Bạn</div>
             <label
-                className={`tfo-dropzone${dragging ? ' dragging' : ''}`}
-                onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                className={`tfo-dropzone${dragging ? ' dragging' : ''}${disabled ? ' disabled' : ''}`}
+                onDragOver={(e) => {
+                    e.preventDefault();
+                    if (!disabled) setDragging(true);
+                }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={handleDrop}
             >
-                <input type="file" style={{ display: 'none' }} onChange={handleChange} />
+                {!disabled && <input type="file" style={{ display: 'none' }} onChange={handleChange} />}
                 <svg className="tfo-dropzone-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 1v10M4 5l4-4 4 4" stroke="#5f5e5e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="#5f5e5e" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
-                {file ? (
-                    <span className="tfo-file-chosen">{file.name}</span>
+                {displayFileName ? (
+                    <span className="tfo-file-chosen">
+                        {previousFile && !file ? (
+                            <a
+                                href={previousFile.startsWith('http') ? previousFile : `${urlBase}${previousFile}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="tfo-file-download-link"
+                            >
+                                {displayFileName} (Tải xuống)
+                            </a>
+                        ) : (
+                            displayFileName
+                        )}
+                    </span>
                 ) : (
                     <>
                         <span className="tfo-dropzone-select">Chọn một tệp</span>
@@ -400,7 +431,17 @@ export default function TaskDoingPage({
     onStartTask     = () => {},
     onCompleteTask  = () => {},
     onResetTask     = () => {},
+    requiresFileUpload = false,
+    requiresTextResponse = false,
+    previousFile = null,
+    previousText = '',
+    onTextResponseSubmit = () => {},
 }) {
+    const [ textInput, setTextInput ] = useState('');
+
+    useEffect(() => {
+        setTextInput(previousText || '');
+    }, [ previousText ]);
     const renderMedia = () => {
         if (!mediaPath) return null;
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
@@ -578,9 +619,39 @@ export default function TaskDoingPage({
                                                     )}
                                                 </div>
 
-                                                <div className="tfo-upload-section">
-                                                    <FileDropzone onFileChange={onFileChange} />
-                                                </div>
+                                                {requiresFileUpload && (
+                                                    <div className="tfo-upload-section">
+                                                        <FileDropzone
+                                                            onFileChange={onFileChange}
+                                                            previousFile={previousFile}
+                                                            urlBase={urlBase}
+                                                            disabled={taskStatus !== 'in_progress'}
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {requiresTextResponse && (
+                                                    <div className="tfo-text-response-section">
+                                                        <div className="tfo-text-response-label">Câu trả lời của bạn</div>
+                                                        <textarea
+                                                            className="tfo-text-response-textarea"
+                                                            placeholder="Nhập câu trả lời của bạn ở đây..."
+                                                            value={textInput}
+                                                            onChange={(e) => setTextInput(e.target.value)}
+                                                            disabled={taskStatus !== 'in_progress'}
+                                                            rows={6}
+                                                        />
+                                                        <div className="tfo-text-response-footer">
+                                                            <button
+                                                                className="tfo-action-btn tfo-action-btn-primary tfo-text-submit-btn"
+                                                                onClick={() => onTextResponseSubmit(textInput)}
+                                                                disabled={taskStatus !== 'in_progress' || !textInput.trim()}
+                                                            >
+                                                                Nộp câu trả lời
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

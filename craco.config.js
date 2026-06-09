@@ -40,4 +40,20 @@ module.exports = {
     webpack: {
         alias: resolvedAliases,
     },
+    jest: {
+        configure: (jestConfig) => {
+            const jestAliases = Object.keys(resolvedAliases).reduce((acc, key) => {
+                const folder = key.slice(1); // remove '@'
+                acc[`^${key}/(.*)$`] = `<rootDir>/src/${folder}/$1`;
+                acc[`^${key}$`] = `<rootDir>/src/${folder}`;
+                return acc;
+            }, {});
+            jestConfig.moduleNameMapper = {
+                ...jestConfig.moduleNameMapper,
+                ...jestAliases,
+                '^axios$': '<rootDir>/node_modules/axios/dist/node/axios.cjs',
+            };
+            return jestConfig;
+        },
+    },
 };

@@ -216,6 +216,11 @@ const apiConfig = {
             method: 'GET',
             headers: baseHeader,
         },
+        studentGet: {
+            baseURL: `${apiUrl}v1/task_progress/student_get/:id`,
+            method: 'GET',
+            headers: baseHeader,
+        },
     },
     achievement: {
         studentList: {
@@ -434,6 +439,13 @@ const apiConfig = {
         otp: {
             baseURL: `${apiUrl}v1/student/verify`,
             method: `POST`,
+            headers: baseHeader,
+        },
+    },
+    questionQuizHistory: {
+        create: {
+            baseURL: `${apiUrl}v1/question_quiz_history/create`,
+            method: 'POST',
             headers: baseHeader,
         },
     },

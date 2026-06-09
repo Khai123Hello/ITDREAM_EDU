@@ -98,6 +98,23 @@ function TaskDoingContainer() {
         false, // Don't auto-fetch
     );
 
+    // Fetch task progress detail (for submissions)
+    const {
+        data: progressDetail,
+        loading: progressDetailLoading,
+        execute: fetchProgressDetail,
+    } = useFetch(
+        apiConfig.taskProgress.studentGet,
+        {
+            pathParams: { id: '' },
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    const { execute: uploadFile } = useFetch(apiConfig.file.upload, {}, false);
+    const { execute: createQuizHistory } = useFetch(apiConfig.questionQuizHistory.create, {}, false);
+
     // Load task list on mount
     React.useEffect(() => {
         if (simulationId) {
@@ -293,10 +310,112 @@ function TaskDoingContainer() {
         }
     }, [ selectedSubtaskId, simulationEnrollmentId, resetTaskProgress, refetchProgress ]);
 
+    // Load progress detail when taskProgressId changes
+    React.useEffect(() => {
+        if (currentSubtaskProgress?.taskProgressId) {
+            fetchProgressDetail({
+                pathParams: { id: currentSubtaskProgress.taskProgressId },
+            });
+        }
+    }, [ currentSubtaskProgress?.taskProgressId, fetchProgressDetail ]);
+
+    // Parse subtask name
+    const subtaskName = subtaskDetail?.name || '';
+    const { requiresFileUpload, requiresTextResponse } = useMemo(() => {
+        const match = subtaskName.match(/^SUB_T(\d+)_S(\d+)(_.*)?$/);
+        if (match) {
+            const suffix = match[3] || '';
+            return {
+                requiresFileUpload: suffix === '_FILE' || suffix === '_FILE_TEXT',
+                requiresTextResponse: suffix === '_TEXT' || suffix === '_FILE_TEXT',
+            };
+        }
+        return {
+            requiresFileUpload: false,
+            requiresTextResponse: false,
+        };
+    }, [ subtaskName ]);
+
+    // Extract previous submissions
+    const submissions = useMemo(() => {
+        return progressDetail?.studentSubmission?.content || [];
+    }, [ progressDetail ]);
+
+    const previousFile = useMemo(() => {
+        if (!requiresFileUpload) return null;
+        const found = submissions.find((s) => !s.taskQuestion && (s.answer?.includes('/') || s.answer?.includes('.')));
+        return found ? found.answer : null;
+    }, [ submissions, requiresFileUpload ]);
+
+    const previousText = useMemo(() => {
+        if (!requiresTextResponse) return '';
+        const found = submissions.find((s) => !s.taskQuestion && !(s.answer?.includes('/') || s.answer?.includes('.')));
+        return found ? found.answer : '';
+    }, [ submissions, requiresTextResponse ]);
+
     // Handle file upload
-    const handleFileUpload = useCallback(() => {
-        // TODO: Implement file upload to submission endpoint
-    }, []);
+    const handleFileUpload = useCallback(async (file) => {
+        if (!currentSubtaskProgress?.taskProgressId) {
+            message.error('Vui lòng bắt đầu nhiệm vụ trước khi nộp bài!');
+            return;
+        }
+        try {
+            const uploadRes = await uploadFile({
+                data: {
+                    file,
+                    type: 'DOCUMENT',
+                },
+            });
+            if (uploadRes?.result === true) {
+                const filePath = uploadRes.data.filePath;
+                // Save to student submission
+                const submitRes = await createQuizHistory({
+                    dataBody: {
+                        studentTaskProgressId: currentSubtaskProgress.taskProgressId,
+                        taskQuestionId: null,
+                        answer: filePath,
+                        isCorrect: true,
+                    },
+                });
+                if (submitRes) {
+                    message.success('Tải file lên và lưu bài làm thành công!');
+                    fetchProgressDetail({
+                        pathParams: { id: currentSubtaskProgress.taskProgressId },
+                    });
+                }
+            } else {
+                message.error('Tải file lên thất bại. Vui lòng thử lại!');
+            }
+        } catch (err) {
+            message.error('Có lỗi xảy ra khi tải file!');
+        }
+    }, [ currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail ]);
+
+    // Handle text response submit
+    const handleTextResponseSubmit = useCallback(async (text) => {
+        if (!currentSubtaskProgress?.taskProgressId) {
+            message.error('Vui lòng bắt đầu nhiệm vụ trước khi nộp bài!');
+            return;
+        }
+        try {
+            const submitRes = await createQuizHistory({
+                dataBody: {
+                    studentTaskProgressId: currentSubtaskProgress.taskProgressId,
+                    taskQuestionId: null,
+                    answer: text,
+                    isCorrect: true,
+                },
+            });
+            if (submitRes) {
+                message.success('Lưu câu trả lời thành công!');
+                fetchProgressDetail({
+                    pathParams: { id: currentSubtaskProgress.taskProgressId },
+                });
+            }
+        } catch (err) {
+            message.error('Có lỗi xảy ra khi lưu câu trả lời!');
+        }
+    }, [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail ]);
 
     // Get selected parent task details
     const selectedParentTask = useMemo(() => {
@@ -342,13 +461,18 @@ function TaskDoingContainer() {
         canGoNext,
         onBack: handleBack,
         onNext: handleNext,
+        requiresFileUpload,
+        requiresTextResponse,
+        previousFile,
+        previousText,
         onFileChange: handleFileUpload,
+        onTextResponseSubmit: handleTextResponseSubmit,
         onStartTask: handleStartTask,
         onCompleteTask: handleCompleteTask,
         onResetTask: handleResetTask,
     };
 
-    const loading = progressLoading || detailLoading || taskListLoading;
+    const loading = progressLoading || detailLoading || taskListLoading || progressDetailLoading;
     const error = progressError || detailError || taskListError;
 
     // Show error if no simulationEnrollmentId

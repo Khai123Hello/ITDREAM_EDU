@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/static/css/main.c138cd93.css",
-    "main.js": "/static/js/main.09a78b72.js",
-    "static/js/453.d8e9a53b.chunk.js": "/static/js/453.d8e9a53b.chunk.js",
+    "main.css": "/static/css/main.9936de0a.css",
+    "main.js": "/static/js/main.946347ac.js",
+    "static/js/206.165013e2.chunk.js": "/static/js/206.165013e2.chunk.js",
     "static/media/SF-Pro-Display-Semibold.otf": "/static/media/SF-Pro-Display-Semibold.f50e0151c241f0e9d573.otf",
     "static/media/SF-Pro-Display-Medium.otf": "/static/media/SF-Pro-Display-Medium.e1d844da0ee028d4e288.otf",
     "static/media/SF-Pro-Display-Heavy.otf": "/static/media/SF-Pro-Display-Heavy.a48bcc073f92987abb91.otf",
@@ -20,13 +20,10 @@
     "static/media/eye.svg": "/static/media/eye.f340030e5b0a64254af1094d58755cc3.svg",
     "index.html": "/index.html",
     "static/media/closeModal.svg": "/static/media/closeModal.b21c7968e3ac1e119067c71a46ad68c3.svg",
-    "static/media/search-normal.svg": "/static/media/search-normal.f16304f6268c23f846c10284a4574db4.svg",
-    "main.c138cd93.css.map": "/static/css/main.c138cd93.css.map",
-    "main.09a78b72.js.map": "/static/js/main.09a78b72.js.map",
-    "453.d8e9a53b.chunk.js.map": "/static/js/453.d8e9a53b.chunk.js.map"
+    "static/media/search-normal.svg": "/static/media/search-normal.f16304f6268c23f846c10284a4574db4.svg"
   },
   "entrypoints": [
-    "static/css/main.c138cd93.css",
-    "static/js/main.09a78b72.js"
+    "static/css/main.9936de0a.css",
+    "static/js/main.946347ac.js"
   ]
 }
