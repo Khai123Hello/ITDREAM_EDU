@@ -12,9 +12,10 @@ const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, path
             setLoading(true);
             setError(null);
             try {
+                const requestData = payload.dataBody !== undefined ? payload.dataBody : dataBody;
                 const { data, status } = await sendRequest(
                     apiConfig,
-                    { params, pathParams, data: dataBody, ...payload },
+                    { params, pathParams, data: requestData, ...payload },
                     cancelType,
                 );
                 if (status !== 200) {

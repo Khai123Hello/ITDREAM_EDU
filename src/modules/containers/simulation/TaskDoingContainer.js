@@ -6,6 +6,54 @@ import useTaskHierarchy from '@hooks/useTaskHierarchy';
 import TaskDoingPage from '@modules/layout/desktop/simulation/TaskDoingPage';
 import { message } from 'antd';
 
+const parseSubtaskName = (name = '') => {
+    const match = name.match(/^SUB_T(\d+)_S(\d+)(_.*)?$/);
+    if (!match) return null;
+
+    const suffix = match[3] || '';
+    return {
+        parentOrder: parseInt(match[1], 10),
+        subtaskOrder: parseInt(match[2], 10),
+        suffix,
+        requiresFileUpload: suffix === '_FILE' || suffix === '_FILE_TEXT',
+        requiresTextResponse: suffix === '_TEXT' || suffix === '_FILE_TEXT',
+    };
+};
+
+const getSubmissionAnswer = (submission = {}) => submission.answer || submission.answear || '';
+
+const getSubmissions = (progressDetail = {}) => {
+    if (Array.isArray(progressDetail?.studentSubmission?.content)) {
+        return progressDetail.studentSubmission.content;
+    }
+    if (Array.isArray(progressDetail?.content)) {
+        return progressDetail.content;
+    }
+    return [];
+};
+
+const getTaskQuestionId = (taskQuestion = {}) => taskQuestion?.id || taskQuestion?.taskQuestionId || null;
+
+const extractQuizBlocks = (content) => {
+    if (!content || typeof content !== 'string') return [];
+
+    try {
+        const blocks = JSON.parse(content.trim());
+        if (!Array.isArray(blocks)) return [];
+        return blocks.filter((block) => block?.type === 'quiz');
+    } catch {
+        return [];
+    }
+};
+
+const getQuizQuestionId = (block = {}) => (
+    block.taskQuestionId ||
+    block.questionId ||
+    block.taskQuestion?.id ||
+    block.id ||
+    null
+);
+
 /**
  * TaskDoingContainer
  * Manages task doing flow:
@@ -13,6 +61,11 @@ import { message } from 'antd';
  * - Map task data from task_progress API response
  * - Handle task lifecycle (start, complete, reset)
  * - Manage step navigation within subtasks
+ *
+ * Progress Init (Case 1.1): If studentList returns empty, auto-create progress for first parent task + first subtask.
+ * Progress Resume (Case 1.2): If studentList has data, find SUB_Tx_Sy with highest x, y to resume.
+ * Complete (Case 2): On "Continue", validate freeform + quiz submissions before calling complete API.
+ * Reset (Case 3): Call reset API to clear all answers, then refetch.
  */
 function TaskDoingContainer() {
     const { id: simulationId } = useParams();
@@ -65,7 +118,7 @@ function TaskDoingContainer() {
             params: {},
             mappingData: (res) => res.data || {},
         },
-        false, // Don't auto-fetch
+        false,
     );
 
     // Fetch task progress list for current enrollment
@@ -80,7 +133,7 @@ function TaskDoingContainer() {
             params: {},
             mappingData: (res) => res.data || {},
         },
-        false, // Don't auto-fetch
+        false,
     );
 
     // Create task progress when starting a new task
@@ -89,7 +142,7 @@ function TaskDoingContainer() {
         {
             mappingData: (res) => res.data || {},
         },
-        false, // Don't auto-fetch
+        false,
     );
 
     // Complete task progress
@@ -98,16 +151,7 @@ function TaskDoingContainer() {
         {
             mappingData: (res) => res.data || {},
         },
-        false, // Don't auto-fetch
-    );
-
-    // Reset task progress
-    const { execute: resetTaskProgress } = useFetch(
-        apiConfig.taskProgress.reset,
-        {
-            mappingData: (res) => res.data || {},
-        },
-        false, // Don't auto-fetch
+        false,
     );
 
     // Fetch selected subtask detail
@@ -123,7 +167,7 @@ function TaskDoingContainer() {
             pathParams: { id: selectedSubtaskId || '' },
             mappingData: (res) => res.data || {},
         },
-        false, // Don't auto-fetch
+        false,
     );
 
     // Fetch task progress detail (for submissions)
@@ -131,6 +175,7 @@ function TaskDoingContainer() {
         data: progressDetail,
         loading: progressDetailLoading,
         execute: fetchProgressDetail,
+        setData: setProgressDetail,
     } = useFetch(
         apiConfig.taskProgress.studentGet,
         {
@@ -161,9 +206,10 @@ function TaskDoingContainer() {
         }
     }, [ simulationEnrollmentId, refetchProgress ]);
 
+    const progressList = useMemo(() => taskProgressData?.content || [], [ taskProgressData ]);
+
     // Map task progress by task ID
     const taskProgressMap = useMemo(() => {
-        const progressList = taskProgressData?.content || [];
         const progressMap = {};
 
         progressList.forEach((progress) => {
@@ -173,42 +219,154 @@ function TaskDoingContainer() {
                 taskProgressId: progress.id,
                 status: progress.status, // 'not_started', 'in_progress', 'completed'
                 errorCount: progress.errorCount || 0,
+                task: progress.task,
             };
         });
 
         return progressMap;
-    }, [ taskProgressData ]);
+    }, [ progressList ]);
 
     // Get parent tasks and subtasks for the selected parent task
     const { parentTasks, defaultSelectedParentId, subtasks } = useTaskHierarchy(taskListData, selectedParentTaskId);
 
-    // eslint-disable-next-line no-console
-    console.log('Danh sách Task Con (Subtasks):', subtasks);
+    const initializedProgressRef = React.useRef(false);
+    const appliedResumeRef = React.useRef(false);
+
+    const ensureTaskProgress = useCallback(async (taskId) => {
+        if (!taskId) return null;
+
+        const existing = taskProgressMap[taskId];
+        if (existing?.taskProgressId) {
+            return existing;
+        }
+
+        const result = await createTaskProgress({
+            dataBody: {
+                simulationEnrollmentId,
+                taskId,
+            },
+        });
+
+        return result?.id ? { taskProgressId: result.id, status: result.status || 'in_progress' } : null;
+    }, [ createTaskProgress, simulationEnrollmentId, taskProgressMap ]);
+
+    /**
+     * Case 1.1: Nếu studentList trả về rỗng (Học viên chưa làm Simulation),
+     * tự động tạo tiến độ cho Task Cha đầu tiên và Task Con đầu tiên của nó.
+     */
+    React.useEffect(() => {
+        if (
+            initializedProgressRef.current ||
+            !simulationEnrollmentId ||
+            taskListLoading ||
+            progressLoading ||
+            parentTasks.length === 0 ||
+            !taskProgressData
+        ) {
+            return;
+        }
+
+        const initializeFirstProgress = async () => {
+            initializedProgressRef.current = true;
+
+            // Nếu progressList đã có dữ liệu, không cần tạo mới tiến độ đầu tiên
+            if (progressList.length > 0) {
+                return;
+            }
+
+            const firstParentTask = parentTasks[0];
+            const firstSubtask = subtasks[0];
+
+            if (!firstParentTask || !firstSubtask) {
+                return;
+            }
+
+            try {
+                // Tạo tiến độ cho Task Cha đầu tiên
+                await ensureTaskProgress(firstParentTask.id);
+                // Tạo tiến độ cho Task Con đầu tiên của Task Cha đó
+                await ensureTaskProgress(firstSubtask.id);
+                setSelectedParentTaskId(firstParentTask.id);
+                setSelectedSubtaskId(firstSubtask.id);
+                refetchProgress({
+                    params: { simulationEnrollmentId },
+                });
+            } catch {
+                message.error('Không thể khởi tạo tiến độ bài học. Vui lòng thử lại');
+            }
+        };
+
+        initializeFirstProgress();
+    }, [
+        ensureTaskProgress,
+        parentTasks,
+        progressList,
+        progressLoading,
+        refetchProgress,
+        simulationEnrollmentId,
+        subtasks,
+        taskListLoading,
+        taskProgressData,
+    ]);
+
+    /**
+     * Case 1.2: Nếu studentList đã có dữ liệu, tìm tiến trình gần nhất
+     * bằng cách tìm SUB_Tx_Sy có x, y cao nhất để resume đúng vị trí.
+     */
+    React.useEffect(() => {
+        if (
+            appliedResumeRef.current ||
+            progressList.length === 0 ||
+            parentTasks.length === 0 ||
+            !taskListData
+        ) {
+            return;
+        }
+
+        // Sort: parentOrder giảm dần, subtaskOrder tăng dần -> phần tử cuối có x cao nhất, y cao nhất trong x đó
+        const sortedProgress = progressList
+            .map((progress) => ({
+                progress,
+                parsed: parseSubtaskName(progress.task?.name),
+            }))
+            .filter((item) => item.parsed)
+            .sort((a, b) => {
+                if (a.parsed.parentOrder !== b.parsed.parentOrder) {
+                    return a.parsed.parentOrder - b.parsed.parentOrder;
+                }
+                return a.parsed.subtaskOrder - b.parsed.subtaskOrder;
+            });
+
+        if (sortedProgress.length === 0) {
+            return;
+        }
+
+        // Phần tử cuối cùng có x, y cao nhất
+        const latestItem = sortedProgress[sortedProgress.length - 1];
+        const latestTask = latestItem.progress.task;
+
+        if (!latestTask?.id) {
+            return;
+        }
+
+        appliedResumeRef.current = true;
+        const parentId = latestTask.parent?.id || latestTask.parentId || latestTask.taskId;
+
+        if (parentId) {
+            setSelectedParentTaskId(parentId);
+        }
+        setSelectedSubtaskId(latestTask.id);
+    }, [ parentTasks, progressList, taskListData ]);
 
     // Handle subtask selection automatically on parent task or subtasks list changes
-    const prevParentIdRef = React.useRef(defaultSelectedParentId);
     React.useEffect(() => {
-        const parentChanged = prevParentIdRef.current !== defaultSelectedParentId;
-        prevParentIdRef.current = defaultSelectedParentId;
-
-        if (parentChanged) {
-            // Reset and select the first subtask of the new parent
-            if (subtasks.length > 0) {
+        if (subtasks.length > 0) {
+            const exists = subtasks.some((s) => s.id === selectedSubtaskId);
+            if (!selectedSubtaskId || !exists) {
                 setSelectedSubtaskId(subtasks[0].id);
-            } else {
-                setSelectedSubtaskId(null);
             }
         } else {
-            // If parent didn't change but subtask list updated (e.g. initial load)
-            // or if there is no current selection, or the selection is not in the subtasks list
-            if (subtasks.length > 0) {
-                const exists = subtasks.some((s) => s.id === selectedSubtaskId);
-                if (!selectedSubtaskId || !exists) {
-                    setSelectedSubtaskId(subtasks[0].id);
-                }
-            } else {
-                setSelectedSubtaskId(null);
-            }
+            setSelectedSubtaskId(null);
         }
     }, [ defaultSelectedParentId, subtasks, selectedSubtaskId ]);
 
@@ -241,7 +399,7 @@ function TaskDoingContainer() {
     }, [ subtasks, selectedSubtaskId ]);
 
     const canGoBack = activeSubtaskIndex > 0;
-    const canGoNext = activeSubtaskIndex >= 0 && activeSubtaskIndex < subtasks.length - 1;
+    const canGoNext = activeSubtaskIndex >= 0;
 
     // Handle back button
     const handleBack = useCallback(() => {
@@ -250,141 +408,77 @@ function TaskDoingContainer() {
         }
     }, [ canGoBack, subtasks, activeSubtaskIndex ]);
 
-    // Handle next button
-    const handleNext = useCallback(() => {
-        if (canGoNext) {
-            setSelectedSubtaskId(subtasks[activeSubtaskIndex + 1].id);
-        }
-    }, [ canGoNext, subtasks, activeSubtaskIndex ]);
-
-    // Handle start task
-    const handleStartTask = useCallback(async () => {
-        if (!selectedSubtaskId) {
-            message.error('Không thể bắt đầu bài tập');
-            return;
-        }
-
-        try {
-            const result = await createTaskProgress({
-                dataBody: {
-                    simulationEnrollmentId,
-                    taskId: selectedSubtaskId,
-                },
-            });
-
-            if (result && result.id) {
-                message.success('Bắt đầu bài tập thành công!');
-                // Refresh progress data
-                refetchProgress({
-                    params: { simulationEnrollmentId },
-                });
-            } else {
-                message.error('Không thể bắt đầu bài tập. Vui lòng thử lại');
-            }
-        } catch (err) {
-            message.error('Có lỗi xảy ra. Vui lòng thử lại');
-        }
-    }, [ selectedSubtaskId, simulationEnrollmentId, createTaskProgress, refetchProgress ]);
-
-    // Handle complete task
-    const handleCompleteTask = useCallback(async () => {
-        if (!selectedSubtaskId) {
-            message.error('Không thể hoàn thành bài tập');
-            return;
-        }
-
-        try {
-            const result = await completeTaskProgress({
-                dataBody: { taskId: selectedSubtaskId },
-            });
-
-            if (result && result.id) {
-                message.success('Hoàn thành bài tập thành công!');
-                // Refresh progress data
-                refetchProgress({
-                    params: { simulationEnrollmentId },
-                });
-            } else {
-                message.error('Không thể hoàn thành bài tập. Vui lòng thử lại');
-            }
-        } catch (err) {
-            message.error('Có lỗi xảy ra. Vui lòng thử lại');
-        }
-    }, [ selectedSubtaskId, simulationEnrollmentId, completeTaskProgress, refetchProgress ]);
-
-    // Handle reset task
-    const handleResetTask = useCallback(async () => {
-        if (!selectedSubtaskId) {
-            message.error('Không thể đặt lại bài tập');
-            return;
-        }
-
-        try {
-            const result = await resetTaskProgress({
-                dataBody: { taskId: selectedSubtaskId },
-            });
-
-            if (result && result.id) {
-                message.success('Đặt lại bài tập thành công!');
-                // Refresh progress data
-                refetchProgress({
-                    params: { simulationEnrollmentId },
-                });
-            } else {
-                message.error('Không thể đặt lại bài tập. Vui lòng thử lại');
-            }
-        } catch (err) {
-            message.error('Có lỗi xảy ra. Vui lòng thử lại');
-        }
-    }, [ selectedSubtaskId, simulationEnrollmentId, resetTaskProgress, refetchProgress ]);
-
     // Load progress detail when taskProgressId changes
+    // Khi vừa chuyển sang Task con có task Question, phải kiểm tra phần này liền để hiện phần trả lời trước đó
     React.useEffect(() => {
         if (currentSubtaskProgress?.taskProgressId) {
             fetchProgressDetail({
                 pathParams: { id: currentSubtaskProgress.taskProgressId },
             });
+        } else {
+            setProgressDetail(null);
         }
-    }, [ currentSubtaskProgress?.taskProgressId, fetchProgressDetail ]);
+    }, [ currentSubtaskProgress?.taskProgressId, fetchProgressDetail, setProgressDetail ]);
 
-    // Parse subtask name
+    // Parse subtask name để xác định loại nhiệm vụ
     const subtaskName = subtaskDetail?.name || '';
-    const { requiresFileUpload, requiresTextResponse } = useMemo(() => {
-        const match = subtaskName.match(/^SUB_T(\d+)_S(\d+)(_.*)?$/);
-        if (match) {
-            const suffix = match[3] || '';
-            return {
-                requiresFileUpload: suffix === '_FILE' || suffix === '_FILE_TEXT',
-                requiresTextResponse: suffix === '_TEXT' || suffix === '_FILE_TEXT',
-            };
-        }
-        return {
-            requiresFileUpload: false,
-            requiresTextResponse: false,
-        };
-    }, [ subtaskName ]);
+    const parsedSubtaskName = useMemo(() => parseSubtaskName(subtaskName), [ subtaskName ]);
+    const requiresFileUpload = parsedSubtaskName?.requiresFileUpload || false;
+    const requiresTextResponse = parsedSubtaskName?.requiresTextResponse || false;
 
-    // Extract previous submissions
+    // Extract previous submissions từ data.content của studentGet
     const submissions = useMemo(() => {
-        return progressDetail?.studentSubmission?.content || [];
+        return getSubmissions(progressDetail);
     }, [ progressDetail ]);
 
+    // Tìm câu trả lời file đã nộp trước (answear không có taskQuestion)
     const previousFile = useMemo(() => {
         if (!requiresFileUpload) return null;
-        const found = submissions.find((s) => !s.taskQuestion && (s.answer?.includes('/') || s.answer?.includes('.')));
-        return found ? found.answer : null;
+        const found = submissions.find((s) => !s.taskQuestion && (getSubmissionAnswer(s).includes('/') || getSubmissionAnswer(s).includes('.')));
+        return found ? getSubmissionAnswer(found) : null;
     }, [ submissions, requiresFileUpload ]);
 
+    // Tìm câu trả lời text đã nộp trước (answear không có taskQuestion)
     const previousText = useMemo(() => {
         if (!requiresTextResponse) return '';
-        const found = submissions.find((s) => !s.taskQuestion && !(s.answer?.includes('/') || s.answer?.includes('.')));
-        return found ? found.answer : '';
+        const found = submissions.find((s) => !s.taskQuestion && !(getSubmissionAnswer(s).includes('/') || getSubmissionAnswer(s).includes('.')));
+        return found ? getSubmissionAnswer(found) : '';
     }, [ submissions, requiresTextResponse ]);
 
-    // Handle file upload
+    // Extract quiz blocks từ content của subtask
+    const quizBlocks = useMemo(() => extractQuizBlocks(subtaskDetail?.content), [ subtaskDetail?.content ]);
+
+    // Map quiz submissions theo taskQuestionId (chỉ câu đã có taskQuestion.id mới là trắc nghiệm)
+    const quizSubmissionMap = useMemo(() => {
+        const map = {};
+        submissions.forEach((submission) => {
+            const questionId = getTaskQuestionId(submission.taskQuestion);
+            if (questionId) {
+                map[questionId] = {
+                    answer: getSubmissionAnswer(submission),
+                    isCorrect: submission.isCorrect,
+                };
+            }
+        });
+        return map;
+    }, [ submissions ]);
+
+    // Kiểm tra xem toàn bộ câu hỏi trắc nghiệm đã được trả lời đúng chưa
+    const hasRequiredQuizSubmissions = useMemo(() => {
+        if (quizBlocks.length === 0) {
+            return true;
+        }
+
+        return quizBlocks.every((block) => {
+            const questionId = getQuizQuestionId(block);
+            return questionId && quizSubmissionMap[questionId] && quizSubmissionMap[questionId].isCorrect;
+        });
+    }, [ quizBlocks, quizSubmissionMap ]);
+
+    // Handle file upload - lưu file vào studentSubmission
     const handleFileUpload = useCallback(async (file) => {
         if (!currentSubtaskProgress?.taskProgressId) {
-            message.error('Vui lòng bắt đầu nhiệm vụ trước khi nộp bài!');
+            message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
             return;
         }
         try {
@@ -396,7 +490,6 @@ function TaskDoingContainer() {
             });
             if (uploadRes?.result === true) {
                 const filePath = uploadRes.data.filePath;
-                // Save to student submission
                 const submitRes = await createQuizHistory({
                     dataBody: {
                         studentTaskProgressId: currentSubtaskProgress.taskProgressId,
@@ -419,10 +512,10 @@ function TaskDoingContainer() {
         }
     }, [ currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail ]);
 
-    // Handle text response submit
+    // Handle text response submit - lưu câu trả lời text vào studentSubmission
     const handleTextResponseSubmit = useCallback(async (text) => {
         if (!currentSubtaskProgress?.taskProgressId) {
-            message.error('Vui lòng bắt đầu nhiệm vụ trước khi nộp bài!');
+            message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
             return;
         }
         try {
@@ -445,10 +538,175 @@ function TaskDoingContainer() {
         }
     }, [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail ]);
 
+    /**
+     * Nộp câu hỏi trắc nghiệm - chỉ nộp khi học viên đã bấm đúng đáp án (isCorrect = true)
+     * Gắn với studentTaskProgressId và taskQuestionId của câu hỏi trắc nghiệm
+     */
+    const handleQuizAnswerSubmit = useCallback(async ({ taskQuestionId, answer, isCorrect }) => {
+        if (!isCorrect) {
+            return;
+        }
+
+        if (!currentSubtaskProgress?.taskProgressId) {
+            message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
+            return;
+        }
+
+        if (!taskQuestionId) {
+            message.error('Không tìm thấy câu hỏi để lưu đáp án');
+            return;
+        }
+
+        try {
+            const submitRes = await createQuizHistory({
+                dataBody: {
+                    studentTaskProgressId: currentSubtaskProgress.taskProgressId,
+                    taskQuestionId,
+                    answer,
+                    isCorrect: true,
+                },
+            });
+            if (submitRes) {
+                message.success('Lưu đáp án đúng thành công!');
+                fetchProgressDetail({
+                    pathParams: { id: currentSubtaskProgress.taskProgressId },
+                });
+            }
+        } catch (err) {
+            message.error('Có lỗi xảy ra khi lưu đáp án!');
+        }
+    }, [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail ]);
+
     // Get selected parent task details
     const selectedParentTask = useMemo(() => {
         return parentTasks.find((t) => t.id === defaultSelectedParentId);
     }, [ parentTasks, defaultSelectedParentId ]);
+
+    /**
+     * Validate điều kiện trước khi hoàn thành Task Con:
+     * - Nếu Task Con yêu cầu nộp File hoặc Text: kiểm tra xem đã nộp chưa
+     * - Nếu Task Con có câu hỏi trắc nghiệm: kiểm tra xem đã trả lời đúng chưa
+     */
+    const validateCurrentSubtask = useCallback(() => {
+        if (requiresFileUpload && !previousFile) {
+            message.warning('Vui lòng nộp file trước khi tiếp tục');
+            return false;
+        }
+
+        if (requiresTextResponse && !previousText) {
+            message.warning('Vui lòng nộp câu trả lời trước khi tiếp tục');
+            return false;
+        }
+
+        if (!hasRequiredQuizSubmissions) {
+            message.warning('Vui lòng trả lời đúng các câu hỏi trắc nghiệm trước khi tiếp tục');
+            return false;
+        }
+
+        return true;
+    }, [ hasRequiredQuizSubmissions, previousFile, previousText, requiresFileUpload, requiresTextResponse ]);
+
+    const getSubtasksForParent = useCallback((parentTaskId) => {
+        const list = taskListData?.content || [];
+        return list
+            .filter(
+                (t) =>
+                    t &&
+                    t.kind === 2 &&
+                    (t.parent?.id === parentTaskId || t.parentId === parentTaskId || t.taskId === parentTaskId),
+            )
+            .sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0));
+    }, [ taskListData ]);
+
+    /**
+     * Case 2: Xử lý bấm nút Tiếp tục
+     * 1. Validate điều kiện nộp bài (file/text/quiz)
+     * 2. Nếu đã nộp đủ, gọi complete cho Task Con hiện tại
+     * 3. Nếu còn Task Con tiếp theo trong Task Cha: chuyển sang Task Con tiếp theo, tạo tiến độ mới nếu cần
+     * 4. Nếu đây là Task Con cuối của Task Cha: complete Task Cha, tìm Task Cha tiếp theo
+     * 5. Nếu không còn Task Cha tiếp theo: thông báo hoàn thành toàn bộ
+     */
+    const handleContinue = useCallback(async () => {
+        if (!selectedSubtaskId || !selectedParentTask) {
+            message.error('Không tìm thấy nhiệm vụ hiện tại');
+            return;
+        }
+
+        if (!currentSubtaskProgress?.taskProgressId) {
+            message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
+            return;
+        }
+
+        if (!validateCurrentSubtask()) {
+            return;
+        }
+
+        try {
+            // Complete Task Con hiện tại
+            await completeTaskProgress({
+                dataBody: { taskId: selectedSubtaskId },
+            });
+
+            // Kiểm tra còn Task Con tiếp theo không
+            const nextSubtask = subtasks[activeSubtaskIndex + 1];
+            if (nextSubtask) {
+                // Tạo tiến độ cho Task Con tiếp theo nếu chưa có
+                await ensureTaskProgress(nextSubtask.id);
+                setSelectedSubtaskId(nextSubtask.id);
+                refetchProgress({
+                    params: { simulationEnrollmentId },
+                });
+                return;
+            }
+
+            // Đây là Task Con cuối cùng của Task Cha hiện tại -> Complete Task Cha
+            await completeTaskProgress({
+                dataBody: { taskId: selectedParentTask.id },
+            });
+
+            const activeParentIndex = parentTasks.findIndex((task) => task.id === selectedParentTask.id);
+            const nextParentTask = parentTasks[activeParentIndex + 1];
+
+            // Không còn Task Cha tiếp theo -> Hoàn thành toàn bộ mô phỏng
+            if (!nextParentTask) {
+                refetchProgress({
+                    params: { simulationEnrollmentId },
+                });
+                message.success('Bạn đã hoàn thành toàn bộ bài mô phỏng!');
+                return;
+            }
+
+            // Tạo tiến độ cho Task Cha tiếp theo và Task Con đầu tiên của nó
+            const nextParentSubtasks = getSubtasksForParent(nextParentTask.id);
+            const firstNextSubtask = nextParentSubtasks[0];
+
+            await ensureTaskProgress(nextParentTask.id);
+            if (firstNextSubtask) {
+                await ensureTaskProgress(firstNextSubtask.id);
+            }
+
+            setSelectedParentTaskId(nextParentTask.id);
+            setSelectedSubtaskId(firstNextSubtask?.id || null);
+            refetchProgress({
+                params: { simulationEnrollmentId },
+            });
+        } catch (err) {
+            message.error('Có lỗi xảy ra khi lưu tiến độ. Vui lòng thử lại');
+        }
+    }, [
+        activeSubtaskIndex,
+        completeTaskProgress,
+        currentSubtaskProgress?.taskProgressId,
+        ensureTaskProgress,
+        getSubtasksForParent,
+        parentTasks,
+        refetchProgress,
+        selectedParentTask,
+        selectedSubtaskId,
+        simulationEnrollmentId,
+        subtasks,
+        validateCurrentSubtask,
+    ]);
 
     // Determine task status display
     const getTaskStatus = () => {
@@ -482,22 +740,23 @@ function TaskDoingContainer() {
         // Progress info
         taskProgress: currentSubtaskProgress,
         taskStatus: getTaskStatus(),
-        errorCount: currentSubtaskProgress?.errorCount || 0,
 
         // Navigation
         canGoBack,
         canGoNext,
         onBack: handleBack,
-        onNext: handleNext,
+        onNext: handleContinue,
+
+        // Submission
         requiresFileUpload,
         requiresTextResponse,
         previousFile,
         previousText,
         onFileChange: handleFileUpload,
         onTextResponseSubmit: handleTextResponseSubmit,
-        onStartTask: handleStartTask,
-        onCompleteTask: handleCompleteTask,
-        onResetTask: handleResetTask,
+        quizSubmissionMap,
+        onQuizAnswerSubmit: handleQuizAnswerSubmit,
+
     };
 
     const loading = progressLoading || detailLoading || taskListLoading || progressDetailLoading;

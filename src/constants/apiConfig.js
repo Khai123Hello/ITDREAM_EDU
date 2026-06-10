@@ -209,7 +209,7 @@ const apiConfig = {
         },
         complete: {
             baseURL: `${apiUrl}v1/task_progress/complete`,
-            method: 'POST',
+            method: 'PUT',
             headers: baseHeader,
         },
         reset: {

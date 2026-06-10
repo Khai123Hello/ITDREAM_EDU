@@ -72,7 +72,7 @@ function MarkdownContent({ text }) {
         if (h1) { flushList(); elements.push(<h2 key={key++} className="tfo-block-h1">{h1[1]}</h2>); return; }
         if (h2) { flushList(); elements.push(<h2 key={key++} className="tfo-block-h2">{h2[1]}</h2>); return; }
         if (h3) { flushList(); elements.push(<h3 key={key++} className="tfo-block-h3">{h3[1]}</h3>); return; }
-        if (li)    { listItems.push(li[1]); return; }
+        if (li) { listItems.push(li[1]); return; }
         if (blank) { flushList(); return; }
         flushList();
         elements.push(<p key={key++} className="tfo-block-text" dangerouslySetInnerHTML={{ __html: parseInline(line) }} />);
@@ -83,16 +83,35 @@ function MarkdownContent({ text }) {
 
 /* ─────────────────────────── Quiz Block (interactive) ─────────────────── */
 
-function QuizBlock({ block }) {
+const getQuizQuestionId = (block = {}) => (
+    block.taskQuestionId ||
+    block.questionId ||
+    block.taskQuestion?.id ||
+    block.id ||
+    null
+);
+
+function QuizBlock({ block, submittedAnswer = null, onQuizAnswerSubmit = () => {} }) {
     const [ selected, setSelected ]   = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
 
-    const correct   = (block.options || []).findIndex((o) => o.answer === true);
-    const isCorrect = submitted && selected === correct;
+    const correct    = (block.options || []).findIndex((o) => o.answer === true);
+    const questionId = getQuizQuestionId(block);
+    const savedAnswer = submittedAnswer?.answer;
+    const savedOptionIndex = (block.options || []).findIndex((o) => o.option === savedAnswer || o.value === savedAnswer);
+    const effectiveSelected  = savedAnswer ? savedOptionIndex : selected;
+    const effectiveSubmitted = Boolean(savedAnswer) || submitted;
+    const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
     const handleSubmit = () => {
         if (selected === null) return;
         setSubmitted(true);
+        const selectedOption = (block.options || [])[selected];
+        onQuizAnswerSubmit({
+            taskQuestionId: questionId,
+            answer: selectedOption?.option || selectedOption?.value || '',
+            isCorrect: selected === correct,
+        });
     };
 
     const handleReset = () => {
@@ -101,7 +120,7 @@ function QuizBlock({ block }) {
     };
 
     return (
-        <div className={`tfo-block-quiz${submitted ? (isCorrect ? ' quiz-correct' : ' quiz-wrong') : ''}`}>
+        <div className={`tfo-block-quiz${effectiveSubmitted ? (isCorrect ? ' quiz-correct' : ' quiz-wrong') : ''}`}>
             {/* Question */}
             <div className="tfo-block-quiz-question">
                 <span className="tfo-block-quiz-icon">❓</span>
@@ -113,23 +132,23 @@ function QuizBlock({ block }) {
                 {(block.options || []).map((opt, oi) => {
                     const letter = String.fromCharCode(65 + oi);
                     let cls = 'tfo-quiz-option';
-                    if (selected === oi)                          cls += ' selected';
-                    if (submitted && oi === correct)              cls += ' answer-correct';
-                    if (submitted && selected === oi && oi !== correct) cls += ' answer-wrong';
+                    if (effectiveSelected === oi) cls += ' selected';
+                    if (effectiveSubmitted && oi === correct) cls += ' answer-correct';
+                    if (effectiveSubmitted && effectiveSelected === oi && oi !== correct) cls += ' answer-wrong';
 
                     return (
                         <button
                             key={oi}
                             className={cls}
-                            disabled={submitted}
-                            onClick={() => !submitted && setSelected(oi)}
+                            disabled={effectiveSubmitted}
+                            onClick={() => !effectiveSubmitted && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
-                            {submitted && oi === correct && (
+                            {effectiveSubmitted && oi === correct && (
                                 <span className="tfo-quiz-option-badge correct">✓ Đúng</span>
                             )}
-                            {submitted && selected === oi && oi !== correct && (
+                            {effectiveSubmitted && effectiveSelected === oi && oi !== correct && (
                                 <span className="tfo-quiz-option-badge wrong">✗ Sai</span>
                             )}
                         </button>
@@ -139,7 +158,7 @@ function QuizBlock({ block }) {
 
             {/* Footer */}
             <div className="tfo-block-quiz-footer">
-                {!submitted ? (
+                {!effectiveSubmitted ? (
                     <button
                         className="tfo-quiz-submit-btn"
                         disabled={selected === null}
@@ -152,9 +171,9 @@ function QuizBlock({ block }) {
                         <span className={`tfo-quiz-result-label ${isCorrect ? 'correct' : 'wrong'}`}>
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
-                        <button className="tfo-quiz-retry-btn" onClick={handleReset}>
+                        {!savedAnswer && <button className="tfo-quiz-retry-btn" onClick={handleReset}>
                             Làm lại
-                        </button>
+                        </button>}
                     </div>
                 )}
             </div>
@@ -164,7 +183,7 @@ function QuizBlock({ block }) {
 
 /* ─────────────────────────── Block Item ─────────────────────────── */
 
-function BlockItem({ block, idx, allBlocks }) {
+function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, onQuizAnswerSubmit = () => {} }) {
     switch (block.type) {
                     case 'meta':
                         return (
@@ -257,8 +276,16 @@ function BlockItem({ block, idx, allBlocks }) {
                         );
                     }
 
-                    case 'quiz':
-                        return <QuizBlock block={block} />;
+                    case 'quiz': {
+                        const questionId = getQuizQuestionId(block);
+                        return (
+                            <QuizBlock
+                                block={block}
+                                submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
+                                onQuizAnswerSubmit={onQuizAnswerSubmit}
+                            />
+                        );
+                    }
 
                     default:
                         return null;
@@ -267,7 +294,7 @@ function BlockItem({ block, idx, allBlocks }) {
 
 /* ─────────────────────────── Blocks content ─────────────────────────── */
 
-function BlocksContent({ blocksJson }) {
+function BlocksContent({ blocksJson, quizSubmissionMap = {}, onQuizAnswerSubmit = () => {} }) {
     const blocks = useMemo(() => {
         try { return JSON.parse(blocksJson); }
         catch { return []; }
@@ -276,7 +303,14 @@ function BlocksContent({ blocksJson }) {
     return (
         <div className="tfo-blocks-content">
             {blocks.map((block, idx) => (
-                <BlockItem key={block.id || idx} block={block} idx={idx} allBlocks={blocks} />
+                <BlockItem
+                    key={block.id || idx}
+                    block={block}
+                    idx={idx}
+                    allBlocks={blocks}
+                    quizSubmissionMap={quizSubmissionMap}
+                    onQuizAnswerSubmit={onQuizAnswerSubmit}
+                />
             ))}
         </div>
     );
@@ -284,10 +318,18 @@ function BlocksContent({ blocksJson }) {
 
 /* ─────────────────────────── Content Router ─────────────────────────── */
 
-function ContentRenderer({ content }) {
+function ContentRenderer({ content, quizSubmissionMap = {}, onQuizAnswerSubmit = () => {} }) {
     const type = useMemo(() => detectContentType(content), [ content ]);
     if (type === 'empty')    return <p className="tfo-empty-content">Không có nội dung.</p>;
-    if (type === 'blocks')   return <BlocksContent blocksJson={content} />;
+    if (type === 'blocks') {
+        return (
+            <BlocksContent
+                blocksJson={content}
+                quizSubmissionMap={quizSubmissionMap}
+                onQuizAnswerSubmit={onQuizAnswerSubmit}
+            />
+        );
+    }
     if (type === 'markdown') return <MarkdownContent text={content} />;
     return <PlainTextContent text={content} />;
 }
@@ -375,8 +417,8 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
         <footer className="tfo-footer-nav">
             <div className="tfo-footer-inner">
                 <div className="tfo-footer-buttons">
-                    <button className="tfo-btn-back" onClick={onBack} disabled={!canGoBack}>Back</button>
-                    <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>Next</button>
+                    <button className="tfo-btn-back" onClick={onBack} disabled={!canGoBack}>Quay lại</button>
+                    <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>Tiếp tục</button>
                 </div>
             </div>
         </footer>
@@ -389,6 +431,10 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
  * TaskDoingPage
  * Renders task content using the BlockEditor block format.
  * Supports: text, h1-h3, bullet, numbered, divider, callout, code, meta, section, step, quiz.
+ *
+ * Không có nút "Bắt đầu" hay "Hoàn thành" riêng biệt.
+ * Tiến độ tự động lưu. Nút "Tiếp tục" sẽ kiểm tra điều kiện và gọi complete.
+ * Nút "Làm lại" cho phép học viên reset câu trả lời và nộp lại.
  */
 export default function TaskDoingPage({
     // Loading/Error
@@ -420,28 +466,29 @@ export default function TaskDoingPage({
 
     // Progress
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
-    errorCount = 0,
 
     // Navigation
-    canGoBack       = false,
-    canGoNext       = false,
-    onBack          = () => {},
-    onNext          = () => {},
-    onFileChange    = () => {},
-    onStartTask     = () => {},
-    onCompleteTask  = () => {},
-    onResetTask     = () => {},
-    requiresFileUpload = false,
+    canGoBack = false,
+    canGoNext = false,
+    onBack    = () => {},
+    onNext    = () => {},
+
+    // Submission
+    onFileChange         = () => {},
+    requiresFileUpload   = false,
     requiresTextResponse = false,
-    previousFile = null,
-    previousText = '',
+    previousFile         = null,
+    previousText         = '',
     onTextResponseSubmit = () => {},
+    quizSubmissionMap    = {},
+    onQuizAnswerSubmit   = () => {},
 }) {
     const [ textInput, setTextInput ] = useState('');
 
     useEffect(() => {
         setTextInput(previousText || '');
     }, [ previousText ]);
+
     const renderMedia = () => {
         if (!mediaPath) return null;
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
@@ -530,6 +577,9 @@ export default function TaskDoingPage({
         ? ((activeSubtaskIndex + 1) / subtasks.length) * 100
         : 0;
 
+    // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
+    const isCompleted = taskStatus === 'completed';
+
     return (
         <>
             <AppHeader />
@@ -588,48 +638,31 @@ export default function TaskDoingPage({
                                                     </p>
                                                 )}
 
-                                                {taskBody && <ContentRenderer content={taskBody} />}
+                                                {taskBody && (
+                                                    <ContentRenderer
+                                                        content={taskBody}
+                                                        quizSubmissionMap={quizSubmissionMap}
+                                                        onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                                    />
+                                                )}
 
                                                 {renderMedia()}
 
-                                                {/* Task action buttons */}
-                                                <div className="tfo-task-actions">
-                                                    {taskStatus === 'not_started' && (
-                                                        <button className="tfo-action-btn tfo-action-btn-primary" onClick={onStartTask}>
-                                                            Bắt đầu Nhiệm vụ
-                                                        </button>
-                                                    )}
-                                                    {taskStatus === 'in_progress' && (
-                                                        <>
-                                                            <button className="tfo-action-btn tfo-action-btn-primary" onClick={onCompleteTask}>
-                                                                Hoàn thành Nhiệm vụ
-                                                            </button>
-                                                            {errorCount > 0 && (
-                                                                <div className="tfo-action-info">Lỗi: {errorCount}</div>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                    {taskStatus === 'completed' && (
-                                                        <>
-                                                            <div className="tfo-action-completed">✓ Nhiệm vụ đã Hoàn thành</div>
-                                                            <button className="tfo-action-btn tfo-action-btn-secondary" onClick={onResetTask}>
-                                                                Làm lại Nhiệm vụ
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
+                                                {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
 
+                                                {/* File upload section */}
                                                 {requiresFileUpload && (
                                                     <div className="tfo-upload-section">
                                                         <FileDropzone
                                                             onFileChange={onFileChange}
                                                             previousFile={previousFile}
                                                             urlBase={urlBase}
-                                                            disabled={taskStatus !== 'in_progress'}
+                                                            disabled={isCompleted}
                                                         />
                                                     </div>
                                                 )}
 
+                                                {/* Text response section */}
                                                 {requiresTextResponse && (
                                                     <div className="tfo-text-response-section">
                                                         <div className="tfo-text-response-label">Câu trả lời của bạn</div>
@@ -638,14 +671,14 @@ export default function TaskDoingPage({
                                                             placeholder="Nhập câu trả lời của bạn ở đây..."
                                                             value={textInput}
                                                             onChange={(e) => setTextInput(e.target.value)}
-                                                            disabled={taskStatus !== 'in_progress'}
+                                                            disabled={isCompleted}
                                                             rows={6}
                                                         />
                                                         <div className="tfo-text-response-footer">
                                                             <button
                                                                 className="tfo-action-btn tfo-action-btn-primary tfo-text-submit-btn"
                                                                 onClick={() => onTextResponseSubmit(textInput)}
-                                                                disabled={taskStatus !== 'in_progress' || !textInput.trim()}
+                                                                disabled={isCompleted || !textInput.trim()}
                                                             >
                                                                 Nộp câu trả lời
                                                             </button>
