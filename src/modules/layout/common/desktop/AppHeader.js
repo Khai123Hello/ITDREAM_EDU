@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import apiConfig from '@constants/apiConfig';
 import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
-import { removeCacheToken, removeCacheUserKind } from '@services/userService';
+import { removeCacheToken, removeCacheUserEmail, removeCacheUserKind } from '@services/userService';
 import { accountActions } from '@store/actions';
 
 import styles from './AppHeader.module.scss';
@@ -23,6 +23,7 @@ const AppHeader = () => {
         setDropdownOpen(false);
         removeCacheToken();
         removeCacheUserKind();
+        removeCacheUserEmail();
         dispatch(accountActions.logout());
         executeLogoutApi({
             onCompleted: () => {},

@@ -7,7 +7,7 @@ import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
 import { showErrorMessage } from '@services/notifyService';
-import { setCacheAccessToken, setCacheUserKind } from '@services/userService';
+import { removeCacheToken, setCacheToken, setCacheUserEmail, setCacheUserKind, removeCacheUserKind, removeCacheUserEmail } from '@services/userService';
 import { accountActions } from '@store/actions';
 import { Buffer } from 'buffer';
 
@@ -52,7 +52,9 @@ const useAppLogin = (role = 'student') => {
                     return;
                 }
 
-                setCacheAccessToken(responseLogin.access_token);
+                // Lưu cả accessToken + refreshToken để interceptor có thể tự refresh khi token hết hạn
+                setCacheToken(responseLogin.access_token, responseLogin.refresh_token);
+                setCacheUserEmail(values.email);
                 setCacheUserKind(userKind);
                 setLoadingProfileFetch(true);
 
@@ -82,14 +84,16 @@ const useAppLogin = (role = 'student') => {
                         navigate('/dashboard');
                     } else {
                         showErrorMessage(translate.formatMessage(message.loginFail));
-                        setCacheAccessToken('');
-                        setCacheUserKind('');
+                        removeCacheToken();
+                        removeCacheUserKind();
+                        removeCacheUserEmail();
                     }
                 } catch (error) {
                     setLoadingProfileFetch(false);
                     showErrorMessage(translate.formatMessage(message.loginFail));
-                    setCacheAccessToken('');
-                    setCacheUserKind('');
+                    removeCacheToken();
+                    removeCacheUserKind();
+                    removeCacheUserEmail();
                 }
             },
             onError: (error) => {

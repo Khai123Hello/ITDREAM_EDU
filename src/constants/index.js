@@ -19,6 +19,7 @@ export const appName = 'nail-fe';
 export const storageKeys = {
     USER_ACCESS_TOKEN: `${appName}-user-access-token`,
     USER_REFRESH_TOKEN: `${appName}-user-refresh-token`,
+    USER_EMAIL: `${appName}-user-email`,
     RESTAURANT_ACTIVE: `${appName}-restaurant-active`,
     X_TENANT: `${appName}-X-tenant`,
     CART: `${appName}-cart`,

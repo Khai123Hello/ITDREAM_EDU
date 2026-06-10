@@ -11,8 +11,7 @@ const accountReducer = createReducer(
     {
         reducerName: 'account',
         initialState,
-        // storage: true,
-        storage: false,
+        storage: true,
     },
     {
         [getProfileSuccess.type]: (state, { payload }) => {

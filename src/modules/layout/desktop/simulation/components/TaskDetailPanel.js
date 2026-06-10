@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './detail.module.scss';
+import styles from '../SimulationDetailDesktop/detail.module.scss';
 
 const parseList = (value) => {
     if (!value) return [];

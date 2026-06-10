@@ -26,6 +26,12 @@ const apiConfig = {
             method: 'POST',
             headers: baseHeader,
         },
+        refreshToken: {
+            baseURL: `${apiUrl}api/token`,
+            method: 'POST',
+            headers: formUrlEncodedHeaders,
+            ignoreAuth: true,
+        },
         getProfileAdmin: {
             baseURL: `${apiUrl}v1/account/profile`,
             method: 'GET',

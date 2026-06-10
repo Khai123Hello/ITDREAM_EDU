@@ -13,7 +13,7 @@ import DropdownMenu from '@components/common/elements/DropdownMenu';
 import Flex from '@components/common/elements/Flex';
 import { AppConstants } from '@constants';
 import useAuth from '@hooks/useAuth';
-import { removeCacheToken } from '@services/userService';
+import { removeCacheToken, removeCacheUserEmail, removeCacheUserKind } from '@services/userService';
 import { accountActions } from '@store/actions';
 
 import styles from './AppHeader.module.scss';
@@ -28,6 +28,8 @@ function UserInfo() {
             content: 'Are you sure you want to log out?',
             onConfirm: () => {
                 removeCacheToken();
+                removeCacheUserKind();
+                removeCacheUserEmail();
                 dispatch(accountActions.logout());
             },
         });

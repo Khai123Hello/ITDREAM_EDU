@@ -38,3 +38,5 @@ export const getCacheUserKind = () => getData(USER_KIND);
 export const setCacheUserKind = (kind) => setData(USER_KIND, kind);
 
 export const removeCacheUserKind = () => removeItem(USER_KIND);
+
+export const removeCacheUserEmail = () => removeItem(USER_EMAIL);

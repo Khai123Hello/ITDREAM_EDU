@@ -4,7 +4,7 @@ import AppFooter from '@modules/layout/common/AppFooter';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
 
-import TaskPanel from './TaskPanel';
+import TaskPanel from '../components/TaskPanel';
 
 import styles from './detail.module.scss';
 

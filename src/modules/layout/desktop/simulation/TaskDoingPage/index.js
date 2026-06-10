@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
-import TaskDoingSidebar from './TaskDoingSidebar';
+import TaskDoingSidebar from '../components/TaskDoingSidebar';
 
 import './TaskDoingPage.scss';
 

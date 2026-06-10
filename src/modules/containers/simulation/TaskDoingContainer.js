@@ -17,13 +17,41 @@ import { message } from 'antd';
 function TaskDoingContainer() {
     const { id: simulationId } = useParams();
     const location = useLocation();
-    // Get simulationEnrollmentId from location state or route
-    const simulationEnrollmentId = location.state?.simulationEnrollmentId;
-    const companyLogo = location.state?.companyLogo;
+
+    // Persist simulationEnrollmentId & companyLogo vào sessionStorage để không bị mất khi reload trang
+    const sessionKey = `taskDoing-${simulationId}`;
+    const getSessionData = () => {
+        try {
+            return JSON.parse(sessionStorage.getItem(sessionKey)) || {};
+        } catch {
+            return {};
+        }
+    };
+
+    const simulationEnrollmentId = (() => {
+        const fromState = location.state?.simulationEnrollmentId;
+        if (fromState) {
+            sessionStorage.setItem(sessionKey, JSON.stringify({ ...getSessionData(), simulationEnrollmentId: fromState, companyLogo: location.state?.companyLogo }));
+            return fromState;
+        }
+        return getSessionData().simulationEnrollmentId;
+    })();
+
+    const companyLogo = location.state?.companyLogo || getSessionData().companyLogo;
 
     // State management
-    const [ selectedParentTaskId, setSelectedParentTaskId ] = useState(null);
-    const [ selectedSubtaskId, setSelectedSubtaskId ] = useState(null);
+    const [ selectedParentTaskId, setSelectedParentTaskId ] = useState(() => getSessionData().selectedParentTaskId || null);
+    const [ selectedSubtaskId, setSelectedSubtaskId ] = useState(() => getSessionData().selectedSubtaskId || null);
+
+    React.useEffect(() => {
+        if (selectedParentTaskId !== null || selectedSubtaskId !== null) {
+            sessionStorage.setItem(sessionKey, JSON.stringify({
+                ...getSessionData(),
+                selectedParentTaskId,
+                selectedSubtaskId,
+            }));
+        }
+    }, [ selectedParentTaskId, selectedSubtaskId, sessionKey ]);
 
     // Load task list for sidebar
     const {
