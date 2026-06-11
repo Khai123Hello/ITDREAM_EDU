@@ -89,8 +89,8 @@ Craco produces `build/` folder. appServer.js (at project root, ignored by ESLint
 ## Important Gotchas
 
 1. **Env file must exist** for chosen build target. `.production` is referenced in package.json but does not exist in repo—create before running that build.
-2. **Husky hook context**: Pre-commit hook changes `cd source` before linting; runs from parent directory.
-3. **ESLINT_ENV=commit** is set only in pre-commit hook; `no-console` is soft warn in dev, hard error at commit time.
+2. **Husky hook context**: Pre-commit hook changes `cd source` before linting; runs from a `source` subfolder if present. Verify the current repo layout when using hooks.
+3. **ESLINT_ENV=commit** is set only in the pre-commit hook; `no-console` is soft warn in dev, hard error at commit time.
 4. **Craco alias resolution is automatic**—use `@moduleName` in imports; no manual path config needed.
 5. **Redux-Saga for async**: store uses sagas; check `src/store/sagas/` for async logic, not thunks.
 6. **Minimal test coverage**: only 1 test file exists (App.test.js). Add new tests in `__tests__/` or as `*.test.js` files.

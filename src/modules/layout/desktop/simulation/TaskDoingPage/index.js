@@ -83,20 +83,11 @@ function MarkdownContent({ text }) {
 
 /* ─────────────────────────── Quiz Block (interactive) ─────────────────── */
 
-const getQuizQuestionId = (block = {}) => (
-    block.taskQuestionId ||
-    block.questionId ||
-    block.taskQuestion?.id ||
-    block.id ||
-    null
-);
-
-function QuizBlock({ block, submittedAnswer = null, onQuizAnswerSubmit = () => {} }) {
+function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAnswerSubmit = () => {} }) {
     const [ selected, setSelected ]   = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
 
     const correct    = (block.options || []).findIndex((o) => o.answer === true);
-    const questionId = getQuizQuestionId(block);
     const savedAnswer = submittedAnswer?.answer;
     const savedOptionIndex = (block.options || []).findIndex((o) => o.option === savedAnswer || o.value === savedAnswer);
     const effectiveSelected  = savedAnswer ? savedOptionIndex : selected;
@@ -183,7 +174,7 @@ function QuizBlock({ block, submittedAnswer = null, onQuizAnswerSubmit = () => {
 
 /* ─────────────────────────── Block Item ─────────────────────────── */
 
-function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
     switch (block.type) {
                     case 'meta':
                         return (
@@ -277,11 +268,13 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, onQuizAnswer
                     }
 
                     case 'quiz': {
-                        const questionId = getQuizQuestionId(block);
+                        const questionKey = (block.question || '').trim();
+                        const questionId = questionKey ? questionMap[questionKey] ?? null : null;
                         return (
                             <QuizBlock
                                 block={block}
                                 submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
+                                questionId={questionId}
                                 onQuizAnswerSubmit={onQuizAnswerSubmit}
                             />
                         );
@@ -294,7 +287,7 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, onQuizAnswer
 
 /* ─────────────────────────── Blocks content ─────────────────────────── */
 
-function BlocksContent({ blocksJson, quizSubmissionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
     const blocks = useMemo(() => {
         try { return JSON.parse(blocksJson); }
         catch { return []; }
@@ -309,6 +302,7 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, onQuizAnswerSubmit 
                     idx={idx}
                     allBlocks={blocks}
                     quizSubmissionMap={quizSubmissionMap}
+                    questionMap={questionMap}
                     onQuizAnswerSubmit={onQuizAnswerSubmit}
                 />
             ))}
@@ -318,7 +312,7 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, onQuizAnswerSubmit 
 
 /* ─────────────────────────── Content Router ─────────────────────────── */
 
-function ContentRenderer({ content, quizSubmissionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
     const type = useMemo(() => detectContentType(content), [ content ]);
     if (type === 'empty')    return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
@@ -326,6 +320,7 @@ function ContentRenderer({ content, quizSubmissionMap = {}, onQuizAnswerSubmit =
             <BlocksContent
                 blocksJson={content}
                 quizSubmissionMap={quizSubmissionMap}
+                questionMap={questionMap}
                 onQuizAnswerSubmit={onQuizAnswerSubmit}
             />
         );
@@ -481,6 +476,7 @@ export default function TaskDoingPage({
     previousText         = '',
     onTextResponseSubmit = () => {},
     quizSubmissionMap    = {},
+    questionMap          = {},
     onQuizAnswerSubmit   = () => {},
 }) {
     const [ textInput, setTextInput ] = useState('');
@@ -642,6 +638,7 @@ export default function TaskDoingPage({
                                                     <ContentRenderer
                                                         content={taskBody}
                                                         quizSubmissionMap={quizSubmissionMap}
+                                                        questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                     />
                                                 )}

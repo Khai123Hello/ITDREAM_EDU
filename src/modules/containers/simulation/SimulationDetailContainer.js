@@ -174,10 +174,13 @@ function SimulationDetailContainer() {
                 dataBody: { simulationId: parseInt(simulationId) },
             });
 
-            if (result && result.id) {
+            const enrollmentId = result?.id || result?.data?.id || null;
+            const isSuccess = result?.result === true || Boolean(enrollmentId);
+
+            if (isSuccess) {
                 message.success('Đăng ký tham gia dự án thành công!');
                 setIsEnrolled(true);
-                setSimulationEnrollmentId(result.id);
+                setSimulationEnrollmentId(enrollmentId);
                 // Refresh enrollment data
                 checkEnrollment({
                     params: { simulationId: parseInt(simulationId) },
