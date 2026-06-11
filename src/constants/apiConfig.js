@@ -189,6 +189,13 @@ const apiConfig = {
             headers: baseHeader,
         },
     },
+    taskQuestion: {
+        studentList: {
+            baseURL: `${apiUrl}v1/task_question/student_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+    },
     simulationEnrollment: {
         create: {
             baseURL: `${apiUrl}v1/simulation_enrollment/create`,

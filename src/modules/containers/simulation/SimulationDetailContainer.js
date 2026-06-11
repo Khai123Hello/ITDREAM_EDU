@@ -174,14 +174,20 @@ function SimulationDetailContainer() {
                 dataBody: { simulationId: parseInt(simulationId) },
             });
 
-            if (result && result.id) {
+            const enrollmentId = result?.id || result?.data?.id || null;
+            const isSuccess = result?.result === true || Boolean(enrollmentId);
+
+            if (isSuccess) {
                 message.success('Đăng ký tham gia dự án thành công!');
                 setIsEnrolled(true);
-                setSimulationEnrollmentId(result.id);
+                setSimulationEnrollmentId(enrollmentId);
                 // Refresh enrollment data
                 checkEnrollment({
                     params: { simulationId: parseInt(simulationId) },
                 });
+                
+                // Store enrollment success flag for TaskDoing page to show notification on reload
+                sessionStorage.setItem(`enrollmentSuccess-${simulationId}`, 'true');
             } else {
                 message.error(result?.message || 'Đăng ký thất bại. Vui lòng thử lại');
             }

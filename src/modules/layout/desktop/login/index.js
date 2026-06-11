@@ -21,6 +21,27 @@ const message = defineMessages({
     continue: 'Continue',
 });
 
+const GoogleIcon = () => (
+    <svg className={styles.googleIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+            fill="#4285f4"
+            d="M23.52 12.27c0-.86-.08-1.69-.22-2.49H12v4.7h6.46a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.08 3.58-5.15 3.58-8.83z"
+        />
+        <path
+            fill="#34a853"
+            d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.87-3a7.22 7.22 0 0 1-10.75-3.8H1.33v3.1A12 12 0 0 0 12 24z"
+        />
+        <path
+            fill="#fbbc05"
+            d="M5.32 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.33a12 12 0 0 0 0 10.8l3.99-3.1z"
+        />
+        <path
+            fill="#ea4335"
+            d="M12 4.77c1.76 0 3.35.61 4.59 1.8l3.43-3.43A11.52 11.52 0 0 0 12 0 12 12 0 0 0 1.33 6.6l3.99 3.1A7.16 7.16 0 0 1 12 4.77z"
+        />
+    </svg>
+);
+
 const getCategoryInfo = (title, index) => {
     const lowerTitle = (title || '').toLowerCase();
     if (
@@ -144,6 +165,15 @@ function LoginPageDesktop({
                                             <span>Đăng Nhập</span>
                                         </>
                                     )}
+                                </Button>
+
+                                <div className={styles.socialDivider}>
+                                    <span>Hoặc</span>
+                                </div>
+
+                                <Button className={styles.googleButton} type="none" buttonType="button">
+                                    <GoogleIcon />
+                                    <span>Tiếp tục với Google</span>
                                 </Button>
                             </Form>
 
