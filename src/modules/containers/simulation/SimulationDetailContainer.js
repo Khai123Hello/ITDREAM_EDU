@@ -182,6 +182,9 @@ function SimulationDetailContainer() {
                 checkEnrollment({
                     params: { simulationId: parseInt(simulationId) },
                 });
+                
+                // Store enrollment success flag for TaskDoing page to show notification on reload
+                sessionStorage.setItem(`enrollmentSuccess-${simulationId}`, 'true');
             } else {
                 message.error(result?.message || 'Đăng ký thất bại. Vui lòng thử lại');
             }

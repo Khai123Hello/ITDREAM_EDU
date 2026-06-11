@@ -13,6 +13,7 @@ import { commonMessage } from '@constants/intl';
 import useFetch from '@hooks/useFetch';
 import useRegisterValidation from '@hooks/useRegisterValidation';
 import useTranslate from '@hooks/useTranslate';
+import { getData, setData } from '@utils/localStorage';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
 
@@ -31,11 +32,10 @@ const message = defineMessages({
     errorPassword: 'Password must be at least 6 characters long!',
     errorPhone: 'Phone must be at 10 characters long!',
     errorEmail: 'Invalid email! Please enter a valid format.',
-    policy: 'By signing up, I agree to our general terms and conditions.',
+    policy: 'By signing up, I agree to the terms and privacy policy of ITDream.',
     description:
-        'Click here if you want to receive updates from NailHPOS via email about current offers and beauty news. You can withdraw your consent at any time with future effect. To do this, click the link at the bottom of the respective email. More information can be found in our',
-    policyLink: 'privacy policy',
-    aboutUs: '.',
+        'I have read and agree to the',
+    policyLink: 'Privacy Policy of ITDream',
     enterEmail: 'Enter email',
 });
 
@@ -45,9 +45,20 @@ function RegisterDesktop({ form }) {
     const { getUsernameRules, getFullNameRules, getEmailRules, getPasswordRules, getPhoneRules } =
         useRegisterValidation();
 
-    const [ step, setStep ] = useState(1);
-    const [ idHash, setIdHash ] = useState('');
-    const [ email, setEmail ] = useState('');
+    const STORAGE_KEY = 'nail-fe-register-flow';
+
+    const [ step, setStep ] = useState(() => {
+        const saved = getData(STORAGE_KEY);
+        return saved?.step || 1;
+    });
+    const [ idHash, setIdHash ] = useState(() => {
+        const saved = getData(STORAGE_KEY);
+        return saved?.idHash || '';
+    });
+    const [ email, setEmail ] = useState(() => {
+        const saved = getData(STORAGE_KEY);
+        return saved?.email || '';
+    });
     const [ otp, setOtp ] = useState([ '', '', '', '', '', '' ]);
     const [ resendTimer, setResendTimer ] = useState(0);
     const [ redirectTimer, setRedirectTimer ] = useState(0);
@@ -90,6 +101,15 @@ function RegisterDesktop({ form }) {
             if (interval) clearInterval(interval);
         };
     }, [ step, redirectTimer, navigate ]);
+
+    // Persist registration flow state to sessionStorage
+    useEffect(() => {
+        if (step === 3) {
+            setData(STORAGE_KEY, null);
+        } else {
+            setData(STORAGE_KEY, { step, idHash, email });
+        }
+    }, [ step, idHash, email, STORAGE_KEY ]);
 
     // Auto-focus first input when entering step 2
     useEffect(() => {
@@ -347,10 +367,9 @@ function RegisterDesktop({ form }) {
                                     <label htmlFor="customCheckbox" className={styles.customCheckbox}></label>
                                     <div className={styles.shortDescription}>
                                         {translate.formatMessage(message.description)}{' '}
-                                        <span className={styles.security}>
+                                        <Link to="/policy" className={styles.security}>
                                             {translate.formatMessage(message.policyLink)}
-                                        </span>{' '}
-                                        {translate.formatMessage(message.aboutUs)}
+                                        </Link>
                                     </div>
                                 </div>
 

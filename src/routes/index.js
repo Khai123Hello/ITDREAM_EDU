@@ -6,6 +6,7 @@ import BlogDetailContainer from '@modules/containers/blog/detail';
 import DashBoardPageContainer from '@modules/containers/dashboard';
 import LandingPageContainer from '@modules/containers/landing';
 import LoginPageContainer from '@modules/containers/login';
+import PolicyContainer from '@modules/containers/policy';
 import ProfilePageContainer from '@modules/containers/profile';
 import RegisterContainer from '@modules/containers/register/register';
 import SimulationDetailContainer from '@modules/containers/simulation/SimulationDetailContainer';
@@ -55,6 +56,13 @@ const routes = {
         component: LoginPageContainer,
         auth: false,
         title: 'Đăng nhập',
+        layout: 'public',
+    },
+    policyPage: {
+        path: '/policy',
+        component: PolicyContainer,
+        auth: null,
+        title: 'Chính sách bảo mật',
         layout: 'public',
     },
     registerPage: {

@@ -91,6 +91,15 @@ function TaskDoingContainer() {
     })();
 
     const companyLogo = location.state?.companyLogo || getSessionData().companyLogo;
+    
+    // Show enrollment success notification on reload if it was shown during enrollment
+    React.useEffect(() => {
+        if (simulationEnrollmentId && sessionStorage.getItem(`enrollmentSuccess-${simulationId}`)) {
+            message.success('Đăng ký tham gia dự án thành công!');
+            // Clear the flag to avoid showing it again on subsequent loads
+            sessionStorage.removeItem(`enrollmentSuccess-${simulationId}`);
+        }
+    }, [ simulationEnrollmentId, simulationId ]);
 
     // State management
     const [ selectedParentTaskId, setSelectedParentTaskId ] = useState(() => getSessionData().selectedParentTaskId || null);
