@@ -1,5 +1,5 @@
 import React from 'react';
-import { TbFileText,TbLock, TbMail, TbShieldCheck, TbTrash, TbUserCheck } from 'react-icons/tb';
+import { TbFileText, TbLock, TbMail, TbShieldCheck, TbTrash, TbUserCheck } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
 
 import styles from './index.module.scss';

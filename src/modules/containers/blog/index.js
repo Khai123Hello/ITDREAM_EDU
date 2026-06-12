@@ -6,19 +6,21 @@ import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import BlogListDesktop from '@modules/layout/desktop/blog';
 
 function BlogListContainer() {
-    const [ selectedCategory, setSelectedCategory ] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     const catParams = useMemo(() => ({ kind: 2, pageNumber: 0, pageSize: 100, paged: true }), []);
     const blogParams = useMemo(() => ({ pageNumber: 0, pageSize: 100, paged: true }), []);
 
     const { data: categoriesData, loading: catLoading } = useFetch(apiConfig.category.autoComplete, {
+        immediate: true,
         params: catParams,
         mappingData: (res) => res.data?.content || [],
     });
 
-    const { data: blogsData, loading: blogLoading } = useFetch(apiConfig.blog.studentList, {
+    const { data: blogsRes, loading: blogLoading } = useFetch(apiConfig.blog.studentList, {
+        immediate: true,
         params: blogParams,
-        mappingData: (res) => res.data?.content || [],
+        mappingData: (res) => res || {},
     });
 
     return (
@@ -26,7 +28,8 @@ function BlogListContainer() {
             <AppHeader />
             <BlogListDesktop
                 categories={categoriesData || []}
-                blogs={blogsData || []}
+                blogs={blogsRes?.data?.content || []}
+                urlBase={blogsRes?.urlBase || ''}
                 loading={catLoading || blogLoading}
                 selectedCategory={selectedCategory}
                 onCategoryChange={setSelectedCategory}

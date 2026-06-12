@@ -9,15 +9,16 @@ import BlogDetailDesktop from '@modules/layout/desktop/blog/detail';
 function BlogDetailContainer() {
     const { id } = useParams();
 
-    const { data: blog, loading } = useFetch(apiConfig.blog.studentGet, {
-        params: { id },
-        mappingData: (res) => res.data || null,
+    const { data: blogRes, loading } = useFetch(apiConfig.blog.studentGet, {
+        immediate: true,
+        pathParams: { id },
+        mappingData: (res) => res || null,
     });
 
     return (
         <>
             <AppHeader />
-            <BlogDetailDesktop blog={blog} loading={loading} />
+            <BlogDetailDesktop blog={blogRes?.data || null} urlBase={blogRes?.urlBase || ''} loading={loading} />
             <AppFooter />
         </>
     );

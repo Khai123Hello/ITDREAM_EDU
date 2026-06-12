@@ -176,9 +176,48 @@ $radiusSm:   8px;
     align-items: flex-start;
 }
 
+.simCardClickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadowH;
+    }
+}
+
 .simCardBody {
     h4 { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
     p { font-size: 12px; color: $text2; margin-bottom: 6px; line-height: 1.4; }
+}
+
+.progressRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 12px;
+}
+
+.progressBarBg {
+    flex: 1;
+    height: 6px;
+    background: $border;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progressBarFill {
+    height: 100%;
+    background: $green;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progressPercent {
+    font-size: 11px;
+    font-weight: 600;
+    color: $text2;
+    min-width: 28px;
 }
 
 .tasksLeft {
@@ -193,6 +232,18 @@ $radiusSm:   8px;
     font-weight: 700;
     font-size: 13px;
     color: #004B87;
+}
+
+.simLogoImg {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: $radiusSm;
+    border: 1px solid $border;
+    padding: 4px;
+    background: $white;
+    flex-shrink: 0;
+    margin-left: 16px;
 }
 
 // RECOMMENDED SIM CARD
@@ -299,6 +350,28 @@ $radiusSm:   8px;
     color: $text2;
     line-height: 1.5;
     margin-bottom: 12px;
+}
+
+.achievementMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.certificateLink {
+    color: $green;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 // JOB CARD

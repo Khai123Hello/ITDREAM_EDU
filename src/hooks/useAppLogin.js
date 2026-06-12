@@ -7,7 +7,14 @@ import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
 import { showErrorMessage } from '@services/notifyService';
-import { removeCacheToken, setCacheToken, setCacheUserEmail, setCacheUserKind, removeCacheUserKind, removeCacheUserEmail } from '@services/userService';
+import {
+    removeCacheToken,
+    removeCacheUserEmail,
+    removeCacheUserKind,
+    setCacheToken,
+    setCacheUserEmail,
+    setCacheUserKind,
+} from '@services/userService';
 import { accountActions } from '@store/actions';
 import { Buffer } from 'buffer';
 
@@ -22,14 +29,14 @@ const useAppLogin = (role = 'student') => {
     const translate = useTranslate();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [ loadingProfileFetch, setLoadingProfileFetch ] = useState(false);
+    const [loadingProfileFetch, setLoadingProfileFetch] = useState(false);
 
     const base64Credentials = useMemo(() => {
         return typeof window !== 'undefined' && typeof window.btoa === 'function'
             ? window.btoa(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`)
             : typeof Buffer !== 'undefined'
-                ? Buffer.from(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`).toString('base64')
-                : '';
+              ? Buffer.from(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`).toString('base64')
+              : '';
     }, []);
 
     const { execute: executeLogin, loading: loadingLogin } = useFetch(apiConfig.account.loginOAuth);
