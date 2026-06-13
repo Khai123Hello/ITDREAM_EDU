@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 
 export function useScript(src, name) {
     // Keep track of script status ("idle", "loading", "ready", "error")
-    const [ status, setStatus ] = useState(src ? 'loading' : 'idle');
+    const [status, setStatus] = useState(src ? 'loading' : 'idle');
 
     const script = useMemo(() => {
         if (status === 'ready' && name) {
             return window[name];
         }
-    }, [ status, name ]);
+    }, [status, name]);
 
     useEffect(
         () => {
@@ -57,7 +57,7 @@ export function useScript(src, name) {
                 }
             };
         },
-        [ src ], // Only re-run effect if script src changes
+        [src], // Only re-run effect if script src changes
     );
 
     return { status, [name]: script };

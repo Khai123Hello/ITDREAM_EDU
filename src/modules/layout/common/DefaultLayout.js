@@ -27,8 +27,8 @@ const DefaultLayout = ({ children, title, layoutProps }) => {
     const { profile } = useAuth();
     const { execute: executeUpdateProfile } = useFetch(apiConfig.user.updateProfile, {});
     const dispatch = useDispatch();
-    const [ openModal, setOpen ] = useState(false);
-    const [ openModalProfile, setOpenProfile ] = useState(false);
+    const [openModal, setOpen] = useState(false);
+    const [openModalProfile, setOpenProfile] = useState(false);
     const collapsed = useSelector((state) => state.app.collapse);
     const handleSubmitProfile = (value, image) => {
         executeUpdateProfile({

@@ -1,10 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import styles from './index.module.scss';
 
 const TOP_CARDS = [
     {
-        badgeDots: [ 'filled', 'filled2', 'empty', 'empty', 'empty' ],
+        badgeDots: ['filled', 'filled2', 'empty', 'empty', 'empty'],
         title: 'Hồ sơ của bạn chưa hoàn thiện',
         description: 'Hồ sơ đầy đủ giúp bạn có cơ hội kết nối với nhà tuyển dụng.',
         link: '/profile',
@@ -38,7 +39,7 @@ const MOCK_RECOMMENDED_SIMS = [
         company: 'BRITISH AIRWAYS',
         companyClass: 'companyBa',
         title: 'Data Science',
-        meta: [ '📊 Data & Analytics', '● Trung cấp', '🕐 3–4 giờ' ],
+        meta: ['📊 Data & Analytics', '● Trung cấp', '🕐 3–4 giờ'],
     },
     {
         id: 2,
@@ -47,7 +48,7 @@ const MOCK_RECOMMENDED_SIMS = [
         company: 'Skyscanner',
         companyClass: 'companySky',
         title: 'Front-End Software Engineering',
-        meta: [ '💻 Software Engineering', '● Cơ bản', '🕐 1–2 giờ' ],
+        meta: ['💻 Software Engineering', '● Cơ bản', '🕐 1–2 giờ'],
     },
 ];
 
@@ -82,8 +83,34 @@ const MOCK_JOBS = [
     },
 ];
 
-function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loading }) {
+function DashboardDesktop({
+    profile,
+    enrolledSims = [],
+    enrolledUrlBase = '',
+    achievements = [],
+    achievementUrlBase = '',
+    loading,
+}) {
+    const navigate = useNavigate();
     const name = profile?.fullName || profile?.account?.fullName || '';
+
+    const handleCardClick = (simId) => {
+        navigate(`/simulations/${simId}`);
+    };
+
+    const handleResumeClick = (e, item, sim) => {
+        e.stopPropagation();
+        navigate(`/simulations/${sim.id}/task`, {
+            state: {
+                simulationEnrollmentId: item.id,
+                companyLogo: sim.educator?.organization?.logoUrl,
+            },
+        });
+    };
+
+    const handleDismissClick = (e) => {
+        e.stopPropagation();
+    };
 
     return (
         <div className={styles.container}>
@@ -121,7 +148,14 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
                             <div className={styles.cardActions}>
                                 <button className={styles.btnDismiss}>Bỏ qua</button>
                                 {card.link ? (
-                                    <a className={styles.linkBtn} href={card.link}>
+                                    <a
+                                        className={styles.linkBtn}
+                                        href={card.link}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigate(card.link);
+                                        }}
+                                    >
                                         Cập nhật hồ sơ <span className={styles.chevron}></span>
                                     </a>
                                 ) : (
@@ -150,28 +184,68 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
                                 const org = sim.educator?.organization || {};
                                 const orgName = org.shortName || org.name || '';
                                 const tasksLeft = sim.totalParticipant ? `${sim.totalParticipant} nhiệm vụ` : '';
+                                const logoUrl = org.logoUrl
+                                    ? org.logoUrl.startsWith('http')
+                                        ? org.logoUrl
+                                        : `${enrolledUrlBase}${org.logoUrl}`
+                                    : null;
+
                                 return (
-                                    <div key={item.id} className={styles.simCard}>
+                                    <div
+                                        key={item.id}
+                                        className={`${styles.simCard} ${styles.simCardClickable}`}
+                                        onClick={() => handleCardClick(sim.id)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleCardClick(sim.id)}
+                                    >
                                         <div>
                                             <div className={styles.simCardBody}>
                                                 <h4>{sim.title || 'Chưa có tiêu đề'}</h4>
                                                 <p>{sim.notice || 'Không có mô tả'}</p>
+                                                <div className={styles.progressRow}>
+                                                    <div className={styles.progressBarBg}>
+                                                        <div
+                                                            className={styles.progressBarFill}
+                                                            style={{ width: `${item.progress || 0}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className={styles.progressPercent}>
+                                                        {item.progress || 0}%
+                                                    </span>
+                                                </div>
                                                 {tasksLeft && <div className={styles.tasksLeft}>{tasksLeft}</div>}
                                             </div>
                                             <div className={styles.cardActions}>
-                                                <button className={styles.btnDismiss}>Bỏ qua</button>
-                                                <button className={styles.linkBtn}>
+                                                <button className={styles.btnDismiss} onClick={handleDismissClick}>
+                                                    Bỏ qua
+                                                </button>
+                                                <button
+                                                    className={styles.linkBtn}
+                                                    onClick={(e) => handleResumeClick(e, item, sim)}
+                                                >
                                                     Tiếp tục <span className={styles.chevron}></span>
                                                 </button>
                                             </div>
                                         </div>
-                                        {orgName && <div className={styles.simLogo}>{orgName}</div>}
+                                        {logoUrl ? (
+                                            <img src={logoUrl} alt={orgName} className={styles.simLogoImg} />
+                                        ) : (
+                                            orgName && <div className={styles.simLogo}>{orgName}</div>
+                                        )}
                                     </div>
                                 );
                             })
                         )}
 
-                        <a className={styles.viewAll} href="/simulations">
+                        <a
+                            className={styles.viewAll}
+                            href="/simulations"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate('/simulations');
+                            }}
+                        >
                             Tất cả bài mô phỏng <span className={styles.chevron}></span>
                         </a>
 
@@ -196,7 +270,10 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
                                     </div>
                                     <div className={styles.cardActions}>
                                         <button className={styles.btnDismiss}>Bỏ qua</button>
-                                        <button className={styles.linkBtn}>
+                                        <button
+                                            className={styles.linkBtn}
+                                            onClick={() => navigate(`/simulations/${sim.id}`)}
+                                        >
                                             Xem chi tiết <span className={styles.chevron}></span>
                                         </button>
                                     </div>
@@ -204,7 +281,14 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
                             </div>
                         ))}
 
-                        <a className={styles.viewAll} href="/simulations">
+                        <a
+                            className={styles.viewAll}
+                            href="/simulations"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate('/simulations');
+                            }}
+                        >
                             Xem tất cả <span className={styles.chevron}></span>
                         </a>
                     </div>
@@ -215,17 +299,37 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
                         </div>
 
                         {achievements.length > 0 ? (
-                            achievements.map((ach) => (
-                                <div key={ach.id} className={styles.achievementCard} style={{ marginBottom: 24 }}>
-                                    <div className={styles.trophyIcon}>🎯</div>
-                                    <div>
-                                        <h4>{ach.simulation?.title || 'Thành tích'}</h4>
-                                        {ach.filePath && (
-                                            <p className={styles.achievementDesc}>Chứng chỉ đã hoàn thành</p>
-                                        )}
+                            achievements.map((ach) => {
+                                const sim = ach.simulation || {};
+                                const filePath = ach.filePath || '';
+                                const fullFilePath = filePath
+                                    ? filePath.startsWith('http')
+                                        ? filePath
+                                        : `${achievementUrlBase}${filePath}`
+                                    : null;
+
+                                return (
+                                    <div key={ach.id} className={styles.achievementCard} style={{ marginBottom: 24 }}>
+                                        <div className={styles.trophyIcon}>🎯</div>
+                                        <div>
+                                            <h4>{sim.title || 'Thành tích'}</h4>
+                                            <div className={styles.achievementMeta}>
+                                                <p className={styles.achievementDesc}>Chứng chỉ đã hoàn thành</p>
+                                                {fullFilePath && (
+                                                    <a
+                                                        href={fullFilePath}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={styles.certificateLink}
+                                                    >
+                                                        Xem chứng chỉ <span className={styles.chevron}></span>
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div className={styles.achievementCard} style={{ marginBottom: 24 }}>
                                 <div className={styles.trophyIcon}>{MOCK_ACHIEVEMENT.icon}</div>
@@ -236,6 +340,10 @@ function DashboardDesktop({ profile, enrolledSims = [], achievements = [], loadi
                                         className={styles.viewAll}
                                         href="/simulations"
                                         style={{ textAlign: 'left', display: 'inline-block', marginTop: 0 }}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigate('/simulations');
+                                        }}
                                     >
                                         Khám phá bài mô phỏng <span className={styles.chevron}></span>
                                     </a>

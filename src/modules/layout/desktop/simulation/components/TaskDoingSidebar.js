@@ -9,7 +9,7 @@ export default function TaskDoingSidebar({
     selectedParentTaskId = null,
     onSelectParentTask = () => {},
 }) {
-    const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
+    const [achievementsExpanded, setAchievementsExpanded] = useState(true);
 
     return (
         <aside className="tfo-sidebar">

@@ -69,13 +69,45 @@ function MarkdownContent({ text }) {
         const li = line.match(/^\*\s+(.+)/);
         const blank = line.trim() === '';
 
-        if (h1) { flushList(); elements.push(<h2 key={key++} className="tfo-block-h1">{h1[1]}</h2>); return; }
-        if (h2) { flushList(); elements.push(<h2 key={key++} className="tfo-block-h2">{h2[1]}</h2>); return; }
-        if (h3) { flushList(); elements.push(<h3 key={key++} className="tfo-block-h3">{h3[1]}</h3>); return; }
-        if (li) { listItems.push(li[1]); return; }
-        if (blank) { flushList(); return; }
+        if (h1) {
+            flushList();
+            elements.push(
+                <h2 key={key++} className="tfo-block-h1">
+                    {h1[1]}
+                </h2>,
+            );
+            return;
+        }
+        if (h2) {
+            flushList();
+            elements.push(
+                <h2 key={key++} className="tfo-block-h2">
+                    {h2[1]}
+                </h2>,
+            );
+            return;
+        }
+        if (h3) {
+            flushList();
+            elements.push(
+                <h3 key={key++} className="tfo-block-h3">
+                    {h3[1]}
+                </h3>,
+            );
+            return;
+        }
+        if (li) {
+            listItems.push(li[1]);
+            return;
+        }
+        if (blank) {
+            flushList();
+            return;
+        }
         flushList();
-        elements.push(<p key={key++} className="tfo-block-text" dangerouslySetInnerHTML={{ __html: parseInline(line) }} />);
+        elements.push(
+            <p key={key++} className="tfo-block-text" dangerouslySetInnerHTML={{ __html: parseInline(line) }} />,
+        );
     });
     flushList();
     return <div className="tfo-markdown-content">{elements}</div>;
@@ -84,13 +116,15 @@ function MarkdownContent({ text }) {
 /* ─────────────────────────── Quiz Block (interactive) ─────────────────── */
 
 function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAnswerSubmit = () => {} }) {
-    const [ selected, setSelected ]   = useState(null);
-    const [ submitted, setSubmitted ] = useState(false);
+    const [selected, setSelected] = useState(null);
+    const [submitted, setSubmitted] = useState(false);
 
-    const correct    = (block.options || []).findIndex((o) => o.answer === true);
+    const correct = (block.options || []).findIndex((o) => o.answer === true);
     const savedAnswer = submittedAnswer?.answer;
-    const savedOptionIndex = (block.options || []).findIndex((o) => o.option === savedAnswer || o.value === savedAnswer);
-    const effectiveSelected  = savedAnswer ? savedOptionIndex : selected;
+    const savedOptionIndex = (block.options || []).findIndex(
+        (o) => o.option === savedAnswer || o.value === savedAnswer,
+    );
+    const effectiveSelected = savedAnswer ? savedOptionIndex : selected;
     const effectiveSubmitted = Boolean(savedAnswer) || submitted;
     const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
@@ -150,11 +184,7 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
             {/* Footer */}
             <div className="tfo-block-quiz-footer">
                 {!effectiveSubmitted ? (
-                    <button
-                        className="tfo-quiz-submit-btn"
-                        disabled={selected === null}
-                        onClick={handleSubmit}
-                    >
+                    <button className="tfo-quiz-submit-btn" disabled={selected === null} onClick={handleSubmit}>
                         Kiểm tra đáp án
                     </button>
                 ) : (
@@ -162,9 +192,11 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
                         <span className={`tfo-quiz-result-label ${isCorrect ? 'correct' : 'wrong'}`}>
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
-                        {!savedAnswer && <button className="tfo-quiz-retry-btn" onClick={handleReset}>
-                            Làm lại
-                        </button>}
+                        {!savedAnswer && (
+                            <button className="tfo-quiz-retry-btn" onClick={handleReset}>
+                                Làm lại
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
@@ -176,112 +208,112 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
 
 function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
     switch (block.type) {
-                    case 'meta':
-                        return (
-                            <div className="tfo-block-meta">
-                                <span className="tfo-block-meta-val">{block.duration}</span>
-                                <span className="tfo-block-meta-dot">·</span>
-                                <span className="tfo-block-meta-val">{block.level}</span>
-                            </div>
-                        );
+        case 'meta':
+            return (
+                <div className="tfo-block-meta">
+                    <span className="tfo-block-meta-val">{block.duration}</span>
+                    <span className="tfo-block-meta-dot">·</span>
+                    <span className="tfo-block-meta-val">{block.level}</span>
+                </div>
+            );
 
-                    case 'section':
-                        return (
-                            <div className="tfo-block-section">
-                                <div className="tfo-block-section-header">
-                                    <span className="tfo-block-section-icon">{block.icon}</span>
-                                    <span className="tfo-block-section-title">{block.title}</span>
-                                </div>
-                                <ul className="tfo-block-section-list">
-                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
-                                        <li key={i}>{b}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        );
+        case 'section':
+            return (
+                <div className="tfo-block-section">
+                    <div className="tfo-block-section-header">
+                        <span className="tfo-block-section-icon">{block.icon}</span>
+                        <span className="tfo-block-section-title">{block.title}</span>
+                    </div>
+                    <ul className="tfo-block-section-list">
+                        {(block.bullets || []).filter(Boolean).map((b, i) => (
+                            <li key={i}>{b}</li>
+                        ))}
+                    </ul>
+                </div>
+            );
 
-                    case 'text':
-                        return <p className="tfo-block-text">{block.content}</p>;
+        case 'text':
+            return <p className="tfo-block-text">{block.content}</p>;
 
-                    case 'h1':
-                        return <h2 className="tfo-block-h1">{block.content}</h2>;
+        case 'h1':
+            return <h2 className="tfo-block-h1">{block.content}</h2>;
 
-                    case 'h2':
-                        return <h3 className="tfo-block-h2">{block.content}</h3>;
+        case 'h2':
+            return <h3 className="tfo-block-h2">{block.content}</h3>;
 
-                    case 'h3':
-                        return <h4 className="tfo-block-h3">{block.content}</h4>;
+        case 'h3':
+            return <h4 className="tfo-block-h3">{block.content}</h4>;
 
-                    case 'bullet':
-                        return (
-                            <div className="tfo-block-bullet-wrap">
-                                <span className="tfo-block-bullet-dot">•</span>
-                                <span className="tfo-block-bullet-text">{block.content}</span>
-                            </div>
-                        );
+        case 'bullet':
+            return (
+                <div className="tfo-block-bullet-wrap">
+                    <span className="tfo-block-bullet-dot">•</span>
+                    <span className="tfo-block-bullet-text">{block.content}</span>
+                </div>
+            );
 
-                    case 'numbered': {
-                        const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
-                        return (
-                            <div className="tfo-block-bullet-wrap">
-                                <span className="tfo-block-num-label">{num}.</span>
-                                <span className="tfo-block-bullet-text">{block.content}</span>
-                            </div>
-                        );
+        case 'numbered': {
+            const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
+            return (
+                <div className="tfo-block-bullet-wrap">
+                    <span className="tfo-block-num-label">{num}.</span>
+                    <span className="tfo-block-bullet-text">{block.content}</span>
+                </div>
+            );
+        }
+
+        case 'divider':
+            return <hr className="tfo-block-divider" />;
+
+        case 'callout':
+            return (
+                <div className="tfo-block-callout">
+                    <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
+                    <span className="tfo-block-callout-text">{block.content}</span>
+                </div>
+            );
+
+        case 'code':
+            return (
+                <div className="tfo-block-code">
+                    <pre>{block.content}</pre>
+                </div>
+            );
+
+        case 'step': {
+            const renderStepBody = (text) => {
+                if (!text) return '';
+                const parts = text.split(/(`[^`]+`)/g);
+                return parts.map((part, pi) => {
+                    if (part.startsWith('`') && part.endsWith('`')) {
+                        return <code key={pi}>{part.slice(1, -1)}</code>;
                     }
+                    return part;
+                });
+            };
+            return (
+                <div className="tfo-block-step">
+                    <span className="tfo-block-step-label">{block.label}:</span>
+                    <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                </div>
+            );
+        }
 
-                    case 'divider':
-                        return <hr className="tfo-block-divider" />;
+        case 'quiz': {
+            const questionKey = (block.question || '').trim();
+            const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
+            return (
+                <QuizBlock
+                    block={block}
+                    submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
+                    questionId={questionId}
+                    onQuizAnswerSubmit={onQuizAnswerSubmit}
+                />
+            );
+        }
 
-                    case 'callout':
-                        return (
-                            <div className="tfo-block-callout">
-                                <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
-                                <span className="tfo-block-callout-text">{block.content}</span>
-                            </div>
-                        );
-
-                    case 'code':
-                        return (
-                            <div className="tfo-block-code">
-                                <pre>{block.content}</pre>
-                            </div>
-                        );
-
-                    case 'step': {
-                        const renderStepBody = (text) => {
-                            if (!text) return '';
-                            const parts = text.split(/(`[^`]+`)/g);
-                            return parts.map((part, pi) => {
-                                if (part.startsWith('`') && part.endsWith('`')) {
-                                    return <code key={pi}>{part.slice(1, -1)}</code>;
-                                }
-                                return part;
-                            });
-                        };
-                        return (
-                            <div className="tfo-block-step">
-                                <span className="tfo-block-step-label">{block.label}:</span>
-                                <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
-                            </div>
-                        );
-                    }
-
-                    case 'quiz': {
-                        const questionKey = (block.question || '').trim();
-                        const questionId = questionKey ? questionMap[questionKey] ?? null : null;
-                        return (
-                            <QuizBlock
-                                block={block}
-                                submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
-                                questionId={questionId}
-                                onQuizAnswerSubmit={onQuizAnswerSubmit}
-                            />
-                        );
-                    }
-
-                    default:
-                        return null;
+        default:
+            return null;
     }
 }
 
@@ -289,9 +321,12 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap 
 
 function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
     const blocks = useMemo(() => {
-        try { return JSON.parse(blocksJson); }
-        catch { return []; }
-    }, [ blocksJson ]);
+        try {
+            return JSON.parse(blocksJson);
+        } catch {
+            return [];
+        }
+    }, [blocksJson]);
 
     return (
         <div className="tfo-blocks-content">
@@ -313,8 +348,8 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, o
 /* ─────────────────────────── Content Router ─────────────────────────── */
 
 function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
-    const type = useMemo(() => detectContentType(content), [ content ]);
-    if (type === 'empty')    return <p className="tfo-empty-content">Không có nội dung.</p>;
+    const type = useMemo(() => detectContentType(content), [content]);
+    if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
         return (
             <BlocksContent
@@ -332,25 +367,31 @@ function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, on
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
 
 function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
-    const [ dragging, setDragging ] = useState(false);
-    const [ file, setFile ]         = useState(null);
+    const [dragging, setDragging] = useState(false);
+    const [file, setFile] = useState(null);
 
     useEffect(() => {
         setFile(null);
-    }, [ previousFile ]);
+    }, [previousFile]);
 
     const handleDrop = (e) => {
         e.preventDefault();
         if (disabled) return;
         setDragging(false);
         const f = e.dataTransfer.files?.[0];
-        if (f) { setFile(f); onFileChange(f); }
+        if (f) {
+            setFile(f);
+            onFileChange(f);
+        }
     };
 
     const handleChange = (e) => {
         if (disabled) return;
         const f = e.target.files?.[0];
-        if (f) { setFile(f); onFileChange(f); }
+        if (f) {
+            setFile(f);
+            onFileChange(f);
+        }
     };
 
     const getFileName = (path) => {
@@ -359,7 +400,7 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         return decodeURIComponent(parts[parts.length - 1]);
     };
 
-    const displayFileName = file ? file.name : (previousFile ? getFileName(previousFile) : '');
+    const displayFileName = file ? file.name : previousFile ? getFileName(previousFile) : '';
 
     return (
         <div className={`tfo-upload-card${disabled ? ' disabled' : ''}`}>
@@ -375,8 +416,19 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
             >
                 {!disabled && <input type="file" style={{ display: 'none' }} onChange={handleChange} />}
                 <svg className="tfo-dropzone-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M8 1v10M4 5l4-4 4 4" stroke="#5f5e5e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="#5f5e5e" strokeWidth="1.5" strokeLinecap="round" />
+                    <path
+                        d="M8 1v10M4 5l4-4 4 4"
+                        stroke="#5f5e5e"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"
+                        stroke="#5f5e5e"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                    />
                 </svg>
                 {displayFileName ? (
                     <span className="tfo-file-chosen">
@@ -412,8 +464,12 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
         <footer className="tfo-footer-nav">
             <div className="tfo-footer-inner">
                 <div className="tfo-footer-buttons">
-                    <button className="tfo-btn-back" onClick={onBack} disabled={!canGoBack}>Quay lại</button>
-                    <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>Tiếp tục</button>
+                    <button className="tfo-btn-back" onClick={onBack} disabled={!canGoBack}>
+                        Quay lại
+                    </button>
+                    <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>
+                        Tiếp tục
+                    </button>
                 </div>
             </div>
         </footer>
@@ -434,30 +490,30 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
 export default function TaskDoingPage({
     // Loading/Error
     loading = false,
-    error   = null,
+    error = null,
     onRetry = () => {},
 
     // Sidebar
-    taskNumber          = 1,
-    taskLabel           = 'Nhiệm vụ',
-    taskDescription     = '',
-    companyLogo         = null,
-    parentTasks         = [],
+    taskNumber = 1,
+    taskLabel = 'Nhiệm vụ',
+    taskDescription = '',
+    companyLogo = null,
+    parentTasks = [],
     selectedParentTaskId = null,
-    onSelectParentTask  = () => {},
+    onSelectParentTask = () => {},
 
     // Subtask navigation
-    subtasks          = [],
+    subtasks = [],
     selectedSubtaskId = null,
-    onSelectSubtask   = () => {},
+    onSelectSubtask = () => {},
 
     // Content
-    pageTitle              = 'Nhiệm vụ',
-    taskHeading            = 'Đang tải...',
-    taskBody               = '',
+    pageTitle = 'Nhiệm vụ',
+    taskHeading = 'Đang tải...',
+    taskBody = '',
     taskDescriptionContent = '',
-    mediaPath              = null,
-    urlBase                = '',
+    mediaPath = null,
+    urlBase = '',
 
     // Progress
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
@@ -465,32 +521,32 @@ export default function TaskDoingPage({
     // Navigation
     canGoBack = false,
     canGoNext = false,
-    onBack    = () => {},
-    onNext    = () => {},
+    onBack = () => {},
+    onNext = () => {},
 
     // Submission
-    onFileChange         = () => {},
-    requiresFileUpload   = false,
+    onFileChange = () => {},
+    requiresFileUpload = false,
     requiresTextResponse = false,
-    previousFile         = null,
-    previousText         = '',
+    previousFile = null,
+    previousText = '',
     onTextResponseSubmit = () => {},
-    quizSubmissionMap    = {},
-    questionMap          = {},
-    onQuizAnswerSubmit   = () => {},
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
 }) {
-    const [ textInput, setTextInput ] = useState('');
+    const [textInput, setTextInput] = useState('');
 
     useEffect(() => {
         setTextInput(previousText || '');
-    }, [ previousText ]);
+    }, [previousText]);
 
     const renderMedia = () => {
         if (!mediaPath) return null;
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
         const ext = mediaPath.split('.').pop().toLowerCase();
 
-        if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -499,7 +555,7 @@ export default function TaskDoingPage({
                 </div>
             );
         }
-        if ([ 'mp4', 'webm', 'ogg' ].includes(ext)) {
+        if (['mp4', 'webm', 'ogg'].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -531,7 +587,9 @@ export default function TaskDoingPage({
                                 <main className="tfo-pane">
                                     <div className="tfo-error-container">
                                         <p>Lỗi tải nhiệm vụ. Vui lòng thử lại.</p>
-                                        <button className="tfo-error-retry" onClick={onRetry}>Thử lại</button>
+                                        <button className="tfo-error-retry" onClick={onRetry}>
+                                            Thử lại
+                                        </button>
                                     </div>
                                 </main>
                             </div>
@@ -556,7 +614,10 @@ export default function TaskDoingPage({
                             </div>
                             <div className="tfo-content-area">
                                 <aside className="tfo-sidebar" />
-                                <main className="tfo-pane" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <main
+                                    className="tfo-pane"
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                >
                                     <Spin size="large" />
                                 </main>
                             </div>
@@ -569,9 +630,8 @@ export default function TaskDoingPage({
 
     /* ── Progress ── */
     const activeSubtaskIndex = subtasks.findIndex((s) => s.id === selectedSubtaskId);
-    const progressPercentage = subtasks.length > 0 && selectedSubtaskId
-        ? ((activeSubtaskIndex + 1) / subtasks.length) * 100
-        : 0;
+    const progressPercentage =
+        subtasks.length > 0 && selectedSubtaskId ? ((activeSubtaskIndex + 1) / subtasks.length) * 100 : 0;
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed';
@@ -662,7 +722,9 @@ export default function TaskDoingPage({
                                                 {/* Text response section */}
                                                 {requiresTextResponse && (
                                                     <div className="tfo-text-response-section">
-                                                        <div className="tfo-text-response-label">Câu trả lời của bạn</div>
+                                                        <div className="tfo-text-response-label">
+                                                            Câu trả lời của bạn
+                                                        </div>
                                                         <textarea
                                                             className="tfo-text-response-textarea"
                                                             placeholder="Nhập câu trả lời của bạn ở đây..."
