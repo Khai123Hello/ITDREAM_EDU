@@ -24,7 +24,7 @@ function PasswordInput({
     classNames,
     ...props
 }) {
-    const [visible, setVisible] = useState(false);
+    const [ visible, setVisible ] = useState(false);
 
     const toggleVisibility = () => setVisible((prev) => !prev);
 

@@ -4,8 +4,8 @@ import classNames from 'classnames';
 import styles from './index.module.scss';
 
 function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory, onCategoryChange }) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [currentPage, setCurrentPage] = useState(0);
+    const [ searchQuery, setSearchQuery ] = useState('');
+    const [ currentPage, setCurrentPage ] = useState(0);
     const itemsPerPage = 8;
 
     const getImageUrl = (imagePath) => {
@@ -32,7 +32,7 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
             );
         }
         return result;
-    }, [blogs, selectedCategory, searchQuery]);
+    }, [ blogs, selectedCategory, searchQuery ]);
 
     // Total pages calculation
     const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
@@ -41,7 +41,7 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
     const paginatedBlogs = useMemo(() => {
         const start = currentPage * itemsPerPage;
         return filteredBlogs.slice(start, start + itemsPerPage);
-    }, [filteredBlogs, currentPage]);
+    }, [ filteredBlogs, currentPage ]);
 
     // Determine the featured blog on the first page
     const featuredBlog = currentPage === 0 ? filteredBlogs[0] : null;

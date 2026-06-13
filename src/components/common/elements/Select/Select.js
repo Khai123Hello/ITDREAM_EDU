@@ -34,7 +34,7 @@ function Select({
 }) {
     const _placeholder = label || placeholder;
 
-    const [_value, _onChange] = useUncontrolled({ value, onChange });
+    const [ _value, _onChange ] = useUncontrolled({ value, onChange });
 
     const hasValue = {
         'data-value': _value != undefined && _value?.length != 0,
@@ -93,7 +93,7 @@ function Select({
         return () => {
             document.removeEventListener('touchstart', handleTouchStart);
         };
-    }, [finalInputRef]);
+    }, [ finalInputRef ]);
 
     return (
         <div>
