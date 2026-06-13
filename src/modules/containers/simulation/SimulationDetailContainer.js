@@ -188,6 +188,14 @@ function SimulationDetailContainer() {
 
                 // Store enrollment success flag for TaskDoing page to show notification on reload
                 sessionStorage.setItem(`enrollmentSuccess-${simulationId}`, 'true');
+
+                // Navigate to task doing page with simulationEnrollmentId immediately
+                navigate(`/simulations/${simulationId}/task`, {
+                    state: {
+                        simulationEnrollmentId: enrollmentId,
+                        companyLogo: simulationData?.educator?.organization?.logoUrl,
+                    },
+                });
             } else {
                 message.error(result?.message || 'Đăng ký thất bại. Vui lòng thử lại');
             }
@@ -196,7 +204,7 @@ function SimulationDetailContainer() {
         } finally {
             setEnrollmentLoading(false);
         }
-    }, [simulationId, isAuthenticated, enrollToSimulation, checkEnrollment, navigate]);
+    }, [simulationId, isAuthenticated, enrollToSimulation, checkEnrollment, navigate, simulationData]);
 
     // Handle login button click
     const handleLogin = useCallback(() => {
