@@ -10,8 +10,8 @@ import Popover from '../../Popover';
 import styles from './TableAction.module.scss';
 
 function TableAction({ data, actions = [], border = false }) {
-    const [open, setOpen] = useState(false);
-    const [_actions, setActions] = useState(actions);
+    const [ open, setOpen ] = useState(false);
+    const [ _actions, setActions ] = useState(actions);
 
     useEffect(() => {
         const newActions = actions.map((action) => {
@@ -39,8 +39,8 @@ function TableAction({ data, actions = [], border = false }) {
             return action;
         });
 
-        setActions([...newActions.filter((item) => item)]);
-    }, [actions]);
+        setActions([ ...newActions.filter((item) => item) ]);
+    }, [ actions ]);
 
     const ActionItem = useCallback(
         ({ label, icon, onClick = () => {} }) => (
@@ -55,7 +55,7 @@ function TableAction({ data, actions = [], border = false }) {
                 <span className={FONT_FAMILY.className}>{label}</span>
             </div>
         ),
-        [data],
+        [ data ],
     );
 
     if (!_actions?.length) {

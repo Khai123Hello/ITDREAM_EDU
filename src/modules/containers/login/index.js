@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import RenderContext from '@components/common/elements/RenderContext';
 import useAppLogin from '@hooks/useAppLogin';
 import LoginPageDesktop from '@modules/layout/desktop/login';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import useForm from 'rc-field-form/lib/useForm';
 
 const LoginPageContainer = () => {
     const navigate = useNavigate();
-    const [form] = useForm();
-    const { loading, handleLogin } = useAppLogin('student');
+    const [ form ] = useForm();
+    const { loading, handleLogin, handleGoogleLogin } = useAppLogin('student');
 
     const handleForgotPasswordClick = () => {
         navigate('/change-password');
@@ -22,6 +23,7 @@ const LoginPageContainer = () => {
         defaultTheme: () => (
             <LoginPageDesktop
                 onFinish={handleLogin}
+                onGoogleLogin={handleGoogleLogin}
                 handleForgotPasswordClick={handleForgotPasswordClick}
                 handleRegisterPage={handleRegisterPage}
                 form={form}
@@ -34,14 +36,16 @@ const LoginPageContainer = () => {
     };
 
     return (
-        <RenderContext
-            components={{
-                desktop: {
-                    defaultTheme: LoginPageDesktop,
-                },
-            }}
-            layout={layout}
-        />
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
+            <RenderContext
+                components={{
+                    desktop: {
+                        defaultTheme: LoginPageDesktop,
+                    },
+                }}
+                layout={layout}
+            />
+        </GoogleOAuthProvider>
     );
 };
 

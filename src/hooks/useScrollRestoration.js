@@ -22,7 +22,7 @@ const useScrollRestoration = () => {
 
         root.addEventListener('scroll', handleScroll);
         return () => root.removeEventListener('scroll', handleScroll);
-    }, [location]);
+    }, [ location ]);
 };
 
 export default useScrollRestoration;

@@ -17,7 +17,7 @@ const Tooltip = ({
     container,
     ...props
 }) => {
-    const [_open, _onOpenChange] = useUncontrolled({ value: open, onChange: onOpenChange });
+    const [ _open, _onOpenChange ] = useUncontrolled({ value: open, onChange: onOpenChange });
     return (
         <RadixTooltip.Root
             delayDuration={delayDuration}
