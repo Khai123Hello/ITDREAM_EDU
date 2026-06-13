@@ -31,7 +31,6 @@ function DashboardPageContainer() {
                 enrolledSims={enrolledRes?.data?.content || []}
                 enrolledUrlBase={enrolledRes?.urlBase || ''}
                 achievements={achievementRes?.data?.content || []}
-                achievementUrlBase={achievementRes?.urlBase || ''}
                 loading={simLoading || achLoading}
             />
             <AppFooter />

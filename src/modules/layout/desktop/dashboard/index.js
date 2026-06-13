@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppConstants } from '@constants';
 
 import styles from './index.module.scss';
 
@@ -83,14 +84,7 @@ const MOCK_JOBS = [
     },
 ];
 
-function DashboardDesktop({
-    profile,
-    enrolledSims = [],
-    enrolledUrlBase = '',
-    achievements = [],
-    achievementUrlBase = '',
-    loading,
-}) {
+function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', achievements = [], loading }) {
     const navigate = useNavigate();
     const name = profile?.fullName || profile?.account?.fullName || '';
 
@@ -305,7 +299,7 @@ function DashboardDesktop({
                                 const fullFilePath = filePath
                                     ? filePath.startsWith('http')
                                         ? filePath
-                                        : `${achievementUrlBase}${filePath}`
+                                        : `${AppConstants.contentRootUrl}${filePath}`
                                     : null;
 
                                 return (

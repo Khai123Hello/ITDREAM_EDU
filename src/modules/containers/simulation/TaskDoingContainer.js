@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import apiConfig from '@constants/apiConfig';
+import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
 import useTaskHierarchy from '@hooks/useTaskHierarchy';
 import TaskDoingPage from '@modules/layout/desktop/simulation/TaskDoingPage';
@@ -251,8 +252,15 @@ function TaskDoingContainer() {
         false,
     );
 
+    const { profile } = useAuth();
+    const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+    const [congratsData, setCongratsData] = useState({ show: false, filePath: '' });
+
     const { execute: uploadFile } = useFetch(apiConfig.file.upload, {}, false);
     const { execute: createQuizHistory } = useFetch(apiConfig.questionQuizHistory.create, {}, false);
+    const { execute: uploadCertificate } = useFetch(apiConfig.file.uploadCertificate, {}, false);
+    const { execute: fetchAchievements } = useFetch(apiConfig.achievement.studentList, {}, false);
+    const { execute: updateAchievement } = useFetch(apiConfig.achievement.update, {}, false);
     const { execute: fetchTaskQuestions } = useFetch(
         apiConfig.taskQuestion.studentList,
         {
@@ -260,6 +268,24 @@ function TaskDoingContainer() {
         },
         false,
     );
+
+    // Fetch simulation detail
+    const { data: simulationDetail, execute: fetchSimulationDetail } = useFetch(
+        apiConfig.simulation.studentGet,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    // Load simulation detail on mount
+    React.useEffect(() => {
+        if (simulationId) {
+            fetchSimulationDetail({
+                pathParams: { id: simulationId },
+            });
+        }
+    }, [simulationId, fetchSimulationDetail]);
 
     // State to store mapping of question text to question ID
     const [questionMap, setQuestionMap] = useState({});
@@ -817,7 +843,48 @@ function TaskDoingContainer() {
                 refetchProgress({
                     params: { simulationEnrollmentId },
                 });
-                message.success('Bạn đã hoàn thành toàn bộ bài mô phỏng!');
+
+                setIsGeneratingCert(true);
+                try {
+                    const simulationTitle =
+                        simulationDetail?.title || selectedParentTask?.simulation?.title || 'Bài mô phỏng';
+                    const username = profile?.username || '';
+
+                    // 1. Tạo chứng chỉ
+                    const certRes = await uploadCertificate({
+                        dataBody: {
+                            simulationTitle,
+                            username,
+                        },
+                    });
+
+                    const filePath = certRes?.data?.filePath || certRes?.filePath;
+                    if (!filePath) {
+                        throw new Error('Không nhận được tệp chứng chỉ từ máy chủ.');
+                    }
+
+                    // 2. Lấy danh sách thành tựu của học viên
+                    const achRes = await fetchAchievements();
+                    const achievements = achRes?.data?.content || achRes?.content || [];
+                    const currentAch = achievements.find((ach) => ach.simulation?.id === parseInt(simulationId, 10));
+
+                    if (currentAch) {
+                        // 3. Cập nhật đường dẫn chứng chỉ vào thành tựu
+                        await updateAchievement({
+                            dataBody: {
+                                id: currentAch.id,
+                                filePath,
+                            },
+                        });
+                    }
+
+                    message.success('Chúc mừng bạn đã hoàn thành toàn bộ bài mô phỏng!');
+                    setCongratsData({ show: true, filePath });
+                } catch (certErr) {
+                    message.error('Hoàn thành bài mô phỏng nhưng không thể tạo chứng chỉ. Vui lòng thử lại sau.');
+                } finally {
+                    setIsGeneratingCert(false);
+                }
                 return;
             }
 
@@ -851,6 +918,12 @@ function TaskDoingContainer() {
         simulationEnrollmentId,
         subtasks,
         validateCurrentSubtask,
+        profile,
+        uploadCertificate,
+        fetchAchievements,
+        updateAchievement,
+        simulationId,
+        simulationDetail,
     ]);
 
     // Determine task status display
@@ -867,7 +940,10 @@ function TaskDoingContainer() {
         taskNumber: parentTasks.indexOf(selectedParentTask) + 1,
         taskLabel: selectedParentTask?.title || 'Nhiệm vụ',
         taskDescription: selectedParentTask?.description || '',
-        companyLogo: companyLogo || selectedParentTask?.simulation?.educator?.organization?.logoUrl,
+        companyLogo:
+            companyLogo ||
+            simulationDetail?.educator?.organization?.logoUrl ||
+            selectedParentTask?.simulation?.educator?.organization?.logoUrl,
 
         // Subtask navigation
         subtasks: subtasks,
@@ -902,6 +978,14 @@ function TaskDoingContainer() {
         quizSubmissionMap,
         questionMap,
         onQuizAnswerSubmit: handleQuizAnswerSubmit,
+
+        // Profile details
+        profile,
+
+        // Certificate and congrats
+        isGeneratingCert,
+        congratsData,
+        onCloseCongrats: () => setCongratsData({ show: false, filePath: '' }),
     };
 
     const loading = progressLoading || detailLoading || taskListLoading || progressDetailLoading;
