@@ -4,6 +4,7 @@ import PageNotFound from '@components/common/page/PageNotFound';
 import BlogListContainer from '@modules/containers/blog';
 import BlogDetailContainer from '@modules/containers/blog/detail';
 import DashBoardPageContainer from '@modules/containers/dashboard';
+import JobsPageContainer from '@modules/containers/jobs';
 import LandingPageContainer from '@modules/containers/landing';
 import LoginPageContainer from '@modules/containers/login';
 import PolicyContainer from '@modules/containers/policy';
@@ -50,6 +51,12 @@ const routes = {
         component: BlogDetailContainer,
         auth: null,
         title: 'Chi tiết Blog',
+    },
+    jobsPage: {
+        path: '/jobs',
+        component: JobsPageContainer,
+        auth: null,
+        title: 'Việc làm IT',
     },
     loginPage: {
         path: '/login',

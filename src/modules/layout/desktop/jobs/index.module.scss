@@ -1,0 +1,639 @@
+/* ── VARIABLES ── */
+$blue-primary: #1a56db;
+$blue-hover: #1348c0;
+$blue-light: #eff4ff;
+$green-tag: #057a55;
+$green-bg: #f3faf7;
+$orange-tag: #c27803;
+$orange-bg: #fdf6ec;
+$purple-tag: #6c2bd9;
+$purple-bg: #f5f0ff;
+$gray-900: #111827;
+$gray-700: #374151;
+$gray-500: #6b7280;
+$gray-400: #9ca3af;
+$gray-200: #e5e7eb;
+$gray-100: #f3f4f6;
+$gray-50: #f9fafb;
+$white: #ffffff;
+$border: #e5e7eb;
+$shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+$shadow-md: 0 4px 12px rgba(0,0,0,.1);
+$radius: 10px;
+$radius-sm: 6px;
+$transition-smooth: all 0.2s ease;
+
+/* ── CONTAINER ── */
+.jobsContainer {
+    width: 100%;
+    background: $white;
+    min-height: 80vh;
+}
+
+/* ── HERO ── */
+.hero {
+    padding: 40px 32px 28px;
+    max-width: 900px;
+    margin: 0 auto;
+
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.3;
+        color: $gray-900;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 14.5px;
+        color: $gray-500;
+        line-height: 1.6;
+    }
+}
+
+/* ── FILTER BAR ── */
+.filterBar {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px 16px;
+}
+
+.filterTabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.tabBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid $border;
+    background: $white;
+    font-size: 13px;
+    font-weight: 600;
+    color: $gray-700;
+    cursor: pointer;
+    transition: $transition-smooth;
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    &:hover {
+        border-color: $blue-primary;
+        color: $blue-primary;
+        background: $gray-50;
+    }
+
+    &.active {
+        background: $blue-primary;
+        border-color: $blue-primary;
+        color: $white;
+    }
+}
+
+.filterDropdowns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.selectWrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.filterSelect {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 30px 8px 14px;
+    border-radius: 8px;
+    border: 1px solid $border;
+    background: $white;
+    font-size: 13px;
+    font-weight: 500;
+    color: $gray-700;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    outline: none;
+
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3e%3cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+
+    &:hover {
+        border-color: $blue-primary;
+    }
+}
+
+.resultCount {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px 16px;
+    font-size: 13px;
+    color: $gray-500;
+}
+
+/* ── MAIN LAYOUT ── */
+.mainLayout {
+    display: grid;
+    grid-template-columns: 1fr 0px;
+    gap: 0;
+    max-width: 1200px;
+    padding: 0 32px;
+    margin: 0 auto;
+    transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mainLayout.panelOpen {
+    grid-template-columns: 1fr 390px;
+    gap: 24px;
+}
+
+/* ── JOB LIST ── */
+.jobList {
+    display: flex;
+    flex-direction: column;
+}
+
+.noJobs {
+    padding: 40px;
+    text-align: center;
+    color: $gray-500;
+    font-size: 14.5px;
+    border: 1.5px dashed $border;
+    border-radius: $radius;
+    background: $gray-50;
+}
+
+.jobCard {
+    border: 1.5px solid $border;
+    border-radius: $radius;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    background: $white;
+    cursor: pointer;
+    transition: $transition-smooth;
+    position: relative;
+
+    &:hover {
+        border-color: $blue-primary;
+        box-shadow: $shadow-sm;
+    }
+
+    &.selected {
+        border-color: $blue-primary;
+        background: $blue-light;
+    }
+}
+
+.cardTop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.companyNameText {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $gray-500;
+}
+
+.cardTags {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.tagSoon {
+    background: $orange-bg;
+    color: $orange-tag;
+}
+
+.tagEvent {
+    background: $green-bg;
+    color: $green-tag;
+}
+
+.tagJob {
+    background: $blue-light;
+    color: $blue-primary;
+}
+
+.cardTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: $gray-900;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.cardDesc {
+    font-size: 13px;
+    color: $gray-500;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.cardMeta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: $gray-500;
+
+    span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.saveBtn {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $gray-400;
+    cursor: pointer;
+    margin-left: auto;
+    transition: $transition-smooth;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    &:hover {
+        color: $orange-tag;
+        transform: scale(1.1);
+    }
+
+    &.saved {
+        color: $orange-tag;
+    }
+}
+
+/* ── DETAIL PANEL ── */
+.rightColumn {
+    overflow: hidden;
+}
+
+.detailPanel {
+    border: 1.5px solid $border;
+    border-radius: $radius;
+    overflow: hidden;
+    position: sticky;
+    top: 74px;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(16px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    background: $white;
+}
+
+.detailPanel.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.detailHeroImg {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.logoOverlay {
+    background: rgba(255, 255, 255, 0.94);
+    padding: 8px 18px;
+    border-radius: $radius-sm;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: $gray-900;
+    box-shadow: $shadow-sm;
+}
+
+.detailBody {
+    padding: 20px;
+}
+
+.detailTags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.detailTitle {
+    font-size: 16px;
+    font-weight: 700;
+    color: $gray-900;
+    margin: 10px 0 12px;
+    line-height: 1.35;
+}
+
+.detailMetaRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: $gray-500;
+    margin-bottom: 8px;
+
+    svg {
+        width: 14px;
+        height: 14px;
+        color: $gray-500;
+    }
+}
+
+.label {
+    font-weight: 700;
+    color: $gray-700;
+}
+
+.eligibilityRow {
+    margin-top: 12px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid $border;
+
+    svg {
+        color: $blue-primary;
+        flex-shrink: 0;
+    }
+}
+
+.actionBtns {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btnPrimary {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: $blue-primary;
+    color: $white;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    svg {
+        stroke: $white;
+    }
+
+    &:hover {
+        background: $blue-hover;
+    }
+
+    &.applied {
+        background: $gray-500;
+        &:hover {
+            background: $gray-700;
+        }
+    }
+}
+
+.btnSecondary {
+    flex: 1;
+    padding: 10px 16px;
+    background: $white;
+    color: $gray-700;
+    border: 1.5px solid $border;
+    border-radius: $radius-sm;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+        border-color: $blue-primary;
+        color: $blue-primary;
+    }
+
+    &.appliedActive {
+        border-color: $green-tag;
+        color: $green-tag;
+        background: $green-bg;
+    }
+}
+
+.detailDescWrapper {
+    margin-bottom: 24px;
+}
+
+.detailDesc {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.7;
+    margin-bottom: 8px;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid $border;
+    margin: 20px 0;
+}
+
+.detailSectionTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: $gray-900;
+    margin-bottom: 8px;
+    margin-top: 16px;
+}
+
+.simulationIntro {
+    font-size: 13px;
+    color: $gray-500;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+/* Related simulations */
+.simCard {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: $gray-50;
+}
+
+.simThumb {
+    width: 54px;
+    height: 54px;
+    border-radius: $radius-sm;
+    background: linear-gradient(135deg, #1e3a8a, #0f2462);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $white;
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 0.03em;
+    padding: 4px;
+}
+
+.simInfo {
+    flex: 1;
+}
+
+.simLabel {
+    font-size: 11px;
+    color: $gray-500;
+    margin-bottom: 2px;
+}
+
+.simName {
+    font-size: 13px;
+    font-weight: 700;
+    color: $gray-900;
+}
+
+.simMeta {
+    font-size: 11px;
+    color: $gray-400;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.simDots {
+    display: flex;
+    gap: 3px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $blue-primary;
+    opacity: 0.25;
+}
+
+.dot.filled {
+    opacity: 1;
+}
+
+/* Achievements */
+.achievementsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.achievementItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    font-size: 12px;
+    font-weight: 600;
+    color: $gray-700;
+    background: $gray-50;
+
+    svg {
+        width: 18px;
+        height: 18px;
+        color: $blue-primary;
+        flex-shrink: 0;
+    }
+}
+
+/* Default state: Upsell panel */
+.upsellPanel {
+    background: $white;
+    border: 1.5px solid $border;
+    border-radius: $radius;
+    padding: 28px 24px;
+    position: sticky;
+    top: 74px;
+    text-align: center;
+
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: $gray-900;
+        margin-bottom: 18px;
+        line-height: 1.3;
+    }
+}
+
+.upsellItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+    color: $gray-700;
+    text-align: left;
+    line-height: 1.5;
+}
+
+.check {
+    color: $green-tag;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 992px) {
+    .mainLayout.panelOpen {
+        grid-template-columns: 1fr;
+    }
+    .detailPanel {
+        position: static;
+        margin-top: 24px;
+        max-height: none;
+    }
+}
