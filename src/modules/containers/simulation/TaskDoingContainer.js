@@ -58,6 +58,9 @@ const isQuizSubmissionCorrect = (submission = {}) => {
     if (submission.isCorrect === true || submission.isCorrect === 1) {
         return true;
     }
+    if (submission.isCorrect === false || submission.isCorrect === 0) {
+        return false;
+    }
 
     // Chỉ lưu đáp án khi học viên trả lời đúng; API có thể không trả isCorrect
     return getSubmissionQuestionId(submission) != null && Boolean(getSubmissionAnswer(submission));
@@ -660,10 +663,6 @@ function TaskDoingContainer() {
      */
     const handleQuizAnswerSubmit = useCallback(
         async ({ taskQuestionId, answer, isCorrect }) => {
-            if (!isCorrect) {
-                return;
-            }
-
             if (!currentSubtaskProgress?.taskProgressId) {
                 message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
                 return;
@@ -677,7 +676,7 @@ function TaskDoingContainer() {
             const normalizedQuestionId = String(taskQuestionId);
             setLocalQuizAnswers((prev) => ({
                 ...prev,
-                [normalizedQuestionId]: { answer, isCorrect: true },
+                [normalizedQuestionId]: { answer, isCorrect },
             }));
 
             try {
@@ -686,7 +685,7 @@ function TaskDoingContainer() {
                         studentTaskProgressId: currentSubtaskProgress.taskProgressId,
                         taskQuestionId,
                         answer,
-                        isCorrect: true,
+                        isCorrect,
                     },
                 });
                 if (submitRes?.result === false) {
@@ -699,7 +698,12 @@ function TaskDoingContainer() {
                     return;
                 }
 
-                message.success('Lưu đáp án đúng thành công!');
+                if (isCorrect) {
+                    message.success('Lưu đáp án đúng thành công!');
+                } else {
+                    message.warning('Đáp án chưa chính xác, vui lòng thử lại!');
+                }
+
                 fetchProgressDetail({
                     pathParams: { id: currentSubtaskProgress.taskProgressId },
                 });

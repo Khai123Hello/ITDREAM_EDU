@@ -118,14 +118,22 @@ function MarkdownContent({ text }) {
 function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAnswerSubmit = () => {} }) {
     const [selected, setSelected] = useState(null);
     const [submitted, setSubmitted] = useState(false);
+    const [isRetrying, setIsRetrying] = useState(false);
 
     const correct = (block.options || []).findIndex((o) => o.answer === true);
     const savedAnswer = submittedAnswer?.answer;
     const savedOptionIndex = (block.options || []).findIndex(
         (o) => o.option === savedAnswer || o.value === savedAnswer,
     );
-    const effectiveSelected = savedAnswer ? savedOptionIndex : selected;
-    const effectiveSubmitted = Boolean(savedAnswer) || submitted;
+
+    useEffect(() => {
+        setIsRetrying(false);
+        setSelected(null);
+        setSubmitted(false);
+    }, [questionId, savedAnswer]);
+
+    const effectiveSelected = savedAnswer && !isRetrying ? savedOptionIndex : selected;
+    const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
     const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
     const handleSubmit = () => {
@@ -142,6 +150,7 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
     const handleReset = () => {
         setSelected(null);
         setSubmitted(false);
+        setIsRetrying(true);
     };
 
     return (
@@ -192,7 +201,7 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
                         <span className={`tfo-quiz-result-label ${isCorrect ? 'correct' : 'wrong'}`}>
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
-                        {!savedAnswer && (
+                        {!isCorrect && (
                             <button className="tfo-quiz-retry-btn" onClick={handleReset}>
                                 Làm lại
                             </button>
