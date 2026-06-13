@@ -19,6 +19,11 @@ const apiConfig = {
             method: 'POST',
             headers: multipartFormHeader,
         },
+        uploadCertificate: {
+            baseURL: `${AppConstants.mediaRootUrl}v1/file/upload-certificate`,
+            method: 'POST',
+            headers: baseHeader,
+        },
     },
     account: {
         getToken: {
@@ -239,6 +244,11 @@ const apiConfig = {
         studentList: {
             baseURL: `${apiUrl}v1/achievement/student_list`,
             method: 'GET',
+            headers: baseHeader,
+        },
+        update: {
+            baseURL: `${apiUrl}v1/achievement/update`,
+            method: 'PUT',
             headers: baseHeader,
         },
     },

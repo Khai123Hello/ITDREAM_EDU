@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AppConstants } from '@constants';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
@@ -543,8 +545,17 @@ export default function TaskDoingPage({
     quizSubmissionMap = {},
     questionMap = {},
     onQuizAnswerSubmit = () => {},
+
+    // Certificate and congrats
+    isGeneratingCert = false,
+    congratsData = { show: false, filePath: '' },
+    onCloseCongrats = () => {},
+
+    // Profile details
+    profile = {},
 }) {
-    const [ textInput, setTextInput ] = useState('');
+    const navigate = useNavigate();
+    const [textInput, setTextInput] = useState('');
 
     useEffect(() => {
         setTextInput(previousText || '');
@@ -644,6 +655,145 @@ export default function TaskDoingPage({
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed';
+
+    if (congratsData.show) {
+        const fullFilePath = congratsData.filePath
+            ? congratsData.filePath.startsWith('http')
+                ? congratsData.filePath
+                : `${AppConstants.contentRootUrl}${congratsData.filePath}`
+            : null;
+        const studentName = profile?.fullName || profile?.account?.fullName || 'Học viên';
+
+        return (
+            <>
+                <AppHeader />
+                <div className="tfo-completion-page">
+                    <div className="tfo-completion-container">
+                        <div className="tfo-completion-header">
+                            <div className="tfo-trophy-badge">🏆</div>
+                            <h1 className="tfo-completion-title">Hoàn Thành Bài Mô Phỏng!</h1>
+                            <p className="tfo-completion-subtitle">
+                                Chúc mừng bạn đã hoàn thành xuất sắc tất cả các nhiệm vụ thực tế của dự án. Dưới đây là
+                                chứng chỉ chứng nhận thành tích học tập của bạn.
+                            </p>
+                        </div>
+
+                        {/* Certificate Mockup Frame */}
+                        <div className="tfo-cert-preview-card">
+                            <div className="tfo-cert-inner-border">
+                                <div className="tfo-cert-header">
+                                    <div className="tfo-cert-logo">ITDREAM EDU</div>
+                                    <h2 className="tfo-cert-main-title">CHỨNG NHẬN HOÀN THÀNH</h2>
+                                    <div className="tfo-cert-award-to">Chứng nhận học viên</div>
+                                </div>
+                                <div className="tfo-cert-recipient">{studentName}</div>
+                                <div className="tfo-cert-body">
+                                    Đã hoàn thành xuất sắc bài thực hành mô phỏng công việc thực tế:
+                                    <div className="tfo-cert-sim-title">“{pageTitle}”</div>
+                                </div>
+                                <div className="tfo-cert-footer">
+                                    <div className="tfo-cert-date">
+                                        <span className="tfo-label">NGÀY CẤP</span>
+                                        <span className="tfo-val">{new Date().toLocaleDateString('vi-VN')}</span>
+                                    </div>
+                                    <div className="tfo-cert-seal">
+                                        <div className="tfo-seal-circle">
+                                            <span>OFFICIAL</span>
+                                            <span>SEAL</span>
+                                        </div>
+                                    </div>
+                                    <div className="tfo-cert-signature">
+                                        <span className="tfo-label">BAN ĐIỀU HÀNH</span>
+                                        <span className="tfo-signature-line">ITDream Edu</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="tfo-completion-actions">
+                            {fullFilePath && (
+                                <>
+                                    <button
+                                        className="tfo-completion-btn tfo-completion-btn-secondary"
+                                        onClick={() => window.open(fullFilePath, '_blank', 'noopener,noreferrer')}
+                                    >
+                                        <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            style={{ marginRight: 8 }}
+                                        >
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                        Xem chứng chỉ
+                                    </button>
+                                    <button
+                                        className="tfo-completion-btn tfo-completion-btn-primary"
+                                        onClick={() => {
+                                            const link = document.createElement('a');
+                                            link.href = fullFilePath;
+                                            link.target = '_blank';
+                                            link.download = `Chung_Chi_${pageTitle.replace(/\s+/g, '_')}.pdf`;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }}
+                                    >
+                                        <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            style={{ marginRight: 8 }}
+                                        >
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                            <polyline points="7 10 12 15 17 10" />
+                                            <line x1="12" y1="15" x2="12" y2="3" />
+                                        </svg>
+                                        Tải xuống chứng chỉ
+                                    </button>
+                                </>
+                            )}
+                            <button
+                                className="tfo-completion-btn tfo-completion-btn-success"
+                                onClick={() => {
+                                    onCloseCongrats();
+                                    navigate('/dashboard');
+                                }}
+                            >
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    style={{ marginRight: 8 }}
+                                >
+                                    <polyline points="9 11 12 14 22 4" />
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                                </svg>
+                                Kết thúc & Trở về Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
     return (
         <>
@@ -764,6 +914,20 @@ export default function TaskDoingPage({
                     <FooterNav onBack={onBack} onNext={onNext} canGoBack={canGoBack} canGoNext={canGoNext} />
                 </div>
             </div>
+
+            {/* Loading overlay for certificate generation */}
+            {isGeneratingCert && (
+                <div className="tfo-cert-generating-overlay">
+                    <div className="tfo-cert-generating-card">
+                        <Spin size="large" />
+                        <h3 style={{ marginTop: 24, color: '#111827', fontWeight: 600 }}>Đang tạo chứng chỉ...</h3>
+                        <p style={{ marginTop: 8, color: '#4b5563', fontSize: 14 }}>
+                            Hệ thống đang lưu trữ kết quả và tạo chứng chỉ hoàn thành bài mô phỏng cho bạn. Vui lòng
+                            không đóng trình duyệt.
+                        </p>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
