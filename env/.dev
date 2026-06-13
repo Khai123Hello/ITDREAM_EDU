@@ -1,5 +1,5 @@
 REACT_APP_API = http://localhost:8787/
-REACT_APP_API_MEDIA = http://localhost:8484/
+REACT_APP_API_MEDIA = https://slim-productions-excluding-your.trycloudflare.com
 REACT_APP_ENV = dev
 GENERATE_SOURCEMAP = false
 CI = false

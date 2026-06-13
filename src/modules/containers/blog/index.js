@@ -8,8 +8,8 @@ import BlogListDesktop from '@modules/layout/desktop/blog';
 function BlogListContainer() {
     const [ selectedCategory, setSelectedCategory ] = useState(null);
 
-    const catParams = useMemo(() => ({ kind: 2, pageNumber: 0, pageSize: 100, paged: true }), []);
-    const blogParams = useMemo(() => ({ pageNumber: 0, pageSize: 100, paged: true }), []);
+    const catParams = useMemo(() => ({ kind: 2, page: 0, size: 100, paged: true }), []);
+    const blogParams = useMemo(() => ({ page: 0, size: 100, paged: true }), []);
 
     const { data: categoriesData, loading: catLoading } = useFetch(apiConfig.category.autoComplete, {
         immediate: true,
