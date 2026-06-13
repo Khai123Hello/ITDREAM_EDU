@@ -34,7 +34,7 @@ const DatePicker = ({
     const onSelect = () => {
         // console.log("Select:", newValue);
     };
-    const pickerDate = ['time', 'date', 'month', 'year', 'timeShort', 'week'].includes(picker) ? picker : undefined;
+    const pickerDate = [ 'time', 'date', 'month', 'year', 'timeShort', 'week' ].includes(picker) ? picker : undefined;
 
     const renderPickers = (picker) => {
         if (!picker) return 'date';
@@ -66,7 +66,7 @@ const DatePicker = ({
             'Tháng 11',
             'Tháng 12',
         ],
-        shortWeekDays: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+        shortWeekDays: [ 'CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7' ],
     };
     const sharedProps = {
         ...props,
@@ -95,7 +95,7 @@ const DatePicker = ({
                 className={classNames(styles.boxTimer, className, {
                     [styles.inputDefault]: true,
                     [styles.inputShowMonth]: pickerDate === 'month',
-                    [styles.inputShowDateOrTime]: ['date', 'time'].includes(pickerDate),
+                    [styles.inputShowDateOrTime]: [ 'date', 'time' ].includes(pickerDate),
                     [styles.inputShowDateTime]: !pickerDate,
                     [styles.error]: error,
                 })}

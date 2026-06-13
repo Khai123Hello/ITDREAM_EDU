@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "postinstall": "cd .. && husky install source/.husky",
-        "start": "env-cmd -f ./env/.beta craco start",
+        "start": "env-cmd -f ./env/.dev craco start",
         "prebuild:dev": "rm -rf build",
         "build:dev": "env-cmd -f ./env/.dev craco build",
         "build:beta": "env-cmd -f ./env/.beta craco build",
@@ -32,6 +32,7 @@
         "@smastrom/react-rating": "^1.5.0",
         "@tanstack/react-query": "^5.59.15",
         "@tanstack/react-table": "^8.20.5",
+        "@react-oauth/google": "^0.13.5",
         "@testing-library/jest-dom": "^5.16.4",
         "@testing-library/react": "^13.4.0",
         "@testing-library/user-event": "^14.2.0",
