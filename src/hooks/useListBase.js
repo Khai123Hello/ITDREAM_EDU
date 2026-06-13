@@ -109,8 +109,8 @@ const useListBase = ({
     override,
 } = {}) => {
     const { params: queryParams, setQueryParams, serializeParams, deserializeParams } = useQueryParams();
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [ data, setData ] = useState([]);
+    const [ loading, setLoading ] = useState(false);
     const confirmModal = useConfirmModal();
     const userTokenProject = getData(storageKeys.USER_PROJECT_ACCESS_TOKEN);
     const { execute: executeGetList } = useFetch(
@@ -126,8 +126,8 @@ const useListBase = ({
             ? { ...apiConfig.changeStatus, authorization: `Bearer ${userTokenProject}` }
             : { ...apiConfig.changeStatus },
     );
-    const [currentPageTab, setCurrentPageTab] = useState(0);
-    const [pagination, setPagination] = useState({
+    const [ currentPageTab, setCurrentPageTab ] = useState(0);
+    const [ pagination, setPagination ] = useState({
         pageSize: options.pageSize,
         total: 0,
         current: 1,
@@ -139,7 +139,7 @@ const useListBase = ({
     const navigate = useNavigate();
     const intl = useIntl();
 
-    const queryFilter = useMemo(() => deserializeParams(queryParams), [queryParams]);
+    const queryFilter = useMemo(() => deserializeParams(queryParams), [ queryParams ]);
 
     const hasPermission = (requiredPermissions) => {
         return validatePermission(requiredPermissions, permissionCode);
@@ -359,7 +359,7 @@ const useListBase = ({
         edit: ({ buttonProps, ...dataRow }) => {
             if (
                 !isProjectToken &&
-                !mixinFuncs.hasPermission([apiConfig.update?.permissionCode, apiConfig.getById?.permissionCode])
+                !mixinFuncs.hasPermission([ apiConfig.update?.permissionCode, apiConfig.getById?.permissionCode ])
             )
                 return null;
 
@@ -386,7 +386,7 @@ const useListBase = ({
         const actionButtons = [];
         const buttons = mixinFuncs.actionColumnButtons(mixinFuncs.additionalActionColumnButtons());
 
-        Object.entries(actions).forEach(([key, value]) => {
+        Object.entries(actions).forEach(([ key, value ]) => {
             let _value = value;
             if (typeof value === 'function') {
                 _value = value(data);
@@ -401,31 +401,31 @@ const useListBase = ({
 
     const checkPermission = (actions) => {
         let isShow = false;
-        Object.entries(actions).forEach(([type, value]) => {
+        Object.entries(actions).forEach(([ type, value ]) => {
             if (value || value?.show) {
                 switch (type) {
-                    case 'delete':
-                        if (isProjectToken) {
-                            isShow = true;
-                        } else if (mixinFuncs.hasPermission([apiConfig.delete?.permissionCode])) {
-                            isShow = true;
-                        }
-                        break;
-                    case 'edit':
-                        if (isProjectToken) {
-                            isShow = true;
-                        } else if (
-                            mixinFuncs.hasPermission([
-                                apiConfig.update?.permissionCode,
-                                apiConfig.getById?.permissionCode,
-                            ])
-                        ) {
-                            isShow = true;
-                        }
-                        break;
-                    default:
-                        isShow = true;
-                        break;
+                                case 'delete':
+                                    if (isProjectToken) {
+                                        isShow = true;
+                                    } else if (mixinFuncs.hasPermission([ apiConfig.delete?.permissionCode ])) {
+                                        isShow = true;
+                                    }
+                                    break;
+                                case 'edit':
+                                    if (isProjectToken) {
+                                        isShow = true;
+                                    } else if (
+                                        mixinFuncs.hasPermission([
+                                            apiConfig.update?.permissionCode,
+                                            apiConfig.getById?.permissionCode,
+                                        ])
+                                    ) {
+                                        isShow = true;
+                                    }
+                                    break;
+                                default:
+                                    isShow = true;
+                                    break;
                 }
             }
         });
@@ -605,7 +605,7 @@ const useListBase = ({
         } else if (page < 1) {
             setPagination((p) => ({ ...p, current: 1 }));
         }
-    }, [queryParams, pagePath, currentPageTab]);
+    }, [ queryParams, pagePath, currentPageTab ]);
 
     return {
         loading,

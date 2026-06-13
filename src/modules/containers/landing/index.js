@@ -27,7 +27,7 @@ const LandingPageContainer = ({ title }) => {
                 avgStar: item.avgStar,
                 organization: item.educator?.organization || {},
             })),
-        [data],
+        [ data ],
     );
 
     const handleRetry = () => {

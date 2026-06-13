@@ -6,13 +6,13 @@ import LoadingComponent from './LoadingComponent';
 import styles from './index.module.scss';
 
 const Loading = ({ show }) => {
-    const [node] = useState(document.createElement('div'));
+    const [ node ] = useState(document.createElement('div'));
 
     useEffect(() => {
         show && document.body.appendChild(node);
 
         return () => show && document.body.removeChild(node);
-    }, [show]);
+    }, [ show ]);
 
     return ReactDOM.createPortal(
         <div className={styles.loadingContainer}>

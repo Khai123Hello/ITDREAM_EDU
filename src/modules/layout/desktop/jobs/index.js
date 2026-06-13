@@ -9,7 +9,7 @@ const MOCK_JOBS = [
         company: 'Baker McKenzie.',
         title: "Bakers' Dozen 2 (Diễn ra qua Zoom)",
         desc: 'Hỏi đáp về đơn xin thực tập làm sáng: Giải đáp mọi thắc mắc của bạn – Buổi 1',
-        tags: ['SẮP TỚI', 'SỰ KIỆN'],
+        tags: [ 'SẮP TỚI', 'SỰ KIỆN' ],
         tagType: 'event',
         location: 'Ảo',
         country: 'Toàn cầu',
@@ -26,7 +26,7 @@ const MOCK_JOBS = [
             duration: '4–5 giờ',
             dots: 1,
         },
-        achievements: ['Đoạn trích sơ yếu lý lịch', 'Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng'],
+        achievements: [ 'Đoạn trích sơ yếu lý lịch', 'Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng' ],
         bannerGradient: 'linear-gradient(135deg, #0f2042, #1b3564, #1a56db)',
         isRecommended: true,
     },
@@ -35,7 +35,7 @@ const MOCK_JOBS = [
         company: 'SLAUGHTER AND MAY',
         title: 'Hỏi đáp về đơn xin hợp đồng đào tạo – Thứ Ba, ngày 16 tháng 6 năm 2026',
         desc: 'Tìm hiểu thêm về quy trình nộp đơn và phỏng vấn của chúng tôi!',
-        tags: ['SẮP TỚI', 'SỰ KIỆN'],
+        tags: [ 'SẮP TỚI', 'SỰ KIỆN' ],
         tagType: 'event',
         location: 'Ảo',
         country: 'Anh Quốc',
@@ -52,7 +52,7 @@ const MOCK_JOBS = [
             duration: '4–5 giờ',
             dots: 1,
         },
-        achievements: ['Đoạn trích sơ yếu lý lịch', 'Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng'],
+        achievements: [ 'Đoạn trích sơ yếu lý lịch', 'Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng' ],
         bannerGradient: 'linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)',
         isRecommended: true,
     },
@@ -61,7 +61,7 @@ const MOCK_JOBS = [
         company: 'KPMG',
         title: 'Hãy làm chủ câu chuyện của bạn – Sự kiện LGBTQIA+ của KPMG',
         desc: 'Bạn được trân trọng mời tham dự sự kiện "Làm chủ câu chuyện của chính mình" – Một sự kiện dành cho cộng đồng LGBTQIA+ do KPMG tổ chức.',
-        tags: ['SẮP TỚI', 'SỰ KIỆN'],
+        tags: [ 'SẮP TỚI', 'SỰ KIỆN' ],
         tagType: 'event',
         location: 'Ảo',
         country: 'Toàn cầu',
@@ -78,7 +78,7 @@ const MOCK_JOBS = [
             duration: '3–4 giờ',
             dots: 2,
         },
-        achievements: ['Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng'],
+        achievements: [ 'Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng' ],
         bannerGradient: 'linear-gradient(135deg, #00338d, #0056b3, #389cfb)',
         isRecommended: false,
     },
@@ -87,7 +87,7 @@ const MOCK_JOBS = [
         company: 'Baker McKenzie.',
         title: "Bakers' Dozen 3 (Diễn ra qua Zoom)",
         desc: 'Cuộc sống của một luật sư toàn cầu tại Bakers',
-        tags: ['SẮP TỚI', 'SỰ KIỆN'],
+        tags: [ 'SẮP TỚI', 'SỰ KIỆN' ],
         tagType: 'event',
         location: 'Ảo',
         country: 'Toàn cầu',
@@ -104,7 +104,7 @@ const MOCK_JOBS = [
             duration: '4–5 giờ',
             dots: 1,
         },
-        achievements: ['Đoạn trích sơ yếu lý lịch', 'Giấy chứng nhận', 'Kỹ năng'],
+        achievements: [ 'Đoạn trích sơ yếu lý lịch', 'Giấy chứng nhận', 'Kỹ năng' ],
         bannerGradient: 'linear-gradient(135deg, #0f2042, #1b3564, #1a56db)',
         isRecommended: false,
     },
@@ -113,7 +113,7 @@ const MOCK_JOBS = [
         company: 'Baker McKenzie.',
         title: "Bakers' Dozen 4 (Diễn ra qua Zoom)",
         desc: 'Hỏi đáp với đối tác',
-        tags: ['SẮP TỚI', 'SỰ KIỆN'],
+        tags: [ 'SẮP TỚI', 'SỰ KIỆN' ],
         tagType: 'event',
         location: 'Ảo',
         country: 'Toàn cầu',
@@ -130,7 +130,7 @@ const MOCK_JOBS = [
             duration: '4–5 giờ',
             dots: 3,
         },
-        achievements: ['Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng'],
+        achievements: [ 'Mẹo phỏng vấn', 'Giấy chứng nhận', 'Kỹ năng' ],
         bannerGradient: 'linear-gradient(135deg, #0f2042, #1b3564, #1a56db)',
         isRecommended: false,
     },
@@ -139,7 +139,7 @@ const MOCK_JOBS = [
         company: 'WHITE & CASE',
         title: 'Chương trình thực tập hè Sydney 2026',
         desc: 'Đã đến lúc bạn tạo dấu ấn riêng.',
-        tags: ['CÔNG VIỆC'],
+        tags: [ 'CÔNG VIỆC' ],
         tagType: 'job',
         location: 'Úc',
         country: 'Úc',
@@ -156,24 +156,24 @@ const MOCK_JOBS = [
             duration: '5–6 giờ',
             dots: 2,
         },
-        achievements: ['Đoạn trích sơ yếu lý lịch', 'Giấy chứng nhận', 'Kỹ năng'],
+        achievements: [ 'Đoạn trích sơ yếu lý lịch', 'Giấy chứng nhận', 'Kỹ năng' ],
         bannerGradient: 'linear-gradient(135deg, #1a1a2e, #333, #0d2b5e)',
         isRecommended: false,
     },
 ];
 
 function JobsDesktop() {
-    const [selectedJobId, setSelectedJobId] = useState(null);
-    const [savedJobIds, setSavedJobIds] = useState([]);
-    const [appliedJobIds, setAppliedJobIds] = useState([]);
-    const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'recommended', 'saved', 'applied'
+    const [ selectedJobId, setSelectedJobId ] = useState(null);
+    const [ savedJobIds, setSavedJobIds ] = useState([]);
+    const [ appliedJobIds, setAppliedJobIds ] = useState([]);
+    const [ selectedTab, setSelectedTab ] = useState('all'); // 'all', 'recommended', 'saved', 'applied'
 
     // Dropdown filters
-    const [opportunityFilter, setOpportunityFilter] = useState('Tất cả');
-    const [countryFilter, setCountryFilter] = useState('Tất cả');
-    const [companyFilter, setCompanyFilter] = useState('Tất cả');
-    const [roleFilter, setRoleFilter] = useState('Tất cả');
-    const [fieldFilter, setFieldFilter] = useState('Tất cả');
+    const [ opportunityFilter, setOpportunityFilter ] = useState('Tất cả');
+    const [ countryFilter, setCountryFilter ] = useState('Tất cả');
+    const [ companyFilter, setCompanyFilter ] = useState('Tất cả');
+    const [ roleFilter, setRoleFilter ] = useState('Tất cả');
+    const [ fieldFilter, setFieldFilter ] = useState('Tất cả');
 
     const handleSelectJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -181,57 +181,57 @@ function JobsDesktop() {
 
     const handleToggleSaveJob = (e, jobId) => {
         e.stopPropagation();
-        setSavedJobIds((prev) => (prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]));
+        setSavedJobIds((prev) => (prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [ ...prev, jobId ]));
     };
 
     const handleApplyJob = (jobId) => {
-        setAppliedJobIds((prev) => (prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]));
+        setAppliedJobIds((prev) => (prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [ ...prev, jobId ]));
     };
 
     const getAchievementIcon = (achievementName) => {
         switch (achievementName) {
-            case 'Đoạn trích sơ yếu lý lịch':
-                return (
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                        />
-                    </svg>
-                );
-            case 'Mẹo phỏng vấn':
-                return (
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.82m2.56-5.84a14.982 14.982 0 00-6.16 12.12A14.98 14.98 0 0014.37 8.41m-2.56 5.96a14.926 14.926 0 00-5.84 2.56"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                        />
-                    </svg>
-                );
-            case 'Giấy chứng nhận':
-                return (
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                        />
-                    </svg>
-                );
-            case 'Kỹ năng':
-                return (
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                        />
-                    </svg>
-                );
-            default:
-                return null;
+                        case 'Đoạn trích sơ yếu lý lịch':
+                            return (
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                    />
+                                </svg>
+                            );
+                        case 'Mẹo phỏng vấn':
+                            return (
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.82m2.56-5.84a14.982 14.982 0 00-6.16 12.12A14.98 14.98 0 0014.37 8.41m-2.56 5.96a14.926 14.926 0 00-5.84 2.56"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                    />
+                                </svg>
+                            );
+                        case 'Giấy chứng nhận':
+                            return (
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                    />
+                                </svg>
+                            );
+                        case 'Kỹ năng':
+                            return (
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path
+                                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                    />
+                                </svg>
+                            );
+                        default:
+                            return null;
         }
     };
 
@@ -266,7 +266,7 @@ function JobsDesktop() {
     // Active job details
     const activeJob = useMemo(() => {
         return MOCK_JOBS.find((job) => job.id === selectedJobId) || null;
-    }, [selectedJobId]);
+    }, [ selectedJobId ]);
 
     return (
         <div className={styles.jobsContainer}>
