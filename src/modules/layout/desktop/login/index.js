@@ -90,8 +90,8 @@ function LoginPageDesktop({
     const { data: simulations } = useFetch(apiConfig.simulation.guestList, {
         immediate: true,
         params: {
-            pageNumber: 0,
-            pageSize: 3,
+            page: 0,
+            size: 3,
             status: 1,
         },
         mappingData: (response) => response?.data?.content || [],

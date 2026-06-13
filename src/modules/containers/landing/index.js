@@ -8,8 +8,8 @@ const LandingPageContainer = ({ title }) => {
     const { data, error, loading, execute } = useFetch(apiConfig.simulation.guestList, {
         immediate: true,
         params: {
-            pageNumber: 0,
-            pageSize: 12,
+            page: 0,
+            size: 12,
             status: 1,
         },
         mappingData: (response) => response?.data?.content || [],

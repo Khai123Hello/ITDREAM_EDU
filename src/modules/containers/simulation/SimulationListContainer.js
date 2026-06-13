@@ -18,15 +18,15 @@ function SimulationListContainer() {
         categoryId: params.get('categoryId') ? parseInt(params.get('categoryId'), 10) : undefined,
     });
     const [pagination, setPagination] = useState({
-        pageNumber: params.get('pageNumber') ? parseInt(params.get('pageNumber'), 10) : 0,
-        pageSize: params.get('pageSize') ? parseInt(params.get('pageSize'), 10) : 16,
+        page: params.get('page') ? parseInt(params.get('page'), 10) : 0,
+        size: params.get('size') ? parseInt(params.get('size'), 10) : 16,
     });
 
     // Fetch simulation list
     const queryParams = useMemo(
         () => ({
-            pageNumber: pagination.pageNumber,
-            pageSize: pagination.pageSize,
+            page: pagination.page,
+            size: pagination.size,
             paged: true,
             status: 1,
             ...(filters.title && { title: filters.title }),
@@ -56,25 +56,25 @@ function SimulationListContainer() {
     const handleFilterChange = useCallback(
         (newFilters) => {
             setFilters(newFilters);
-            setPagination({ ...pagination, pageNumber: 0 });
+            setPagination({ ...pagination, page: 0 });
             setQueryParams({
                 title: newFilters.title || '',
                 level: newFilters.level ? String(newFilters.level) : '',
                 categoryId: newFilters.categoryId ? String(newFilters.categoryId) : '',
-                pageNumber: '0',
-                pageSize: String(pagination.pageSize),
+                page: '0',
+                size: String(pagination.size),
             });
         },
-        [pagination.pageSize, setQueryParams],
+        [pagination.size, setQueryParams],
     );
 
     const handlePaginationChange = useCallback(
-        (pageNumber, pageSize) => {
-            setPagination({ pageNumber: pageNumber - 1, pageSize });
+        (page, size) => {
+            setPagination({ page: page - 1, size });
             setQueryParams({
                 ...deserializeParams(params),
-                pageNumber: String(pageNumber - 1),
-                pageSize: String(pageSize),
+                page: String(page - 1),
+                size: String(size),
             });
         },
         [params, setQueryParams],
@@ -101,8 +101,8 @@ function SimulationListContainer() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 pagination={{
-                    current: pagination.pageNumber + 1,
-                    pageSize: pagination.pageSize,
+                    current: pagination.page + 1,
+                    pageSize: pagination.size,
                     total: simList?.totalElements || 0,
                 }}
                 onPaginationChange={handlePaginationChange}

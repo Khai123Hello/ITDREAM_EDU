@@ -9,7 +9,7 @@ import DashboardDesktop from '@modules/layout/desktop/dashboard';
 function DashboardPageContainer() {
     const { profile } = useAuth();
 
-    const simParams = useMemo(() => ({ pageNumber: 0, pageSize: 10, paged: true }), []);
+    const simParams = useMemo(() => ({ page: 0, size: 10, paged: true }), []);
 
     const { data: enrolledRes, loading: simLoading } = useFetch(apiConfig.simulationEnrollment.studentList, {
         immediate: true,
@@ -19,7 +19,7 @@ function DashboardPageContainer() {
 
     const { data: achievementRes, loading: achLoading } = useFetch(apiConfig.achievement.studentList, {
         immediate: true,
-        params: { pageNumber: 0, pageSize: 10, paged: true },
+        params: { page: 0, size: 10, paged: true },
         mappingData: (res) => res || {},
     });
 
