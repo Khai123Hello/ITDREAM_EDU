@@ -4,6 +4,7 @@ import { AppConstants } from '@constants';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
+import CommentPanel from '../components/CommentPanel';
 import TaskDoingSidebar from '../components/TaskDoingSidebar';
 
 import './TaskDoingPage.scss';
@@ -553,9 +554,17 @@ export default function TaskDoingPage({
 
     // Profile details
     profile = {},
+
+    // Comments
+    comments = [],
+    commentsLoading = false,
+    showComments = false,
+    setShowComments = () => {},
+    onSendComment = () => {},
+    onUpdateComment = () => {},
 }) {
     const navigate = useNavigate();
-    const [textInput, setTextInput] = useState('');
+    const [ textInput, setTextInput ] = useState('');
 
     useEffect(() => {
         setTextInput(previousText || '');
@@ -820,8 +829,8 @@ export default function TaskDoingPage({
                             />
 
                             <main className="tfo-pane">
-                                <div className="tfo-pane-layout" style={{ width: '100%' }}>
-                                    <div className="tfo-pane-left" style={{ width: '100%' }}>
+                                <div className="tfo-pane-layout">
+                                    <div className="tfo-pane-left">
                                         {/* Top bar */}
                                         <div className="tfo-pane-topbar">
                                             <div className="tfo-pane-title">{pageTitle}</div>
@@ -844,7 +853,31 @@ export default function TaskDoingPage({
 
                                         {/* Content */}
                                         <div className="tfo-task-content">
-                                            <div className="tfo-task-heading">{taskHeading}</div>
+                                            <div className="tfo-task-heading-container">
+                                                <div className="tfo-task-heading">{taskHeading}</div>
+                                                {selectedSubtaskId && (
+                                                    <button
+                                                        className={`tfo-comments-toggle-btn${showComments ? ' active' : ''}`}
+                                                        onClick={() => setShowComments(!showComments)}
+                                                        title="Bình luận nhiệm vụ"
+                                                    >
+                                                        <svg
+                                                            width="18"
+                                                            height="18"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2.5"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            style={{ marginRight: 6 }}
+                                                        >
+                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                                        </svg>
+                                                        <span>Bình luận ({comments.length})</span>
+                                                    </button>
+                                                )}
+                                            </div>
 
                                             <div className="tfo-task-body">
                                                 {taskDescriptionContent && (
@@ -906,6 +939,16 @@ export default function TaskDoingPage({
                                             </div>
                                         </div>
                                     </div>
+                                    {showComments && (
+                                        <CommentPanel
+                                            comments={comments}
+                                            loading={commentsLoading}
+                                            profile={profile}
+                                            onClose={() => setShowComments(false)}
+                                            onSendComment={onSendComment}
+                                            onUpdateComment={onUpdateComment}
+                                        />
+                                    )}
                                 </div>
                             </main>
                         </div>

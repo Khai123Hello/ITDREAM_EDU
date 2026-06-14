@@ -253,8 +253,8 @@ function TaskDoingContainer() {
     );
 
     const { profile } = useAuth();
-    const [isGeneratingCert, setIsGeneratingCert] = useState(false);
-    const [congratsData, setCongratsData] = useState({ show: false, filePath: '' });
+    const [ isGeneratingCert, setIsGeneratingCert ] = useState(false);
+    const [ congratsData, setCongratsData ] = useState({ show: false, filePath: '' });
 
     const { execute: uploadFile } = useFetch(apiConfig.file.upload, {}, false);
     const { execute: createQuizHistory } = useFetch(apiConfig.questionQuizHistory.create, {}, false);
@@ -278,6 +278,38 @@ function TaskDoingContainer() {
         false,
     );
 
+    // Comments state & fetches
+    const [ showComments, setShowComments ] = useState(false);
+
+    const {
+        data: commentsData,
+        loading: commentsLoading,
+        execute: fetchComments,
+    } = useFetch(
+        apiConfig.comment.userList,
+        {
+            params: { taskId: selectedSubtaskId || '', size: 1000 },
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    const { execute: createCommentApi } = useFetch(
+        apiConfig.comment.create,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    const { execute: updateCommentApi } = useFetch(
+        apiConfig.comment.update,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
     // Load simulation detail on mount
     React.useEffect(() => {
         if (simulationId) {
@@ -285,7 +317,7 @@ function TaskDoingContainer() {
                 pathParams: { id: simulationId },
             });
         }
-    }, [simulationId, fetchSimulationDetail]);
+    }, [ simulationId, fetchSimulationDetail ]);
 
     // State to store mapping of question text to question ID
     const [ questionMap, setQuestionMap ] = useState({});
@@ -509,6 +541,69 @@ function TaskDoingContainer() {
             setQuestionMap({});
         }
     }, [ selectedSubtaskId, fetchTaskQuestions ]);
+
+    // Fetch comments when subtask selection changes
+    React.useEffect(() => {
+        if (selectedSubtaskId) {
+            fetchComments({
+                params: { taskId: selectedSubtaskId, size: 1000 },
+            });
+        }
+    }, [ selectedSubtaskId, fetchComments ]);
+
+    const handleCreateComment = useCallback(
+        async (content, parentId = 0) => {
+            if (!selectedSubtaskId) {
+                message.error('Không tìm thấy nhiệm vụ hiện tại');
+                return;
+            }
+            try {
+                const res = await createCommentApi({
+                    dataBody: {
+                        content,
+                        parentId,
+                        taskId: selectedSubtaskId,
+                    },
+                });
+                if (res?.result !== false) {
+                    message.success('Đăng bình luận thành công!');
+                    fetchComments({
+                        params: { taskId: selectedSubtaskId, size: 1000 },
+                    });
+                } else {
+                    message.error(res?.message || 'Không thể đăng bình luận. Vui lòng thử lại.');
+                }
+            } catch {
+                message.error('Có lỗi xảy ra khi đăng bình luận.');
+            }
+        },
+        [ selectedSubtaskId, createCommentApi, fetchComments ],
+    );
+
+    const handleUpdateComment = useCallback(
+        async (id, content) => {
+            if (!selectedSubtaskId) return;
+            try {
+                const res = await updateCommentApi({
+                    dataBody: {
+                        id,
+                        content,
+                    },
+                });
+                if (res?.result !== false) {
+                    message.success('Cập nhật bình luận thành công!');
+                    fetchComments({
+                        params: { taskId: selectedSubtaskId, size: 1000 },
+                    });
+                } else {
+                    message.error(res?.message || 'Không thể cập nhật bình luận. Vui lòng thử lại.');
+                }
+            } catch {
+                message.error('Có lỗi xảy ra khi cập nhật bình luận.');
+            }
+        },
+        [ selectedSubtaskId, updateCommentApi, fetchComments ],
+    );
 
     // Get current subtask progress info
     const currentSubtaskProgress = useMemo(() => {
@@ -986,6 +1081,14 @@ function TaskDoingContainer() {
         isGeneratingCert,
         congratsData,
         onCloseCongrats: () => setCongratsData({ show: false, filePath: '' }),
+
+        // Comments
+        comments: commentsData?.content || [],
+        commentsLoading,
+        showComments,
+        setShowComments,
+        onSendComment: handleCreateComment,
+        onUpdateComment: handleUpdateComment,
     };
 
     const loading = progressLoading || detailLoading || taskListLoading || progressDetailLoading;

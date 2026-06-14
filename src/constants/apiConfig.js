@@ -472,6 +472,23 @@ const apiConfig = {
             headers: baseHeader,
         },
     },
+    comment: {
+        userList: {
+            baseURL: `${apiUrl}v1/comment/user_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        create: {
+            baseURL: `${apiUrl}v1/comment/create`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        update: {
+            baseURL: `${apiUrl}v1/comment/update`,
+            method: 'PUT',
+            headers: baseHeader,
+        },
+    },
 };
 
 export default apiConfig;
