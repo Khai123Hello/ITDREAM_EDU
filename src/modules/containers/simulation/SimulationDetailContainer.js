@@ -69,6 +69,49 @@ function SimulationDetailContainer() {
         false, // Don't auto-fetch
     );
 
+    // Fetch feedback list
+    const {
+        data: feedbacksData,
+        loading: feedbacksLoading,
+        execute: fetchFeedbacks,
+    } = useFetch(
+        apiConfig.feedback.clientList,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false, // Don't auto-fetch
+    );
+
+    // Check simulation completion status
+    const {
+        data: completeData,
+        execute: checkCompleted,
+    } = useFetch(
+        apiConfig.simulationEnrollment.studentCompleteList,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false, // Don't auto-fetch
+    );
+
+    // Create feedback
+    const { execute: createReview } = useFetch(
+        apiConfig.feedback.create,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    // Update feedback
+    const { execute: updateReview } = useFetch(
+        apiConfig.feedback.update,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
     // Determine which data to use
     const simulationData = isAuthenticated ? studentSimulationData : guestSimulationData;
     const loading = isAuthenticated ? studentLoading : guestLoading;
@@ -113,14 +156,22 @@ function SimulationDetailContainer() {
         fetchGuestTasks({ params });
     }, [ simulationId, fetchGuestTasks ]);
 
-    // Check enrollment status on mount if authenticated
+    // Check enrollment and feedback status on mount if authenticated
     React.useEffect(() => {
-        if (isAuthenticated && simulationId) {
-            checkEnrollment({
+        if (simulationId) {
+            fetchFeedbacks({
                 params: { simulationId: parseInt(simulationId) },
             });
+            if (isAuthenticated) {
+                checkEnrollment({
+                    params: { simulationId: parseInt(simulationId) },
+                });
+                checkCompleted({
+                    params: { simulationId: parseInt(simulationId) },
+                });
+            }
         }
-    }, [ isAuthenticated, simulationId, checkEnrollment ]);
+    }, [ isAuthenticated, simulationId, checkEnrollment, checkCompleted, fetchFeedbacks ]);
 
     // Check if already enrolled and get simulationEnrollmentId
     React.useEffect(() => {
@@ -145,13 +196,19 @@ function SimulationDetailContainer() {
             } else {
                 fetchGuest({ pathParams });
             }
+            fetchFeedbacks({
+                params: { simulationId: parseInt(simulationId) },
+            });
         }
         if (isAuthenticated) {
             checkEnrollment({
                 params: { simulationId: parseInt(simulationId) },
             });
+            checkCompleted({
+                params: { simulationId: parseInt(simulationId) },
+            });
         }
-    }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest, checkEnrollment ]);
+    }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest, checkEnrollment, checkCompleted, fetchFeedbacks ]);
 
     // Handle enrollment button click
     const handleEnroll = useCallback(async () => {
@@ -239,6 +296,58 @@ function SimulationDetailContainer() {
         });
     }, [ simulationId, isAuthenticated, isEnrolled, simulationEnrollmentId, navigate, simulationData ]);
 
+    const hasCompleted = useMemo(() => {
+        return completeData?.content && completeData.content.length > 0;
+    }, [ completeData ]);
+
+    const handleSubmitReview = useCallback(async ({ content, star }) => {
+        try {
+            const result = await createReview({
+                data: {
+                    content,
+                    simulationId: parseInt(simulationId),
+                    star,
+                },
+            });
+            const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
+            if (isSuccess) {
+                message.success('Gửi nhận xét thành công!');
+                handleRetry();
+                return true;
+            } else {
+                message.error(result?.message || 'Gửi nhận xét thất bại');
+                return false;
+            }
+        } catch (err) {
+            message.error('Gửi nhận xét thất bại');
+            return false;
+        }
+    }, [ simulationId, createReview, handleRetry ]);
+
+    const handleUpdateReview = useCallback(async ({ id, content, star }) => {
+        try {
+            const result = await updateReview({
+                data: {
+                    id,
+                    content,
+                    star,
+                },
+            });
+            const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
+            if (isSuccess) {
+                message.success('Cập nhật nhận xét thành công!');
+                handleRetry();
+                return true;
+            } else {
+                message.error(result?.message || 'Cập nhật nhận xét thất bại');
+                return false;
+            }
+        } catch (err) {
+            message.error('Cập nhật nhận xét thất bại');
+            return false;
+        }
+    }, [ updateReview, handleRetry ]);
+
     return (
         <SimulationDetailDesktop
             simulation={simulationData || {}}
@@ -253,6 +362,11 @@ function SimulationDetailContainer() {
             onEnroll={handleEnroll}
             onLogin={handleLogin}
             onStartTask={handleStartTask}
+            feedbacks={feedbacksData?.content || []}
+            feedbacksLoading={feedbacksLoading}
+            hasCompleted={hasCompleted}
+            onSubmitReview={handleSubmitReview}
+            onUpdateReview={handleUpdateReview}
         />
     );
 }

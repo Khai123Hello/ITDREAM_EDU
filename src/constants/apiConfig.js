@@ -212,6 +212,11 @@ const apiConfig = {
             method: 'GET',
             headers: baseHeader,
         },
+        studentCompleteList: {
+            baseURL: `${apiUrl}v1/simulation_enrollment/student_complete_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
     },
     taskProgress: {
         create: {
@@ -503,6 +508,23 @@ const apiConfig = {
         clearAll: {
             baseURL: `${apiUrl}v1/notification/clear_all`,
             method: 'DELETE',
+            headers: baseHeader,
+        },
+    },
+    feedback: {
+        clientList: {
+            baseURL: `${apiUrl}v1/feedback/client_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        create: {
+            baseURL: `${apiUrl}v1/feedback/create`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        update: {
+            baseURL: `${apiUrl}v1/feedback/update`,
+            method: 'PUT',
             headers: baseHeader,
         },
     },
