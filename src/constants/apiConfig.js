@@ -489,6 +489,23 @@ const apiConfig = {
             headers: baseHeader,
         },
     },
+    notification: {
+        studentList: {
+            baseURL: `${apiUrl}v1/notification/student_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        updateReadFlag: {
+            baseURL: `${apiUrl}v1/notification/update_read_flag`,
+            method: 'PUT',
+            headers: baseHeader,
+        },
+        clearAll: {
+            baseURL: `${apiUrl}v1/notification/clear_all`,
+            method: 'DELETE',
+            headers: baseHeader,
+        },
+    },
 };
 
 export default apiConfig;

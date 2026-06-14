@@ -7,6 +7,8 @@ import useFetch from '@hooks/useFetch';
 import { removeCacheToken, removeCacheUserEmail, removeCacheUserKind } from '@services/userService';
 import { accountActions } from '@store/actions';
 
+import NotificationDropdown from './NotificationDropdown';
+
 import styles from './AppHeader.module.scss';
 
 const AppHeader = () => {
@@ -97,33 +99,36 @@ const AppHeader = () => {
 
                 <div className={styles['lp-nav__actions']}>
                     {isAuthenticated ? (
-                        <div style={{ position: 'relative' }}>
-                            <button className={styles.userAvatarTrigger} onClick={() => setDropdownOpen(!dropdownOpen)}>
-                                {profile?.avatar || profile?.avatarPath ? (
-                                    <img
-                                        src={profile.avatar || profile.avatarPath}
-                                        alt={profile?.fullName || 'User'}
-                                        className={styles.userAvatarImg}
-                                    />
-                                ) : (
-                                    <span className={styles.userAvatarInitials}>
-                                        {(profile?.fullName || profile?.account?.fullName || 'U')
-                                            .charAt(0)
-                                            .toUpperCase()}
-                                    </span>
-                                )}
-                            </button>
-                            {dropdownOpen && (
-                                <div className={styles.dropdownMenu}>
-                                    <button className={styles.dropdownItem} onClick={handleProfileClick}>
+                        <>
+                            <NotificationDropdown />
+                            <div style={{ position: 'relative' }}>
+                                <button className={styles.userAvatarTrigger} onClick={() => setDropdownOpen(!dropdownOpen)}>
+                                    {profile?.avatar || profile?.avatarPath ? (
+                                        <img
+                                            src={profile.avatar || profile.avatarPath}
+                                            alt={profile?.fullName || 'User'}
+                                            className={styles.userAvatarImg}
+                                        />
+                                    ) : (
+                                        <span className={styles.userAvatarInitials}>
+                                            {(profile?.fullName || profile?.account?.fullName || 'U')
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                        </span>
+                                    )}
+                                </button>
+                                {dropdownOpen && (
+                                    <div className={styles.dropdownMenu}>
+                                        <button className={styles.dropdownItem} onClick={handleProfileClick}>
                                         Hồ sơ cá nhân
-                                    </button>
-                                    <button className={styles.dropdownItem} onClick={handleLogout}>
+                                        </button>
+                                        <button className={styles.dropdownItem} onClick={handleLogout}>
                                         Đăng xuất
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     ) : (
                         <>
                             <button
