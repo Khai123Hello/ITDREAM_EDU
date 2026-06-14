@@ -212,6 +212,11 @@ const apiConfig = {
             method: 'GET',
             headers: baseHeader,
         },
+        studentCompleteList: {
+            baseURL: `${apiUrl}v1/simulation_enrollment/student_complete_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
     },
     taskProgress: {
         create: {
@@ -469,6 +474,57 @@ const apiConfig = {
         create: {
             baseURL: `${apiUrl}v1/question_quiz_history/create`,
             method: 'POST',
+            headers: baseHeader,
+        },
+    },
+    comment: {
+        userList: {
+            baseURL: `${apiUrl}v1/comment/user_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        create: {
+            baseURL: `${apiUrl}v1/comment/create`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        update: {
+            baseURL: `${apiUrl}v1/comment/update`,
+            method: 'PUT',
+            headers: baseHeader,
+        },
+    },
+    notification: {
+        studentList: {
+            baseURL: `${apiUrl}v1/notification/student_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        updateReadFlag: {
+            baseURL: `${apiUrl}v1/notification/update_read_flag`,
+            method: 'PUT',
+            headers: baseHeader,
+        },
+        clearAll: {
+            baseURL: `${apiUrl}v1/notification/clear_all`,
+            method: 'DELETE',
+            headers: baseHeader,
+        },
+    },
+    feedback: {
+        clientList: {
+            baseURL: `${apiUrl}v1/feedback/client_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        create: {
+            baseURL: `${apiUrl}v1/feedback/create`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        update: {
+            baseURL: `${apiUrl}v1/feedback/update`,
+            method: 'PUT',
             headers: baseHeader,
         },
     },

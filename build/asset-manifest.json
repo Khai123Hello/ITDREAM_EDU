@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.0cff6e81.css",
-    "main.js": "/static/js/main.251d016a.js",
+    "main.css": "/static/css/main.3ea80ff8.css",
+    "main.js": "/static/js/main.437f6f26.js",
     "static/js/206.165013e2.chunk.js": "/static/js/206.165013e2.chunk.js",
     "static/media/SF-Pro-Display-Semibold.otf": "/static/media/SF-Pro-Display-Semibold.f50e0151c241f0e9d573.otf",
     "static/media/SF-Pro-Display-Medium.otf": "/static/media/SF-Pro-Display-Medium.e1d844da0ee028d4e288.otf",
@@ -23,7 +23,7 @@
     "static/media/search-normal.svg": "/static/media/search-normal.f16304f6268c23f846c10284a4574db4.svg"
   },
   "entrypoints": [
-    "static/css/main.0cff6e81.css",
-    "static/js/main.251d016a.js"
+    "static/css/main.3ea80ff8.css",
+    "static/js/main.437f6f26.js"
   ]
 }

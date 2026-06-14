@@ -1,8 +1,11 @@
 import React, { useMemo, useState } from 'react';
+import RatingStar from '@components/common/elements/RatingStar';
 import { AppConstants } from '@constants';
+import useAuth from '@hooks/useAuth';
 import AppFooter from '@modules/layout/common/AppFooter';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
+import dayjs from 'dayjs';
 
 import TaskPanel from '../components/TaskPanel';
 
@@ -79,9 +82,19 @@ function SimulationDetailDesktop({
     onEnroll = () => {},
     onLogin = () => {},
     onStartTask = () => {},
+    feedbacks = [],
+    feedbacksLoading = false,
+    hasCompleted = false,
+    onSubmitReview = () => {},
+    onUpdateReview = () => {},
 }) {
+    const { profile } = useAuth();
     const [ activeTab, setActiveTab ] = useState('overview');
     const [ activeTaskId, setActiveTaskId ] = useState(null);
+    const [ isEditingReview, setIsEditingReview ] = useState(false);
+    const [ reviewStar, setReviewStar ] = useState(5);
+    const [ reviewContent, setReviewContent ] = useState('');
+    const [ isSubmitting, setIsSubmitting ] = useState(false);
 
     // ✅ FIX: chỉ lấy id của subtask đầu tiên (kind=2), không dùng task cha (kind=1)
     const defaultActiveTaskId = useMemo(() => {
@@ -115,6 +128,48 @@ function SimulationDetailDesktop({
         ({ 0: 'Giới thiệu', 1: 'Cơ bản', 2: 'Trung cấp', 3: 'Nâng cao' })[level] ?? 'Giới thiệu';
 
     const getStarCount = (avgStar) => Math.round(avgStar || 0);
+
+    const myReview = useMemo(() => {
+        if (!isAuthenticated || !profile || !feedbacks.length) return null;
+        return feedbacks.find(
+            (f) =>
+                f.student?.profileAccountDto?.email === profile.email ||
+                f.student?.profileAccountDto?.username === profile.username,
+        );
+    }, [ isAuthenticated, profile, feedbacks ]);
+
+    const handleStartEdit = () => {
+        if (myReview) {
+            setReviewStar(myReview.star || 5);
+            setReviewContent(myReview.content || '');
+            setIsEditingReview(true);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!reviewContent.trim()) return;
+
+        setIsSubmitting(true);
+        let success = false;
+        if (myReview) {
+            success = await onUpdateReview({
+                id: myReview.id,
+                content: reviewContent,
+                star: reviewStar,
+            });
+        } else {
+            success = await onSubmitReview({
+                content: reviewContent,
+                star: reviewStar,
+            });
+        }
+        setIsSubmitting(false);
+        if (success) {
+            setIsEditingReview(false);
+            setReviewContent('');
+        }
+    };
 
     /* ── Loading ── */
     if (loading)
@@ -495,6 +550,7 @@ function SimulationDetailDesktop({
                     {/* REVIEWS */}
                     {activeTab === 'reviews' && (
                         <div className={styles.reviewsLayout}>
+                            {/* Summary Card */}
                             <div className={styles.reviewsSummary}>
                                 <div className={styles.reviewsScore}>{simulation?.avgStar?.toFixed(1) || '—'}</div>
                                 <div className={styles.reviewsStars}>
@@ -511,43 +567,132 @@ function SimulationDetailDesktop({
                                         </span>
                                     ))}
                                 </div>
-                                <div className={styles.reviewsTotal}>{simulation?.totalParticipant || 0} đánh giá</div>
+                                <div className={styles.reviewsTotal}>{feedbacks.length} đánh giá</div>
                             </div>
 
-                            <div className={styles.reviewsCarousel}>
-                                <button className={styles.reviewArrow}>
-                                    <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 14 14"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                    >
-                                        <path d="M9 11L5 7l4-4" />
-                                    </svg>
-                                </button>
-                                <blockquote className={styles.reviewQuote}>
-                                    <p>
-                                        &quot;Bài mô phỏng rất hấp dẫn và thực tế. Tôi đã học được nhiều kỹ năng quý giá
-                                        áp dụng trực tiếp vào công việc.&quot;
+                            {/* User Review Actions (Form / Status Prompts) */}
+                            {!isAuthenticated ? (
+                                <div className={styles.loginPrompt}>
+                                    Vui lòng <a href="/login" onClick={(e) => { e.preventDefault(); onLogin(); }}>đăng nhập</a> để gửi nhận xét.
+                                </div>
+                            ) : !isStudent ? (
+                                <div className={styles.completePrompt}>
+                                    Tính năng gửi nhận xét chỉ dành cho học viên.
+                                </div>
+                            ) : !hasCompleted ? (
+                                <div className={styles.completePrompt}>
+                                    Bạn cần hoàn thành bài mô phỏng này để có thể gửi nhận xét.
+                                </div>
+                            ) : myReview && !isEditingReview ? (
+                                <div className={styles.reviewForm}>
+                                    <h4 className={styles.formTitle}>Nhận xét của bạn</h4>
+                                    <div className={styles.reviewsStars} style={{ marginBottom: 8 }}>
+                                        <RatingStar value={myReview.star} readOnly style={{ maxWidth: 100 }} />
+                                    </div>
+                                    <p className={styles.reviewContent} style={{ fontStyle: 'italic', marginBottom: 12 }}>
+                                        &quot;{myReview.content}&quot;
                                     </p>
-                                    <footer>
-                                        — Học viên từ {simulation.educator?.organization?.name || 'cộng đồng'}
-                                    </footer>
-                                </blockquote>
-                                <button className={styles.reviewArrow}>
-                                    <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 14 14"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                    >
-                                        <path d="M5 3l4 4-4 4" />
-                                    </svg>
-                                </button>
+                                    <div className={styles.formActions}>
+                                        <button className={styles.cancelBtn} onClick={handleStartEdit}>
+                                            Chỉnh sửa
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <form className={styles.reviewForm} onSubmit={handleSubmit}>
+                                    <h4 className={styles.formTitle}>
+                                        {myReview ? 'Chỉnh sửa nhận xét' : 'Gửi nhận xét của bạn'}
+                                    </h4>
+                                    <div className={styles.formStars}>
+                                        <span>Đánh giá sao:</span>
+                                        <RatingStar
+                                            value={reviewStar}
+                                            onChange={setReviewStar}
+                                            style={{ maxWidth: 120 }}
+                                        />
+                                    </div>
+                                    <textarea
+                                        className={styles.formTextarea}
+                                        rows={4}
+                                        placeholder="Nhập nội dung nhận xét của bạn về bài mô phỏng này..."
+                                        value={reviewContent}
+                                        onChange={(e) => setReviewContent(e.target.value)}
+                                        required
+                                    />
+                                    <div className={styles.formActions}>
+                                        {myReview && (
+                                            <button
+                                                type="button"
+                                                className={styles.cancelBtn}
+                                                onClick={() => setIsEditingReview(false)}
+                                            >
+                                                Hủy
+                                            </button>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            className={styles.submitBtn}
+                                            disabled={isSubmitting || !reviewContent.trim()}
+                                        >
+                                            {isSubmitting ? 'Đang gửi...' : myReview ? 'Cập nhật' : 'Gửi nhận xét'}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+
+                            {/* Feedbacks List */}
+                            <div className={styles.reviewsList}>
+                                <h3 className={styles.sectionTitle} style={{ fontSize: '18px', marginTop: '16px' }}>
+                                    Nhận xét từ các học viên khác
+                                </h3>
+                                {feedbacksLoading && feedbacks.length === 0 ? (
+                                    <div className={styles.emptyWrap}>
+                                        <Spin size="medium" />
+                                    </div>
+                                ) : feedbacks.length > 0 ? (
+                                    feedbacks.map((item) => {
+                                        const initials = (item.student?.profileAccountDto?.fullName || 'H')
+                                            .charAt(0)
+                                            .toUpperCase();
+                                        const avatarUrl = getImageUrl(item.student?.profileAccountDto?.avatar);
+
+                                        return (
+                                            <div key={item.id} className={styles.reviewItem}>
+                                                <div className={styles.userAvatar}>
+                                                    {avatarUrl ? (
+                                                        <img src={avatarUrl} alt="" />
+                                                    ) : (
+                                                        initials
+                                                    )}
+                                                </div>
+                                                <div className={styles.reviewBody}>
+                                                    <div className={styles.reviewHeader}>
+                                                        <div className={styles.userMeta}>
+                                                            <span className={styles.userName}>
+                                                                {item.student?.profileAccountDto?.fullName || 'Học viên'}
+                                                            </span>
+                                                            <span className={styles.reviewDate}>
+                                                                {dayjs(item.createdDate).format('DD/MM/YYYY HH:mm')}
+                                                            </span>
+                                                        </div>
+                                                        <div className={styles.reviewHeaderRight}>
+                                                            <RatingStar
+                                                                value={item.star}
+                                                                readOnly
+                                                                style={{ maxWidth: 85 }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <p className={styles.reviewContent}>{item.content}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className={styles.emptyWrap} style={{ padding: '40px 0' }}>
+                                        <Empty description="Chưa có nhận xét nào" />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

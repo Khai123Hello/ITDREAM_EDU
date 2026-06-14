@@ -7,7 +7,14 @@ import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
 import { showErrorMessage } from '@services/notifyService';
-import { removeCacheToken, removeCacheUserEmail,removeCacheUserKind, setCacheToken, setCacheUserEmail, setCacheUserKind } from '@services/userService';
+import {
+    removeCacheToken,
+    removeCacheUserEmail,
+    removeCacheUserKind,
+    setCacheToken,
+    setCacheUserEmail,
+    setCacheUserKind,
+} from '@services/userService';
 import { accountActions } from '@store/actions';
 import { Buffer } from 'buffer';
 

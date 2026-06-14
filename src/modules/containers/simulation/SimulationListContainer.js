@@ -17,7 +17,7 @@ function SimulationListContainer() {
         level: params.get('level') ? parseInt(params.get('level'), 10) : undefined,
         categoryId: params.get('categoryId') ? parseInt(params.get('categoryId'), 10) : undefined,
     });
-    const [pagination, setPagination] = useState({
+    const [ pagination, setPagination ] = useState({
         page: params.get('page') ? parseInt(params.get('page'), 10) : 0,
         size: params.get('size') ? parseInt(params.get('size'), 10) : 16,
     });
@@ -65,7 +65,7 @@ function SimulationListContainer() {
                 size: String(pagination.size),
             });
         },
-        [pagination.size, setQueryParams],
+        [ pagination.size, setQueryParams ],
     );
 
     const handlePaginationChange = useCallback(
