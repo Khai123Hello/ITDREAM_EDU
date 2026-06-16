@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IoNotificationsOffOutline,IoNotificationsOutline } from 'react-icons/io5';
+import { IoNotificationsOffOutline, IoNotificationsOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import DropdownMenu from '@components/common/elements/DropdownMenu';
 import apiConfig from '@constants/apiConfig';
@@ -10,14 +10,15 @@ import styles from './NotificationDropdown.module.scss';
 function NotificationDropdown() {
     const [ open, setOpen ] = useState(false);
 
-    const { data: notificationsData, execute: fetchNotifications, loading: loadingList } = useFetch(
-        apiConfig.notification.studentList,
-        {
-            immediate: true,
-            params: { page: 0, size: 20 },
-            mappingData: (res) => res || {},
-        },
-    );
+    const {
+        data: notificationsData,
+        execute: fetchNotifications,
+        loading: loadingList,
+    } = useFetch(apiConfig.notification.studentList, {
+        immediate: true,
+        params: { page: 0, size: 20 },
+        mappingData: (res) => res || {},
+    });
 
     const { execute: updateRead, loading: loadingUpdate } = useFetch(apiConfig.notification.updateReadFlag);
     const { execute: clearAllRead, loading: loadingClear } = useFetch(apiConfig.notification.clearAll);

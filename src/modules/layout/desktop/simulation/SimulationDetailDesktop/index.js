@@ -200,13 +200,22 @@ function SimulationDetailDesktop({
 
     /* ── CTA button logic ── */
     const renderCtaButton = () => {
-        if (isEnrolled)
+        if (isEnrolled) {
+            if (hasCompleted) {
+                return (
+                    <button className={styles.ctaBtn} onClick={onStartTask}>
+                        <span className={styles.ctaBtnIcon}>👁</span>
+                        Đã hoàn thành
+                    </button>
+                );
+            }
             return (
                 <button className={`${styles.ctaBtn} ${styles.ctaBtnSuccess}`} onClick={onStartTask}>
                     <span className={styles.ctaBtnIcon}>▶</span>
                     Tiếp tục học
                 </button>
             );
+        }
         if (!isAuthenticated)
             return (
                 <button className={styles.ctaBtn} onClick={onLogin} disabled={enrollmentLoading}>
@@ -349,7 +358,11 @@ function SimulationDetailDesktop({
                         {/* RIGHT — Enroll card */}
                         <div className={styles.enrollCard}>
                             <div className={styles.enrollCardBadge}>
-                                {isEnrolled ? '✓ Đã tham gia' : getLevelLabel(simulation.level)}
+                                {isEnrolled
+                                    ? hasCompleted
+                                        ? '✓ Đã hoàn thành'
+                                        : '✓ Đã tham gia'
+                                    : getLevelLabel(simulation.level)}
                             </div>
 
                             <div className={styles.enrollCardTitle}>
@@ -573,7 +586,17 @@ function SimulationDetailDesktop({
                             {/* User Review Actions (Form / Status Prompts) */}
                             {!isAuthenticated ? (
                                 <div className={styles.loginPrompt}>
-                                    Vui lòng <a href="/login" onClick={(e) => { e.preventDefault(); onLogin(); }}>đăng nhập</a> để gửi nhận xét.
+                                    Vui lòng{' '}
+                                    <a
+                                        href="/login"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onLogin();
+                                        }}
+                                    >
+                                        đăng nhập
+                                    </a>{' '}
+                                    để gửi nhận xét.
                                 </div>
                             ) : !isStudent ? (
                                 <div className={styles.completePrompt}>
@@ -589,7 +612,10 @@ function SimulationDetailDesktop({
                                     <div className={styles.reviewsStars} style={{ marginBottom: 8 }}>
                                         <RatingStar value={myReview.star} readOnly style={{ maxWidth: 100 }} />
                                     </div>
-                                    <p className={styles.reviewContent} style={{ fontStyle: 'italic', marginBottom: 12 }}>
+                                    <p
+                                        className={styles.reviewContent}
+                                        style={{ fontStyle: 'italic', marginBottom: 12 }}
+                                    >
                                         &quot;{myReview.content}&quot;
                                     </p>
                                     <div className={styles.formActions}>
@@ -659,20 +685,17 @@ function SimulationDetailDesktop({
                                         return (
                                             <div key={item.id} className={styles.reviewItem}>
                                                 <div className={styles.userAvatar}>
-                                                    {avatarUrl ? (
-                                                        <img src={avatarUrl} alt="" />
-                                                    ) : (
-                                                        initials
-                                                    )}
+                                                    {avatarUrl ? <img src={avatarUrl} alt="" /> : initials}
                                                 </div>
                                                 <div className={styles.reviewBody}>
                                                     <div className={styles.reviewHeader}>
                                                         <div className={styles.userMeta}>
                                                             <span className={styles.userName}>
-                                                                {item.student?.profileAccountDto?.fullName || 'Học viên'}
+                                                                {item.student?.profileAccountDto?.fullName ||
+                                                                    'Học viên'}
                                                             </span>
                                                             <span className={styles.reviewDate}>
-                                                                {dayjs(item.createdDate).format('DD/MM/YYYY HH:mm')}
+                                                                {dayjs(item.modifiedDate).format('DD/MM/YYYY HH:mm')}
                                                             </span>
                                                         </div>
                                                         <div className={styles.reviewHeaderRight}>

@@ -82,18 +82,6 @@ function SimulationDetailContainer() {
         false, // Don't auto-fetch
     );
 
-    // Check simulation completion status
-    const {
-        data: completeData,
-        execute: checkCompleted,
-    } = useFetch(
-        apiConfig.simulationEnrollment.studentCompleteList,
-        {
-            mappingData: (res) => res.data || {},
-        },
-        false, // Don't auto-fetch
-    );
-
     // Create feedback
     const { execute: createReview } = useFetch(
         apiConfig.feedback.create,
@@ -166,12 +154,9 @@ function SimulationDetailContainer() {
                 checkEnrollment({
                     params: { simulationId: parseInt(simulationId) },
                 });
-                checkCompleted({
-                    params: { simulationId: parseInt(simulationId) },
-                });
             }
         }
-    }, [ isAuthenticated, simulationId, checkEnrollment, checkCompleted, fetchFeedbacks ]);
+    }, [ isAuthenticated, simulationId, checkEnrollment, fetchFeedbacks ]);
 
     // Check if already enrolled and get simulationEnrollmentId
     React.useEffect(() => {
@@ -204,11 +189,8 @@ function SimulationDetailContainer() {
             checkEnrollment({
                 params: { simulationId: parseInt(simulationId) },
             });
-            checkCompleted({
-                params: { simulationId: parseInt(simulationId) },
-            });
         }
-    }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest, checkEnrollment, checkCompleted, fetchFeedbacks ]);
+    }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest, checkEnrollment, fetchFeedbacks ]);
 
     // Handle enrollment button click
     const handleEnroll = useCallback(async () => {
@@ -297,56 +279,66 @@ function SimulationDetailContainer() {
     }, [ simulationId, isAuthenticated, isEnrolled, simulationEnrollmentId, navigate, simulationData ]);
 
     const hasCompleted = useMemo(() => {
-        return completeData?.content && completeData.content.length > 0;
-    }, [ completeData ]);
+        if (enrollmentData?.content) {
+            const enrollment = enrollmentData.content.find((e) => e.simulation?.id === parseInt(simulationId));
+            return enrollment?.progress === 100;
+        }
+        return false;
+    }, [ enrollmentData, simulationId ]);
 
-    const handleSubmitReview = useCallback(async ({ content, star }) => {
-        try {
-            const result = await createReview({
-                data: {
-                    content,
-                    simulationId: parseInt(simulationId),
-                    star,
-                },
-            });
-            const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
-            if (isSuccess) {
-                message.success('Gửi nhận xét thành công!');
-                handleRetry();
-                return true;
-            } else {
-                message.error(result?.message || 'Gửi nhận xét thất bại');
+    const handleSubmitReview = useCallback(
+        async ({ content, star }) => {
+            try {
+                const result = await createReview({
+                    data: {
+                        content,
+                        simulationId: parseInt(simulationId),
+                        star,
+                    },
+                });
+                const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
+                if (isSuccess) {
+                    message.success('Gửi nhận xét thành công!');
+                    handleRetry();
+                    return true;
+                } else {
+                    message.error(result?.message || 'Gửi nhận xét thất bại');
+                    return false;
+                }
+            } catch (err) {
+                message.error('Gửi nhận xét thất bại');
                 return false;
             }
-        } catch (err) {
-            message.error('Gửi nhận xét thất bại');
-            return false;
-        }
-    }, [ simulationId, createReview, handleRetry ]);
+        },
+        [ simulationId, createReview, handleRetry ],
+    );
 
-    const handleUpdateReview = useCallback(async ({ id, content, star }) => {
-        try {
-            const result = await updateReview({
-                data: {
-                    id,
-                    content,
-                    star,
-                },
-            });
-            const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
-            if (isSuccess) {
-                message.success('Cập nhật nhận xét thành công!');
-                handleRetry();
-                return true;
-            } else {
-                message.error(result?.message || 'Cập nhật nhận xét thất bại');
+    const handleUpdateReview = useCallback(
+        async ({ id, content, star }) => {
+            try {
+                const result = await updateReview({
+                    data: {
+                        id,
+                        content,
+                        star,
+                    },
+                });
+                const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
+                if (isSuccess) {
+                    message.success('Cập nhật nhận xét thành công!');
+                    handleRetry();
+                    return true;
+                } else {
+                    message.error(result?.message || 'Cập nhật nhận xét thất bại');
+                    return false;
+                }
+            } catch (err) {
+                message.error('Cập nhật nhận xét thất bại');
                 return false;
             }
-        } catch (err) {
-            message.error('Cập nhật nhận xét thất bại');
-            return false;
-        }
-    }, [ updateReview, handleRetry ]);
+        },
+        [ updateReview, handleRetry ],
+    );
 
     return (
         <SimulationDetailDesktop

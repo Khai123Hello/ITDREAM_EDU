@@ -102,7 +102,10 @@ const AppHeader = () => {
                         <>
                             <NotificationDropdown />
                             <div style={{ position: 'relative' }}>
-                                <button className={styles.userAvatarTrigger} onClick={() => setDropdownOpen(!dropdownOpen)}>
+                                <button
+                                    className={styles.userAvatarTrigger}
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                >
                                     {profile?.avatar || profile?.avatarPath ? (
                                         <img
                                             src={profile.avatar || profile.avatarPath}
@@ -120,10 +123,10 @@ const AppHeader = () => {
                                 {dropdownOpen && (
                                     <div className={styles.dropdownMenu}>
                                         <button className={styles.dropdownItem} onClick={handleProfileClick}>
-                                        Hồ sơ cá nhân
+                                            Hồ sơ cá nhân
                                         </button>
                                         <button className={styles.dropdownItem} onClick={handleLogout}>
-                                        Đăng xuất
+                                            Đăng xuất
                                         </button>
                                     </div>
                                 )}

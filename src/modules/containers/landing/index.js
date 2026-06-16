@@ -26,6 +26,7 @@ const LandingPageContainer = ({ title }) => {
                 totalParticipant: item.totalParticipant,
                 avgStar: item.avgStar,
                 organization: item.educator?.organization || {},
+                category: item.category,
             })),
         [ data ],
     );

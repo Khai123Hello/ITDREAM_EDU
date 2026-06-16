@@ -118,7 +118,13 @@ function MarkdownContent({ text }) {
 
 /* ─────────────────────────── Quiz Block (interactive) ─────────────────── */
 
-function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAnswerSubmit = () => {} }) {
+function QuizBlock({
+    block,
+    submittedAnswer = null,
+    questionId = null,
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     const [ selected, setSelected ] = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
     const [ isRetrying, setIsRetrying ] = useState(false);
@@ -177,8 +183,8 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
                         <button
                             key={oi}
                             className={cls}
-                            disabled={effectiveSubmitted}
-                            onClick={() => !effectiveSubmitted && setSelected(oi)}
+                            disabled={effectiveSubmitted || hasCompleted}
+                            onClick={() => !(effectiveSubmitted || hasCompleted) && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
@@ -196,7 +202,11 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
             {/* Footer */}
             <div className="tfo-block-quiz-footer">
                 {!effectiveSubmitted ? (
-                    <button className="tfo-quiz-submit-btn" disabled={selected === null} onClick={handleSubmit}>
+                    <button
+                        className="tfo-quiz-submit-btn"
+                        disabled={selected === null || hasCompleted}
+                        onClick={handleSubmit}
+                    >
                         Kiểm tra đáp án
                     </button>
                 ) : (
@@ -205,7 +215,7 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" onClick={handleReset}>
+                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted} onClick={handleReset}>
                                 Làm lại
                             </button>
                         )}
@@ -218,7 +228,15 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
 
 /* ─────────────────────────── Block Item ─────────────────────────── */
 
-function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function BlockItem({
+    block,
+    idx,
+    allBlocks,
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     switch (block.type) {
                     case 'meta':
                         return (
@@ -320,6 +338,7 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap 
                                 submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
                                 questionId={questionId}
                                 onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                hasCompleted={hasCompleted}
                             />
                         );
                     }
@@ -331,7 +350,13 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap 
 
 /* ─────────────────────────── Blocks content ─────────────────────────── */
 
-function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function BlocksContent({
+    blocksJson,
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     const blocks = useMemo(() => {
         try {
             return JSON.parse(blocksJson);
@@ -351,6 +376,7 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, o
                     quizSubmissionMap={quizSubmissionMap}
                     questionMap={questionMap}
                     onQuizAnswerSubmit={onQuizAnswerSubmit}
+                    hasCompleted={hasCompleted}
                 />
             ))}
         </div>
@@ -359,7 +385,13 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, o
 
 /* ─────────────────────────── Content Router ─────────────────────────── */
 
-function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function ContentRenderer({
+    content,
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     const type = useMemo(() => detectContentType(content), [ content ]);
     if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
@@ -369,6 +401,7 @@ function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, on
                 quizSubmissionMap={quizSubmissionMap}
                 questionMap={questionMap}
                 onQuizAnswerSubmit={onQuizAnswerSubmit}
+                hasCompleted={hasCompleted}
             />
         );
     }
@@ -471,7 +504,13 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
 
 /* ─────────────────────────── Footer Nav ─────────────────────────── */
 
-function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, canGoNext = true }) {
+function FooterNav({
+    onBack = () => {},
+    onNext = () => {},
+    canGoBack = true,
+    canGoNext = true,
+    isLastSubtask = false,
+}) {
     return (
         <footer className="tfo-footer-nav">
             <div className="tfo-footer-inner">
@@ -480,11 +519,121 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
                         Quay lại
                     </button>
                     <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>
-                        Tiếp tục
+                        {isLastSubtask ? 'Hoàn thành' : 'Tiếp tục'}
                     </button>
                 </div>
             </div>
         </footer>
+    );
+}
+
+/* ─────────────────────────── Confetti Effect ─────────────────────────── */
+
+function ConfettiEffect() {
+    const canvasRef = React.useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+
+        const handleResize = () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        };
+        window.addEventListener('resize', handleResize);
+
+        const colors = [
+            '#f44336',
+            '#e91e63',
+            '#9c27b0',
+            '#673ab7',
+            '#3f51b5',
+            '#2196f3',
+            '#03a9f4',
+            '#00bcd4',
+            '#009688',
+            '#4caf50',
+            '#8bc34a',
+            '#cddc39',
+            '#ffeb3b',
+            '#ffc107',
+            '#ff9800',
+            '#ff5722',
+        ];
+        const pieces = [];
+
+        for (let i = 0; i < 150; i++) {
+            pieces.push({
+                x: Math.random() * width,
+                y: Math.random() * height - height,
+                r: Math.random() * 6 + 4,
+                d: Math.random() * height,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                tilt: Math.random() * 10 - 5,
+                tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+                tiltAngle: 0,
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            pieces.forEach((p, idx) => {
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle);
+                p.tilt = Math.sin(p.tiltAngle - idx / 3) * 15;
+
+                if (p.y > height) {
+                    pieces[idx] = {
+                        x: Math.random() * width,
+                        y: -20,
+                        r: p.r,
+                        d: p.d,
+                        color: p.color,
+                        tilt: p.tilt,
+                        tiltAngleIncremental: p.tiltAngleIncremental,
+                        tiltAngle: p.tiltAngle,
+                    };
+                }
+
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                ctx.stroke();
+            });
+
+            animationFrameId = requestAnimationFrame(draw);
+        }
+
+        draw();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                pointerEvents: 'none',
+                zIndex: 9999,
+            }}
+        />
     );
 }
 
@@ -529,6 +678,8 @@ export default function TaskDoingPage({
 
     // Progress
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
+    hasCompleted = false,
+    isLastSubtask = false,
 
     // Navigation
     canGoBack = false,
@@ -551,6 +702,7 @@ export default function TaskDoingPage({
     isGeneratingCert = false,
     congratsData = { show: false, filePath: '' },
     onCloseCongrats = () => {},
+    simulationId = null,
 
     // Profile details
     profile = {},
@@ -663,7 +815,7 @@ export default function TaskDoingPage({
         subtasks.length > 0 && selectedSubtaskId ? ((activeSubtaskIndex + 1) / subtasks.length) * 100 : 0;
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
-    const isCompleted = taskStatus === 'completed';
+    const isCompleted = taskStatus === 'completed' || hasCompleted;
 
     if (congratsData.show) {
         const fullFilePath = congratsData.filePath
@@ -676,6 +828,7 @@ export default function TaskDoingPage({
         return (
             <>
                 <AppHeader />
+                <ConfettiEffect />
                 <div className="tfo-completion-page">
                     <div className="tfo-completion-container">
                         <div className="tfo-completion-header">
@@ -721,64 +874,60 @@ export default function TaskDoingPage({
 
                         {/* Action buttons */}
                         <div className="tfo-completion-actions">
-                            {fullFilePath && (
-                                <>
-                                    <button
-                                        className="tfo-completion-btn tfo-completion-btn-secondary"
-                                        onClick={() => window.open(fullFilePath, '_blank', 'noopener,noreferrer')}
+                            {fullFilePath ? (
+                                <button
+                                    className="tfo-completion-btn tfo-completion-btn-primary"
+                                    onClick={() => window.open(fullFilePath, '_blank', 'noopener,noreferrer')}
+                                >
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        style={{ marginRight: 8 }}
                                     >
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            style={{ marginRight: 8 }}
-                                        >
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                            <circle cx="12" cy="12" r="3" />
-                                        </svg>
-                                        Xem chứng chỉ
-                                    </button>
-                                    <button
-                                        className="tfo-completion-btn tfo-completion-btn-primary"
-                                        onClick={() => {
-                                            const link = document.createElement('a');
-                                            link.href = fullFilePath;
-                                            link.target = '_blank';
-                                            link.download = `Chung_Chi_${pageTitle.replace(/\s+/g, '_')}.pdf`;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        }}
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                    Xem chứng chỉ
+                                </button>
+                            ) : (
+                                <button
+                                    className="tfo-completion-btn tfo-completion-btn-secondary"
+                                    disabled
+                                    title="Chứng chỉ đang được xử lý hoặc không có sẵn"
+                                    style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                                >
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        style={{ marginRight: 8 }}
                                     >
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            style={{ marginRight: 8 }}
-                                        >
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                            <polyline points="7 10 12 15 17 10" />
-                                            <line x1="12" y1="15" x2="12" y2="3" />
-                                        </svg>
-                                        Tải xuống chứng chỉ
-                                    </button>
-                                </>
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    Xem chứng chỉ (Chưa sẵn sàng)
+                                </button>
                             )}
                             <button
                                 className="tfo-completion-btn tfo-completion-btn-success"
                                 onClick={() => {
                                     onCloseCongrats();
-                                    navigate('/dashboard');
+                                    if (simulationId) {
+                                        navigate(`/simulations/${simulationId}`);
+                                    } else {
+                                        navigate('/simulations');
+                                    }
                                 }}
                             >
                                 <svg
@@ -792,10 +941,9 @@ export default function TaskDoingPage({
                                     strokeLinejoin="round"
                                     style={{ marginRight: 8 }}
                                 >
-                                    <polyline points="9 11 12 14 22 4" />
-                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                                    <polyline points="15 18 9 12 15 6" />
                                 </svg>
-                                Kết thúc & Trở về Dashboard
+                                Trở về Chi tiết Bài Mô phỏng
                             </button>
                         </div>
                     </div>
@@ -892,6 +1040,7 @@ export default function TaskDoingPage({
                                                         quizSubmissionMap={quizSubmissionMap}
                                                         questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                                        hasCompleted={hasCompleted}
                                                     />
                                                 )}
 
@@ -954,7 +1103,13 @@ export default function TaskDoingPage({
                         </div>
                     </div>
 
-                    <FooterNav onBack={onBack} onNext={onNext} canGoBack={canGoBack} canGoNext={canGoNext} />
+                    <FooterNav
+                        onBack={onBack}
+                        onNext={onNext}
+                        canGoBack={canGoBack}
+                        canGoNext={canGoNext}
+                        isLastSubtask={isLastSubtask}
+                    />
                 </div>
             </div>
 

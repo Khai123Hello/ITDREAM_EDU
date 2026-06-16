@@ -1,5 +1,5 @@
-import React, { useEffect,useMemo, useRef, useState } from 'react';
-import { FiCornerDownRight, FiEdit2,FiSend, FiX } from 'react-icons/fi';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FiCornerDownRight, FiEdit2, FiSend, FiX } from 'react-icons/fi';
 import { Spin } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
