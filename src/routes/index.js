@@ -10,6 +10,7 @@ import LoginPageContainer from '@modules/containers/login';
 import PolicyContainer from '@modules/containers/policy';
 import ProfilePageContainer from '@modules/containers/profile';
 import RegisterContainer from '@modules/containers/register/register';
+import SimulationCompletedContainer from '@modules/containers/simulation/SimulationCompletedContainer';
 import SimulationDetailContainer from '@modules/containers/simulation/SimulationDetailContainer';
 import SimulationListContainer from '@modules/containers/simulation/SimulationListContainer';
 import TaskDoingContainer from '@modules/containers/simulation/TaskDoingContainer';
@@ -105,6 +106,12 @@ const routes = {
         component: TaskDoingContainer,
         auth: true,
         title: 'Nhiệm vụ',
+    },
+    simulationCompletedPage: {
+        path: '/simulations/:id/completed',
+        component: SimulationCompletedContainer,
+        auth: true,
+        title: 'Hoàn thành bài mô phỏng',
     },
     pageNotFound: {
         path: '/page-not-found',

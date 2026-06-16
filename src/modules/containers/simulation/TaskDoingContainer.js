@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import apiConfig from '@constants/apiConfig';
 import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
@@ -116,6 +116,7 @@ const getQuestionIdFromMap = (questionMap = {}, questionText) => {
 function TaskDoingContainer() {
     const { id: simulationId } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
 
     // Persist simulationEnrollmentId & companyLogo vào sessionStorage để không bị mất khi reload trang
     const sessionKey = `taskDoing-${simulationId}`;
@@ -254,7 +255,6 @@ function TaskDoingContainer() {
 
     const { profile } = useAuth();
     const [ isGeneratingCert, setIsGeneratingCert ] = useState(false);
-    const [ congratsData, setCongratsData ] = useState({ show: false, filePath: '' });
 
     const { execute: uploadFile } = useFetch(apiConfig.file.upload, {}, false);
     const { execute: createQuizHistory } = useFetch(apiConfig.questionQuizHistory.create, {}, false);
@@ -941,16 +941,7 @@ function TaskDoingContainer() {
             const nextParentTask = parentTasks[activeParentIndex + 1];
 
             if (!nextParentTask) {
-                let filePath = null;
-                try {
-                    const achRes = await fetchAchievements();
-                    const achievements = achRes?.data?.content || achRes?.content || [];
-                    const currentAch = achievements.find((ach) => ach.simulation?.id === parseInt(simulationId, 10));
-                    filePath = currentAch?.filePath || null;
-                } catch {
-                    // Ignore error fetching achievements
-                }
-                setCongratsData({ show: true, filePath });
+                navigate(`/simulations/${simulationId}/completed`);
                 return;
             }
 
@@ -1047,7 +1038,7 @@ function TaskDoingContainer() {
                     message.error('Hoàn thành bài mô phỏng nhưng không thể tạo chứng chỉ. Vui lòng thử lại sau.');
                 } finally {
                     setIsGeneratingCert(false);
-                    setCongratsData({ show: true, filePath });
+                    navigate(`/simulations/${simulationId}/completed`);
                 }
                 return;
             }
@@ -1151,9 +1142,6 @@ function TaskDoingContainer() {
 
         // Certificate and congrats
         isGeneratingCert,
-        congratsData,
-        onCloseCongrats: () => setCongratsData({ show: false, filePath: '' }),
-        simulationId,
 
         // Comments
         comments: commentsData?.content || [],

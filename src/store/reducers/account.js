@@ -25,6 +25,7 @@ const accountReducer = createReducer(
                     ...profile.profileAccountDto,
                     ...(profile.isReviewed !== undefined && { isReviewed: profile.isReviewed }),
                     ...(profile.organization !== undefined && { organization: profile.organization }),
+                    ...(profile.preferences !== undefined && { preferences: profile.preferences }),
                 };
             }
 

@@ -9,7 +9,7 @@ import DashboardDesktop from '@modules/layout/desktop/dashboard';
 function DashboardPageContainer() {
     const { profile } = useAuth();
 
-    const simParams = useMemo(() => ({ page: 0, size: 10, paged: true }), []);
+    const simParams = useMemo(() => ({ page: 0, size: 100, paged: true }), []);
 
     const { data: enrolledRes, loading: simLoading } = useFetch(apiConfig.simulationEnrollment.studentList, {
         immediate: true,
@@ -19,8 +19,14 @@ function DashboardPageContainer() {
 
     const { data: achievementRes, loading: achLoading } = useFetch(apiConfig.achievement.studentList, {
         immediate: true,
-        params: { page: 0, size: 10, paged: true },
+        params: { page: 0, size: 100, paged: true },
         mappingData: (res) => res || {},
+    });
+
+    const { data: allSimsRes, loading: allSimsLoading } = useFetch(apiConfig.simulation.guestList, {
+        immediate: true,
+        params: { page: 0, size: 100, paged: true, status: 1 },
+        mappingData: (res) => res?.data || {},
     });
 
     return (
@@ -31,7 +37,8 @@ function DashboardPageContainer() {
                 enrolledSims={enrolledRes?.data?.content || []}
                 enrolledUrlBase={enrolledRes?.urlBase || ''}
                 achievements={achievementRes?.data?.content || []}
-                loading={simLoading || achLoading}
+                allSimulations={allSimsRes?.content || []}
+                loading={simLoading || achLoading || allSimsLoading}
             />
             <AppFooter />
         </>
