@@ -402,4 +402,59 @@
             font-size: 15px;
         }
     }
+
+    .preferencePillsContainer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+    .preferencePill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        background-color: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        transition: all 0.15s ease;
+
+        &:hover {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+
+        &.specialization {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+
+            &:hover {
+                background-color: #dcfce7;
+                color: #14532d;
+            }
+        }
+
+        &.organization {
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+
+            &:hover {
+                background-color: #dbeafe;
+                color: #1e3a8a;
+            }
+        }
+
+        img {
+            display: block;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+    }
 }

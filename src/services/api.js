@@ -126,6 +126,8 @@ const sendRequest = (options, payload, cancelToken) => {
         }
     }
 
+    const { responseType } = options;
+
     return axiosInstance.request({
         method,
         baseURL,
@@ -133,6 +135,7 @@ const sendRequest = (options, payload, cancelToken) => {
         params,
         data,
         cancelToken,
+        responseType,
     });
 };
 

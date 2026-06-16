@@ -69,6 +69,7 @@ $radiusSm:   8px;
 
 .dotFilled { background: $red; }
 .dotFilled2 { background: $amber; }
+.dotCompleted { background: $green; }
 .dotEmpty { background: $border; }
 
 .recommendedBadge {
@@ -358,19 +359,31 @@ $radiusSm:   8px;
     align-items: flex-start;
 }
 
-.certificateLink {
-    color: $green;
+.certificateBtn {
+    background-color: $green;
+    color: $white;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-top: 4px;
+    gap: 6px;
+    margin-top: 8px;
     cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
 
     &:hover {
-        text-decoration: underline;
+        background-color: $greenDark;
+        color: $white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 }
 

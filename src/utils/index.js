@@ -1,5 +1,6 @@
 import {
     apiUrl,
+    AppConstants,
     CurrentcyPositions,
     DATE_FORMAT_DISPLAY,
     DATE_SHORT_MONTH_FORMAT,
@@ -639,4 +640,28 @@ export const getColumnWidth = (params = {}) => {
     const maxLength = lengths.length > 0 ? Math.max(...lengths) : 0;
 
     return Math.max(width, maxLength * ratio);
+};
+
+export const getDownloadUrl = (filePath) => {
+    if (!filePath) return '';
+    if (filePath.startsWith('http')) return filePath;
+    let cleanPath = filePath.replace(/\\/g, '/');
+    if (cleanPath.startsWith('/')) {
+        cleanPath = cleanPath.substring(1);
+    }
+    const rootUrl = AppConstants.contentRootUrl || '';
+    const separator = rootUrl.endsWith('/') ? '' : '/';
+    return `${rootUrl}${separator}${cleanPath}`;
+};
+
+export const getPreviewUrl = (filePath) => {
+    if (!filePath) return '';
+    if (filePath.startsWith('http')) return filePath;
+    let cleanPath = filePath.replace(/\\/g, '/');
+    if (cleanPath.startsWith('/')) {
+        cleanPath = cleanPath.substring(1);
+    }
+    const rootUrl = (AppConstants.contentRootUrl || '').replace('v1/file/download', 'v1/file/preview');
+    const separator = rootUrl.endsWith('/') ? '' : '/';
+    return `${rootUrl}${separator}${cleanPath}`;
 };

@@ -1,6 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AppConstants } from '@constants';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
@@ -118,7 +116,13 @@ function MarkdownContent({ text }) {
 
 /* ─────────────────────────── Quiz Block (interactive) ─────────────────── */
 
-function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAnswerSubmit = () => {} }) {
+function QuizBlock({
+    block,
+    submittedAnswer = null,
+    questionId = null,
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     const [ selected, setSelected ] = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
     const [ isRetrying, setIsRetrying ] = useState(false);
@@ -177,8 +181,8 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
                         <button
                             key={oi}
                             className={cls}
-                            disabled={effectiveSubmitted}
-                            onClick={() => !effectiveSubmitted && setSelected(oi)}
+                            disabled={effectiveSubmitted || hasCompleted}
+                            onClick={() => !(effectiveSubmitted || hasCompleted) && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
@@ -196,7 +200,11 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
             {/* Footer */}
             <div className="tfo-block-quiz-footer">
                 {!effectiveSubmitted ? (
-                    <button className="tfo-quiz-submit-btn" disabled={selected === null} onClick={handleSubmit}>
+                    <button
+                        className="tfo-quiz-submit-btn"
+                        disabled={selected === null || hasCompleted}
+                        onClick={handleSubmit}
+                    >
                         Kiểm tra đáp án
                     </button>
                 ) : (
@@ -205,7 +213,7 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" onClick={handleReset}>
+                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted} onClick={handleReset}>
                                 Làm lại
                             </button>
                         )}
@@ -218,7 +226,15 @@ function QuizBlock({ block, submittedAnswer = null, questionId = null, onQuizAns
 
 /* ─────────────────────────── Block Item ─────────────────────────── */
 
-function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function BlockItem({
+    block,
+    idx,
+    allBlocks,
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     switch (block.type) {
                     case 'meta':
                         return (
@@ -320,6 +336,7 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap 
                                 submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
                                 questionId={questionId}
                                 onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                hasCompleted={hasCompleted}
                             />
                         );
                     }
@@ -331,7 +348,13 @@ function BlockItem({ block, idx, allBlocks, quizSubmissionMap = {}, questionMap 
 
 /* ─────────────────────────── Blocks content ─────────────────────────── */
 
-function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function BlocksContent({
+    blocksJson,
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     const blocks = useMemo(() => {
         try {
             return JSON.parse(blocksJson);
@@ -351,6 +374,7 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, o
                     quizSubmissionMap={quizSubmissionMap}
                     questionMap={questionMap}
                     onQuizAnswerSubmit={onQuizAnswerSubmit}
+                    hasCompleted={hasCompleted}
                 />
             ))}
         </div>
@@ -359,7 +383,13 @@ function BlocksContent({ blocksJson, quizSubmissionMap = {}, questionMap = {}, o
 
 /* ─────────────────────────── Content Router ─────────────────────────── */
 
-function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, onQuizAnswerSubmit = () => {} }) {
+function ContentRenderer({
+    content,
+    quizSubmissionMap = {},
+    questionMap = {},
+    onQuizAnswerSubmit = () => {},
+    hasCompleted = false,
+}) {
     const type = useMemo(() => detectContentType(content), [ content ]);
     if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
@@ -369,6 +399,7 @@ function ContentRenderer({ content, quizSubmissionMap = {}, questionMap = {}, on
                 quizSubmissionMap={quizSubmissionMap}
                 questionMap={questionMap}
                 onQuizAnswerSubmit={onQuizAnswerSubmit}
+                hasCompleted={hasCompleted}
             />
         );
     }
@@ -471,7 +502,13 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
 
 /* ─────────────────────────── Footer Nav ─────────────────────────── */
 
-function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, canGoNext = true }) {
+function FooterNav({
+    onBack = () => {},
+    onNext = () => {},
+    canGoBack = true,
+    canGoNext = true,
+    isLastSubtask = false,
+}) {
     return (
         <footer className="tfo-footer-nav">
             <div className="tfo-footer-inner">
@@ -480,7 +517,7 @@ function FooterNav({ onBack = () => {}, onNext = () => {}, canGoBack = true, can
                         Quay lại
                     </button>
                     <button className="tfo-btn-next" onClick={onNext} disabled={!canGoNext}>
-                        Tiếp tục
+                        {isLastSubtask ? 'Hoàn thành' : 'Tiếp tục'}
                     </button>
                 </div>
             </div>
@@ -529,6 +566,8 @@ export default function TaskDoingPage({
 
     // Progress
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
+    hasCompleted = false,
+    isLastSubtask = false,
 
     // Navigation
     canGoBack = false,
@@ -549,8 +588,6 @@ export default function TaskDoingPage({
 
     // Certificate and congrats
     isGeneratingCert = false,
-    congratsData = { show: false, filePath: '' },
-    onCloseCongrats = () => {},
 
     // Profile details
     profile = {},
@@ -563,7 +600,6 @@ export default function TaskDoingPage({
     onSendComment = () => {},
     onUpdateComment = () => {},
 }) {
-    const navigate = useNavigate();
     const [ textInput, setTextInput ] = useState('');
 
     useEffect(() => {
@@ -663,146 +699,7 @@ export default function TaskDoingPage({
         subtasks.length > 0 && selectedSubtaskId ? ((activeSubtaskIndex + 1) / subtasks.length) * 100 : 0;
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
-    const isCompleted = taskStatus === 'completed';
-
-    if (congratsData.show) {
-        const fullFilePath = congratsData.filePath
-            ? congratsData.filePath.startsWith('http')
-                ? congratsData.filePath
-                : `${AppConstants.contentRootUrl}${congratsData.filePath}`
-            : null;
-        const studentName = profile?.fullName || profile?.account?.fullName || 'Học viên';
-
-        return (
-            <>
-                <AppHeader />
-                <div className="tfo-completion-page">
-                    <div className="tfo-completion-container">
-                        <div className="tfo-completion-header">
-                            <div className="tfo-trophy-badge">🏆</div>
-                            <h1 className="tfo-completion-title">Hoàn Thành Bài Mô Phỏng!</h1>
-                            <p className="tfo-completion-subtitle">
-                                Chúc mừng bạn đã hoàn thành xuất sắc tất cả các nhiệm vụ thực tế của dự án. Dưới đây là
-                                chứng chỉ chứng nhận thành tích học tập của bạn.
-                            </p>
-                        </div>
-
-                        {/* Certificate Mockup Frame */}
-                        <div className="tfo-cert-preview-card">
-                            <div className="tfo-cert-inner-border">
-                                <div className="tfo-cert-header">
-                                    <div className="tfo-cert-logo">ITDREAM EDU</div>
-                                    <h2 className="tfo-cert-main-title">CHỨNG NHẬN HOÀN THÀNH</h2>
-                                    <div className="tfo-cert-award-to">Chứng nhận học viên</div>
-                                </div>
-                                <div className="tfo-cert-recipient">{studentName}</div>
-                                <div className="tfo-cert-body">
-                                    Đã hoàn thành xuất sắc bài thực hành mô phỏng công việc thực tế:
-                                    <div className="tfo-cert-sim-title">“{pageTitle}”</div>
-                                </div>
-                                <div className="tfo-cert-footer">
-                                    <div className="tfo-cert-date">
-                                        <span className="tfo-label">NGÀY CẤP</span>
-                                        <span className="tfo-val">{new Date().toLocaleDateString('vi-VN')}</span>
-                                    </div>
-                                    <div className="tfo-cert-seal">
-                                        <div className="tfo-seal-circle">
-                                            <span>OFFICIAL</span>
-                                            <span>SEAL</span>
-                                        </div>
-                                    </div>
-                                    <div className="tfo-cert-signature">
-                                        <span className="tfo-label">BAN ĐIỀU HÀNH</span>
-                                        <span className="tfo-signature-line">ITDream Edu</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="tfo-completion-actions">
-                            {fullFilePath && (
-                                <>
-                                    <button
-                                        className="tfo-completion-btn tfo-completion-btn-secondary"
-                                        onClick={() => window.open(fullFilePath, '_blank', 'noopener,noreferrer')}
-                                    >
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            style={{ marginRight: 8 }}
-                                        >
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                            <circle cx="12" cy="12" r="3" />
-                                        </svg>
-                                        Xem chứng chỉ
-                                    </button>
-                                    <button
-                                        className="tfo-completion-btn tfo-completion-btn-primary"
-                                        onClick={() => {
-                                            const link = document.createElement('a');
-                                            link.href = fullFilePath;
-                                            link.target = '_blank';
-                                            link.download = `Chung_Chi_${pageTitle.replace(/\s+/g, '_')}.pdf`;
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        }}
-                                    >
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            style={{ marginRight: 8 }}
-                                        >
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                            <polyline points="7 10 12 15 17 10" />
-                                            <line x1="12" y1="15" x2="12" y2="3" />
-                                        </svg>
-                                        Tải xuống chứng chỉ
-                                    </button>
-                                </>
-                            )}
-                            <button
-                                className="tfo-completion-btn tfo-completion-btn-success"
-                                onClick={() => {
-                                    onCloseCongrats();
-                                    navigate('/dashboard');
-                                }}
-                            >
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    style={{ marginRight: 8 }}
-                                >
-                                    <polyline points="9 11 12 14 22 4" />
-                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                                </svg>
-                                Kết thúc & Trở về Dashboard
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    }
+    const isCompleted = taskStatus === 'completed' || hasCompleted;
 
     return (
         <>
@@ -892,6 +789,7 @@ export default function TaskDoingPage({
                                                         quizSubmissionMap={quizSubmissionMap}
                                                         questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                                        hasCompleted={hasCompleted}
                                                     />
                                                 )}
 
@@ -954,7 +852,13 @@ export default function TaskDoingPage({
                         </div>
                     </div>
 
-                    <FooterNav onBack={onBack} onNext={onNext} canGoBack={canGoBack} canGoNext={canGoNext} />
+                    <FooterNav
+                        onBack={onBack}
+                        onNext={onNext}
+                        canGoBack={canGoBack}
+                        canGoNext={canGoNext}
+                        isLastSubtask={isLastSubtask}
+                    />
                 </div>
             </div>
 

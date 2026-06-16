@@ -94,7 +94,7 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
                 totalParticipant={item.totalParticipant}
                 avgStar={item.avgStar}
                 organization={item.organization}
-                category={item.title}
+                category={item.category?.name || 'N/A'}
                 onClick={() => handleSelectCard(item.id)}
             />
         </div>

@@ -1,57 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppConstants } from '@constants';
+import { getDownloadUrl } from '@utils';
 
 import styles from './index.module.scss';
-
-const TOP_CARDS = [
-    {
-        badgeDots: [ 'filled', 'filled2', 'empty', 'empty', 'empty' ],
-        title: 'Hồ sơ của bạn chưa hoàn thiện',
-        description: 'Hồ sơ đầy đủ giúp bạn có cơ hội kết nối với nhà tuyển dụng.',
-        link: '/profile',
-        linkText: 'Cập nhật hồ sơ',
-    },
-    {
-        recommended: true,
-        company: 'BRITISH AIRWAYS',
-        companyClass: 'companyBa',
-        role: 'Data Science',
-    },
-    {
-        recommended: true,
-        company: 'Skyscanner',
-        companyClass: 'companySky',
-        role: 'Front-End Software Engineering',
-    },
-    {
-        resume: true,
-        company: 'TATA',
-        companyClass: 'companyTata',
-        role: 'GenAI Powered Data Analytics',
-    },
-];
-
-const MOCK_RECOMMENDED_SIMS = [
-    {
-        id: 1,
-        thumbLabel: 'BA',
-        thumbClass: 'thumbBa',
-        company: 'BRITISH AIRWAYS',
-        companyClass: 'companyBa',
-        title: 'Data Science',
-        meta: [ '📊 Data & Analytics', '● Trung cấp', '🕐 3–4 giờ' ],
-    },
-    {
-        id: 2,
-        thumbLabel: 'SKY',
-        thumbClass: 'thumbSky',
-        company: 'Skyscanner',
-        companyClass: 'companySky',
-        title: 'Front-End Software Engineering',
-        meta: [ '💻 Software Engineering', '● Cơ bản', '🕐 1–2 giờ' ],
-    },
-];
 
 const MOCK_ACHIEVEMENT = {
     icon: '🎯',
@@ -84,7 +35,14 @@ const MOCK_JOBS = [
     },
 ];
 
-function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', achievements = [], loading }) {
+function DashboardDesktop({
+    profile,
+    enrolledSims = [],
+    enrolledUrlBase = '',
+    achievements = [],
+    allSimulations = [],
+    loading,
+}) {
     const navigate = useNavigate();
     const name = profile?.fullName || profile?.account?.fullName || '';
 
@@ -102,82 +60,187 @@ function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', ac
         });
     };
 
-    const handleDismissClick = (e) => {
-        e.stopPropagation();
+    const hasFullName = !!(profile?.fullName || profile?.account?.fullName);
+    const hasEmail = !!(profile?.email || profile?.account?.email);
+    const hasPhone = !!(profile?.phone || profile?.account?.phone);
+
+    const preferences = profile?.preferences || [];
+    const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
+    const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
+
+    const completionStatus = [
+        hasFullName,
+        hasEmail,
+        hasPhone,
+        hasSpecialization,
+        hasOrganization,
+    ];
+    const completedCount = completionStatus.filter(Boolean).length;
+    const missingCount = 5 - completedCount;
+    const isProfileComplete = completedCount === 5;
+
+    // Filter enrolled simulations in progress (progress < 100)
+    const activeEnrolledSims = enrolledSims.filter((item) => item.progress < 100);
+
+    // Calculate recommended simulations based on preferences
+    const enrolledIds = enrolledSims.map((item) => item.simulation?.id).filter(Boolean);
+    const nonEnrolledSims = allSimulations.filter((sim) => !enrolledIds.includes(sim.id));
+
+    const prefSpecIds = preferences.map((p) => p.specializationId).filter(Boolean);
+    const prefOrgIds = preferences.map((p) => p.organizationId).filter(Boolean);
+
+    let recommendedSims = nonEnrolledSims.filter((sim) => {
+        const matchesSpec = sim.category?.id && prefSpecIds.includes(sim.category.id);
+        const matchesOrg = sim.educator?.organization?.id && prefOrgIds.includes(sim.educator.organization.id);
+        return matchesSpec || matchesOrg;
+    });
+
+    // Fallback if no matching preferences or no preferences selected
+    if (recommendedSims.length === 0) {
+        recommendedSims = nonEnrolledSims.slice(0, 3);
+    } else {
+        recommendedSims = recommendedSims.slice(0, 3);
+    }
+
+    // Level label helper
+    const getLevelLabel = (level) => {
+        const config = {
+            1: 'Cơ bản',
+            2: 'Trung cấp',
+            3: 'Nâng cao',
+        };
+        return config[level] || 'Cơ bản';
     };
+
+    // Dynamically construct TOP_CARDS
+    const dynamicCards = [];
+
+    // 1. Profile incomplete card (only if not completed)
+    if (!isProfileComplete) {
+        const badgeDots = completionStatus.map((completed) => completed ? 'completed' : 'empty');
+        dynamicCards.push({
+            badgeDots,
+            title: 'Hồ sơ của bạn chưa hoàn thiện',
+            description: `Bạn cần cập nhật thêm ${missingCount} thông tin để hoàn thiện hồ sơ.`,
+            link: '/profile',
+            linkText: 'Cập nhật hồ sơ',
+        });
+    }
+
+    // 2. Active simulations to resume
+    activeEnrolledSims.slice(0, 1).forEach((item) => {
+        const sim = item.simulation || {};
+        const org = sim.educator?.organization || {};
+        dynamicCards.push({
+            resume: true,
+            company: org.shortName || org.name || 'Tổ chức',
+            role: sim.title || 'Bài mô phỏng',
+            link: `/simulations/${sim.id}/task`,
+            linkState: {
+                simulationEnrollmentId: item.id,
+                companyLogo: org.logoUrl,
+            },
+            linkText: 'Tiếp tục',
+            simId: sim.id,
+        });
+    });
+
+    // 3. Recommended simulations
+    recommendedSims.slice(0, 2).forEach((sim) => {
+        const org = sim.educator?.organization || {};
+        dynamicCards.push({
+            recommended: true,
+            company: org.shortName || org.name || 'Tổ chức',
+            role: sim.title,
+            link: `/simulations/${sim.id}`,
+            linkText: 'Bắt đầu',
+            simId: sim.id,
+        });
+    });
 
     return (
         <div className={styles.container}>
             <main className={styles.main}>
                 <h1 className={styles.greeting}>Xin chào{name ? `, ${name}!` : '!'}</h1>
 
-                <div className={styles.topCards}>
-                    {TOP_CARDS.map((card, idx) => (
-                        <div key={idx} className={styles.topCard}>
-                            {card.badgeDots && (
-                                <div className={styles.badgeRow}>
-                                    {card.badgeDots.map((type, i) => (
-                                        <div
-                                            key={i}
-                                            className={`${styles.badgeDot} ${styles[`dot${type.charAt(0).toUpperCase()}${type.slice(1)}`]}`}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                            {card.recommended && (
-                                <div className={styles.recommendedBadge}>
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-                                    </svg>
-                                    Gợi ý cho bạn!
-                                </div>
-                            )}
-                            {card.resume && <div className={styles.recommendedBadge}>Tiếp tục bài mô phỏng</div>}
-                            <div className={`${styles.companyName} ${styles[card.companyClass] || ''}`}>
-                                {card.company}
-                            </div>
-                            <div className={styles.roleText}>{card.role}</div>
-                            {card.title && <h4 className={styles.topCardTitle}>{card.title}</h4>}
-                            {card.description && <p className={styles.topCardDesc}>{card.description}</p>}
-                            <div className={styles.cardActions}>
-                                <button className={styles.btnDismiss}>Bỏ qua</button>
-                                {card.link ? (
-                                    <a
-                                        className={styles.linkBtn}
-                                        href={card.link}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            navigate(card.link);
-                                        }}
-                                    >
-                                        Cập nhật hồ sơ <span className={styles.chevron}></span>
-                                    </a>
-                                ) : (
-                                    <button className={styles.linkBtn}>
-                                        Bắt đầu <span className={styles.chevron}></span>
-                                    </button>
+                {dynamicCards.length > 0 && (
+                    <div className={styles.topCards}>
+                        {dynamicCards.map((card, idx) => (
+                            <div key={idx} className={styles.topCard}>
+                                {card.badgeDots && (
+                                    <div className={styles.badgeRow}>
+                                        {card.badgeDots.map((type, i) => (
+                                            <div
+                                                key={i}
+                                                className={`${styles.badgeDot} ${styles[`dot${type.charAt(0).toUpperCase()}${type.slice(1)}`]}`}
+                                            />
+                                        ))}
+                                    </div>
                                 )}
+                                {card.recommended && (
+                                    <div className={styles.recommendedBadge}>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
+                                        </svg>
+                                        Gợi ý cho bạn!
+                                    </div>
+                                )}
+                                {card.resume && <div className={styles.recommendedBadge}>Tiếp tục bài mô phỏng</div>}
+                                <div className={styles.companyName}>
+                                    {card.company}
+                                </div>
+                                <div className={styles.roleText}>{card.role}</div>
+                                {card.title && <h4 className={styles.topCardTitle}>{card.title}</h4>}
+                                {card.description && <p className={styles.topCardDesc}>{card.description}</p>}
+                                <div className={styles.cardActions}>
+                                    <button className={styles.btnDismiss}>Bỏ qua</button>
+                                    {card.link ? (
+                                        <a
+                                            className={styles.linkBtn}
+                                            href={card.link}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (card.linkState) {
+                                                    navigate(card.link, { state: card.linkState });
+                                                } else {
+                                                    navigate(card.link);
+                                                }
+                                            }}
+                                        >
+                                            {card.linkText} <span className={styles.chevron}></span>
+                                        </a>
+                                    ) : (
+                                        <button
+                                            className={styles.linkBtn}
+                                            onClick={() => card.simId && navigate(`/simulations/${card.simId}`)}
+                                        >
+                                            Bắt đầu <span className={styles.chevron}></span>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
 
                 <div className={styles.twoCol}>
                     <div>
                         <div className={styles.sectionTitle}>
-                            <span className={styles.sectionIcon}>🚀</span> Bài mô phỏng đã đăng ký
+                            <span className={styles.sectionIcon}>🚀</span> Bài mô phỏng còn cần tiếp tục
                         </div>
 
                         {loading ? (
                             <div className={styles.loadingBox}>Đang tải...</div>
-                        ) : enrolledSims.length === 0 ? (
-                            <div className={styles.emptyBox}>Bạn chưa đăng ký bài mô phỏng nào.</div>
+                        ) : activeEnrolledSims.length === 0 ? (
+                            <div className={styles.emptyBox}>Bạn không có bài mô phỏng nào cần tiếp tục.</div>
                         ) : (
-                            enrolledSims.map((item) => {
+                            activeEnrolledSims.map((item) => {
                                 const sim = item.simulation || {};
                                 const org = sim.educator?.organization || {};
                                 const orgName = org.shortName || org.name || '';
-                                const tasksLeft = sim.totalParticipant ? `${sim.totalParticipant} nhiệm vụ` : '';
+                                const participantsText = sim.totalParticipant
+                                    ? `${sim.totalParticipant.toLocaleString()} người tham gia`
+                                    : '';
                                 const logoUrl = org.logoUrl
                                     ? org.logoUrl.startsWith('http')
                                         ? org.logoUrl
@@ -208,19 +271,20 @@ function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', ac
                                                         {item.progress || 0}%
                                                     </span>
                                                 </div>
-                                                {tasksLeft && <div className={styles.tasksLeft}>{tasksLeft}</div>}
+                                                {participantsText && (
+                                                    <div className={styles.tasksLeft}>{participantsText}</div>
+                                                )}
                                             </div>
-                                            <div className={styles.cardActions}>
-                                                <button className={styles.btnDismiss} onClick={handleDismissClick}>
-                                                    Bỏ qua
-                                                </button>
-                                                <button
-                                                    className={styles.linkBtn}
-                                                    onClick={(e) => handleResumeClick(e, item, sim)}
-                                                >
-                                                    Tiếp tục <span className={styles.chevron}></span>
-                                                </button>
-                                            </div>
+                                            {item.progress < 100 && (
+                                                <div className={styles.cardActions}>
+                                                    <button
+                                                        className={styles.linkBtn}
+                                                        onClick={(e) => handleResumeClick(e, item, sim)}
+                                                    >
+                                                        Tiếp tục <span className={styles.chevron}></span>
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                         {logoUrl ? (
                                             <img src={logoUrl} alt={orgName} className={styles.simLogoImg} />
@@ -247,33 +311,69 @@ function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', ac
                             <span className={styles.sectionIcon}>⭐</span> Bài mô phỏng gợi ý
                         </div>
 
-                        {MOCK_RECOMMENDED_SIMS.map((sim) => (
-                            <div key={sim.id} className={styles.recSimCard}>
-                                <div className={`${styles.recSimThumb} ${styles[sim.thumbClass]}`}>
-                                    {sim.thumbLabel}
-                                </div>
-                                <div className={styles.recSimBody}>
-                                    <div className={`${styles.companyName} ${styles[sim.companyClass]}`}>
-                                        {sim.company}
+                        {loading ? (
+                            <div className={styles.loadingBox}>Đang tải...</div>
+                        ) : recommendedSims.length === 0 ? (
+                            <div className={styles.emptyBox}>Chưa có bài mô phỏng gợi ý phù hợp.</div>
+                        ) : (
+                            recommendedSims.map((sim) => {
+                                const org = sim.educator?.organization || {};
+                                const orgName = org.shortName || org.name || '';
+                                const orgInitial = orgName ? orgName.charAt(0).toUpperCase() : '?';
+                                const catName = sim.category?.name || 'Chuyên ngành';
+                                const lvlLabel = getLevelLabel(sim.level);
+                                const durationText = sim.duration ? `${sim.duration} giờ` : '';
+
+                                return (
+                                    <div key={sim.id} className={styles.recSimCard}>
+                                        <div className={styles.recSimThumb}>
+                                            {sim.thumbnail ? (
+                                                <img
+                                                    src={sim.thumbnail}
+                                                    alt={sim.title}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                                />
+                                            ) : (
+                                                <div style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                                                    borderRadius: '8px',
+                                                    color: '#fff',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '14px',
+                                                }}>
+                                                    {orgInitial}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className={styles.recSimBody}>
+                                            <div className={styles.companyName}>
+                                                {orgName}
+                                            </div>
+                                            <div className={styles.simTitle}>{sim.title}</div>
+                                            <div className={styles.recSimMeta}>
+                                                <span>📊 {catName}</span>
+                                                <span>● {lvlLabel}</span>
+                                                {durationText && <span>🕐 {durationText}</span>}
+                                            </div>
+                                            <div className={styles.cardActions}>
+                                                <button className={styles.btnDismiss}>Bỏ qua</button>
+                                                <button
+                                                    className={styles.linkBtn}
+                                                    onClick={() => navigate(`/simulations/${sim.id}`)}
+                                                >
+                                                    Xem chi tiết <span className={styles.chevron}></span>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className={styles.simTitle}>{sim.title}</div>
-                                    <div className={styles.recSimMeta}>
-                                        {sim.meta.map((m, i) => (
-                                            <span key={i}>{m}</span>
-                                        ))}
-                                    </div>
-                                    <div className={styles.cardActions}>
-                                        <button className={styles.btnDismiss}>Bỏ qua</button>
-                                        <button
-                                            className={styles.linkBtn}
-                                            onClick={() => navigate(`/simulations/${sim.id}`)}
-                                        >
-                                            Xem chi tiết <span className={styles.chevron}></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                                );
+                            })
+                        )}
 
                         <a
                             className={styles.viewAll}
@@ -296,11 +396,7 @@ function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', ac
                             achievements.map((ach) => {
                                 const sim = ach.simulation || {};
                                 const filePath = ach.filePath || '';
-                                const fullFilePath = filePath
-                                    ? filePath.startsWith('http')
-                                        ? filePath
-                                        : `${AppConstants.contentRootUrl}${filePath}`
-                                    : null;
+                                const fullFilePath = getDownloadUrl(filePath);
 
                                 return (
                                     <div key={ach.id} className={styles.achievementCard} style={{ marginBottom: 24 }}>
@@ -314,9 +410,9 @@ function DashboardDesktop({ profile, enrolledSims = [], enrolledUrlBase = '', ac
                                                         href={fullFilePath}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className={styles.certificateLink}
+                                                        className={styles.certificateBtn}
                                                     >
-                                                        Xem chứng chỉ <span className={styles.chevron}></span>
+                                                        Xem chứng chỉ
                                                     </a>
                                                 )}
                                             </div>

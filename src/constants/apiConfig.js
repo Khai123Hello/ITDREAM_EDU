@@ -24,6 +24,16 @@ const apiConfig = {
             method: 'POST',
             headers: baseHeader,
         },
+        preview: {
+            baseURL: `${AppConstants.mediaRootUrl}v1/file/download/:folder/:subFolder/:fileName`,
+            method: 'GET',
+            responseType: 'blob',
+        },
+        download: {
+            baseURL: `${AppConstants.mediaRootUrl}v1/file/download/:folder/:subFolder/:fileName`,
+            method: 'GET',
+            responseType: 'blob',
+        },
     },
     account: {
         getToken: {
@@ -260,6 +270,13 @@ const apiConfig = {
     category: {
         autoComplete: {
             baseURL: `${apiUrl}v1/category/auto-complete`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+    },
+    organization: {
+        list: {
+            baseURL: `${apiUrl}v1/organization/list`,
             method: 'GET',
             headers: baseHeader,
         },
