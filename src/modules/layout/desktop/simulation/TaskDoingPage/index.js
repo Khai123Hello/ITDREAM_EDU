@@ -321,8 +321,11 @@ function BlockItem({
                         };
                         return (
                             <div className="tfo-block-step">
-                                <span className="tfo-block-step-label">{block.label}:</span>
-                                <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                                <div className="tfo-block-step-badge">{idx + 1}</div>
+                                <div className="tfo-block-step-content">
+                                    <span className="tfo-block-step-label">{block.label}</span>
+                                    <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                                </div>
                             </div>
                         );
                     }
