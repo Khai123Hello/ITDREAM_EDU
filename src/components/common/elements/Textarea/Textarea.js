@@ -33,7 +33,7 @@ function Textarea({
     ...props
 }) {
     const { styleProps, rest } = extractStyleProps(props);
-    const [ _value, _onChange ] = useUncontrolled({ value, onChange, defaultValue: '' });
+    const [_value, _onChange] = useUncontrolled({ value, onChange, defaultValue: '' });
     const inputRef = useRef();
     const finalInputRef = innerRef || inputRef;
 
@@ -69,7 +69,7 @@ function Textarea({
         return () => {
             document.removeEventListener('touchstart', handleTouchStart);
         };
-    }, [ finalInputRef ]);
+    }, [finalInputRef]);
 
     return (
         <Box

@@ -68,13 +68,7 @@ function DashboardDesktop({
     const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
     const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
 
-    const completionStatus = [
-        hasFullName,
-        hasEmail,
-        hasPhone,
-        hasSpecialization,
-        hasOrganization,
-    ];
+    const completionStatus = [hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization];
     const completedCount = completionStatus.filter(Boolean).length;
     const missingCount = 5 - completedCount;
     const isProfileComplete = completedCount === 5;
@@ -117,7 +111,7 @@ function DashboardDesktop({
 
     // 1. Profile incomplete card (only if not completed)
     if (!isProfileComplete) {
-        const badgeDots = completionStatus.map((completed) => completed ? 'completed' : 'empty');
+        const badgeDots = completionStatus.map((completed) => (completed ? 'completed' : 'empty'));
         dynamicCards.push({
             badgeDots,
             title: 'Hồ sơ của bạn chưa hoàn thiện',
@@ -186,9 +180,7 @@ function DashboardDesktop({
                                     </div>
                                 )}
                                 {card.resume && <div className={styles.recommendedBadge}>Tiếp tục bài mô phỏng</div>}
-                                <div className={styles.companyName}>
-                                    {card.company}
-                                </div>
+                                <div className={styles.companyName}>{card.company}</div>
                                 <div className={styles.roleText}>{card.role}</div>
                                 {card.title && <h4 className={styles.topCardTitle}>{card.title}</h4>}
                                 {card.description && <p className={styles.topCardDesc}>{card.description}</p>}
@@ -331,29 +323,34 @@ function DashboardDesktop({
                                                 <img
                                                     src={sim.thumbnail}
                                                     alt={sim.title}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover',
+                                                        borderRadius: '8px',
+                                                    }}
                                                 />
                                             ) : (
-                                                <div style={{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                                                    borderRadius: '8px',
-                                                    color: '#fff',
-                                                    fontWeight: 'bold',
-                                                    fontSize: '14px',
-                                                }}>
+                                                <div
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                                                        borderRadius: '8px',
+                                                        color: '#fff',
+                                                        fontWeight: 'bold',
+                                                        fontSize: '14px',
+                                                    }}
+                                                >
                                                     {orgInitial}
                                                 </div>
                                             )}
                                         </div>
                                         <div className={styles.recSimBody}>
-                                            <div className={styles.companyName}>
-                                                {orgName}
-                                            </div>
+                                            <div className={styles.companyName}>{orgName}</div>
                                             <div className={styles.simTitle}>{sim.title}</div>
                                             <div className={styles.recSimMeta}>
                                                 <span>📊 {catName}</span>

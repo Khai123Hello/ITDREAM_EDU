@@ -21,7 +21,7 @@ function useValidatePermission() {
                 kindSystem,
             );
         },
-        [ permissionCodes, kind ],
+        [permissionCodes, kind],
     );
 
     return hasPermission;

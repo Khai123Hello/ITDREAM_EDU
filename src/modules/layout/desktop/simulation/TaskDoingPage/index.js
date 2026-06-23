@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
@@ -24,9 +24,20 @@ function detectContentType(content) {
     return 'text';
 }
 
-function parseInline(text) {
+function escapeHtml(text) {
     if (!text) return '';
     return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function parseInline(text) {
+    if (!text) return '';
+    const escaped = escapeHtml(text);
+    return escaped
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
@@ -123,9 +134,9 @@ function QuizBlock({
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
 }) {
-    const [ selected, setSelected ] = useState(null);
-    const [ submitted, setSubmitted ] = useState(false);
-    const [ isRetrying, setIsRetrying ] = useState(false);
+    const [selected, setSelected] = useState(null);
+    const [submitted, setSubmitted] = useState(false);
+    const [isRetrying, setIsRetrying] = useState(false);
 
     const correct = (block.options || []).findIndex((o) => o.answer === true);
     const savedAnswer = submittedAnswer?.answer;
@@ -133,11 +144,22 @@ function QuizBlock({
         (o) => o.option === savedAnswer || o.value === savedAnswer,
     );
 
+    const prevQuestionIdRef = useRef(questionId);
+    const prevSavedAnswerRef = useRef(savedAnswer);
+
     useEffect(() => {
-        setIsRetrying(false);
-        setSelected(null);
-        setSubmitted(false);
-    }, [ questionId, savedAnswer ]);
+        const questionChanged = prevQuestionIdRef.current !== questionId;
+        const resetTriggered = Boolean(prevSavedAnswerRef.current) && !savedAnswer;
+
+        if (questionChanged || resetTriggered) {
+            setIsRetrying(false);
+            setSelected(null);
+            setSubmitted(false);
+        }
+
+        prevQuestionIdRef.current = questionId;
+        prevSavedAnswerRef.current = savedAnswer;
+    }, [questionId, savedAnswer]);
 
     const effectiveSelected = savedAnswer && !isRetrying ? savedOptionIndex : selected;
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
@@ -236,116 +258,116 @@ function BlockItem({
     hasCompleted = false,
 }) {
     switch (block.type) {
-                    case 'meta':
-                        return (
-                            <div className="tfo-block-meta">
-                                <span className="tfo-block-meta-val">{block.duration}</span>
-                                <span className="tfo-block-meta-dot">·</span>
-                                <span className="tfo-block-meta-val">{block.level}</span>
-                            </div>
-                        );
+        case 'meta':
+            return (
+                <div className="tfo-block-meta">
+                    <span className="tfo-block-meta-val">{block.duration}</span>
+                    <span className="tfo-block-meta-dot">·</span>
+                    <span className="tfo-block-meta-val">{block.level}</span>
+                </div>
+            );
 
-                    case 'section':
-                        return (
-                            <div className="tfo-block-section">
-                                <div className="tfo-block-section-header">
-                                    <span className="tfo-block-section-icon">{block.icon}</span>
-                                    <span className="tfo-block-section-title">{block.title}</span>
-                                </div>
-                                <ul className="tfo-block-section-list">
-                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
-                                        <li key={i}>{b}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        );
+        case 'section':
+            return (
+                <div className="tfo-block-section">
+                    <div className="tfo-block-section-header">
+                        <span className="tfo-block-section-icon">{block.icon}</span>
+                        <span className="tfo-block-section-title">{block.title}</span>
+                    </div>
+                    <ul className="tfo-block-section-list">
+                        {(block.bullets || []).filter(Boolean).map((b, i) => (
+                            <li key={i}>{b}</li>
+                        ))}
+                    </ul>
+                </div>
+            );
 
-                    case 'text':
-                        return <p className="tfo-block-text">{block.content}</p>;
+        case 'text':
+            return <p className="tfo-block-text">{block.content}</p>;
 
-                    case 'h1':
-                        return <h2 className="tfo-block-h1">{block.content}</h2>;
+        case 'h1':
+            return <h2 className="tfo-block-h1">{block.content}</h2>;
 
-                    case 'h2':
-                        return <h3 className="tfo-block-h2">{block.content}</h3>;
+        case 'h2':
+            return <h3 className="tfo-block-h2">{block.content}</h3>;
 
-                    case 'h3':
-                        return <h4 className="tfo-block-h3">{block.content}</h4>;
+        case 'h3':
+            return <h4 className="tfo-block-h3">{block.content}</h4>;
 
-                    case 'bullet':
-                        return (
-                            <div className="tfo-block-bullet-wrap">
-                                <span className="tfo-block-bullet-dot">•</span>
-                                <span className="tfo-block-bullet-text">{block.content}</span>
-                            </div>
-                        );
+        case 'bullet':
+            return (
+                <div className="tfo-block-bullet-wrap">
+                    <span className="tfo-block-bullet-dot">•</span>
+                    <span className="tfo-block-bullet-text">{block.content}</span>
+                </div>
+            );
 
-                    case 'numbered': {
-                        const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
-                        return (
-                            <div className="tfo-block-bullet-wrap">
-                                <span className="tfo-block-num-label">{num}.</span>
-                                <span className="tfo-block-bullet-text">{block.content}</span>
-                            </div>
-                        );
+        case 'numbered': {
+            const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
+            return (
+                <div className="tfo-block-bullet-wrap">
+                    <span className="tfo-block-num-label">{num}.</span>
+                    <span className="tfo-block-bullet-text">{block.content}</span>
+                </div>
+            );
+        }
+
+        case 'divider':
+            return <hr className="tfo-block-divider" />;
+
+        case 'callout':
+            return (
+                <div className="tfo-block-callout">
+                    <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
+                    <span className="tfo-block-callout-text">{block.content}</span>
+                </div>
+            );
+
+        case 'code':
+            return (
+                <div className="tfo-block-code">
+                    <pre>{block.content}</pre>
+                </div>
+            );
+
+        case 'step': {
+            const renderStepBody = (text) => {
+                if (!text) return '';
+                const parts = text.split(/(`[^`]+`)/g);
+                return parts.map((part, pi) => {
+                    if (part.startsWith('`') && part.endsWith('`')) {
+                        return <code key={pi}>{part.slice(1, -1)}</code>;
                     }
+                    return part;
+                });
+            };
+            return (
+                <div className="tfo-block-step">
+                    <div className="tfo-block-step-badge">{idx + 1}</div>
+                    <div className="tfo-block-step-content">
+                        <span className="tfo-block-step-label">{block.label}</span>
+                        <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                    </div>
+                </div>
+            );
+        }
 
-                    case 'divider':
-                        return <hr className="tfo-block-divider" />;
+        case 'quiz': {
+            const questionKey = (block.question || '').trim();
+            const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
+            return (
+                <QuizBlock
+                    block={block}
+                    submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
+                    questionId={questionId}
+                    onQuizAnswerSubmit={onQuizAnswerSubmit}
+                    hasCompleted={hasCompleted}
+                />
+            );
+        }
 
-                    case 'callout':
-                        return (
-                            <div className="tfo-block-callout">
-                                <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
-                                <span className="tfo-block-callout-text">{block.content}</span>
-                            </div>
-                        );
-
-                    case 'code':
-                        return (
-                            <div className="tfo-block-code">
-                                <pre>{block.content}</pre>
-                            </div>
-                        );
-
-                    case 'step': {
-                        const renderStepBody = (text) => {
-                            if (!text) return '';
-                            const parts = text.split(/(`[^`]+`)/g);
-                            return parts.map((part, pi) => {
-                                if (part.startsWith('`') && part.endsWith('`')) {
-                                    return <code key={pi}>{part.slice(1, -1)}</code>;
-                                }
-                                return part;
-                            });
-                        };
-                        return (
-                            <div className="tfo-block-step">
-                                <div className="tfo-block-step-badge">{idx + 1}</div>
-                                <div className="tfo-block-step-content">
-                                    <span className="tfo-block-step-label">{block.label}</span>
-                                    <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
-                                </div>
-                            </div>
-                        );
-                    }
-
-                    case 'quiz': {
-                        const questionKey = (block.question || '').trim();
-                        const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
-                        return (
-                            <QuizBlock
-                                block={block}
-                                submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
-                                questionId={questionId}
-                                onQuizAnswerSubmit={onQuizAnswerSubmit}
-                                hasCompleted={hasCompleted}
-                            />
-                        );
-                    }
-
-                    default:
-                        return null;
+        default:
+            return null;
     }
 }
 
@@ -364,7 +386,7 @@ function BlocksContent({
         } catch {
             return [];
         }
-    }, [ blocksJson ]);
+    }, [blocksJson]);
 
     return (
         <div className="tfo-blocks-content">
@@ -393,7 +415,7 @@ function ContentRenderer({
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
 }) {
-    const type = useMemo(() => detectContentType(content), [ content ]);
+    const type = useMemo(() => detectContentType(content), [content]);
     if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
         return (
@@ -413,12 +435,12 @@ function ContentRenderer({
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
 
 function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
-    const [ dragging, setDragging ] = useState(false);
-    const [ file, setFile ] = useState(null);
+    const [dragging, setDragging] = useState(false);
+    const [file, setFile] = useState(null);
 
     useEffect(() => {
         setFile(null);
-    }, [ previousFile ]);
+    }, [previousFile]);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -603,18 +625,18 @@ export default function TaskDoingPage({
     onSendComment = () => {},
     onUpdateComment = () => {},
 }) {
-    const [ textInput, setTextInput ] = useState('');
+    const [textInput, setTextInput] = useState('');
 
     useEffect(() => {
         setTextInput(previousText || '');
-    }, [ previousText ]);
+    }, [previousText]);
 
     const renderMedia = () => {
         if (!mediaPath) return null;
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
         const ext = mediaPath.split('.').pop().toLowerCase();
 
-        if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -623,7 +645,7 @@ export default function TaskDoingPage({
                 </div>
             );
         }
-        if ([ 'mp4', 'webm', 'ogg' ].includes(ext)) {
+        if (['mp4', 'webm', 'ogg'].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -823,14 +845,18 @@ export default function TaskDoingPage({
                                                             placeholder="Nhập câu trả lời của bạn ở đây..."
                                                             value={textInput}
                                                             onChange={(e) => setTextInput(e.target.value)}
-                                                            disabled={isCompleted}
+                                                            disabled={isCompleted || Boolean(previousText)}
                                                             rows={6}
                                                         />
                                                         <div className="tfo-text-response-footer">
                                                             <button
                                                                 className="tfo-action-btn tfo-action-btn-primary tfo-text-submit-btn"
                                                                 onClick={() => onTextResponseSubmit(textInput)}
-                                                                disabled={isCompleted || !textInput.trim()}
+                                                                disabled={
+                                                                    isCompleted ||
+                                                                    Boolean(previousText) ||
+                                                                    !textInput.trim()
+                                                                }
                                                             >
                                                                 Nộp câu trả lời
                                                             </button>
@@ -842,6 +868,7 @@ export default function TaskDoingPage({
                                     </div>
                                     {showComments && (
                                         <CommentPanel
+                                            taskId={selectedSubtaskId}
                                             comments={comments}
                                             loading={commentsLoading}
                                             profile={profile}

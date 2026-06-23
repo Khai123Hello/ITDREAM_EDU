@@ -9,7 +9,7 @@ export default function TaskDoingSidebar({
     selectedParentTaskId = null,
     onSelectParentTask = () => {},
 }) {
-    const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
+    const [achievementsExpanded, setAchievementsExpanded] = useState(true);
 
     return (
         <aside className="tfo-sidebar">
@@ -19,7 +19,7 @@ export default function TaskDoingSidebar({
                     <img src={companyLogo} alt="Company logo" className="tfo-sidebar-logo-img" />
                 ) : (
                     <div className="tfo-sidebar-logo-skyscanner">
-                        <span className="tfo-logo-blue">Skyscanner</span>
+                        <span className="tfo-logo-blue">IT DREAM</span>
                     </div>
                 )}
             </div>
@@ -107,14 +107,37 @@ export default function TaskDoingSidebar({
                             />
                         </svg>
                     </div>
-                    <div className={`tfo-achievements-body-wrap${achievementsExpanded ? ' expanded' : ''}`}>
-                        <div className="tfo-achievements-body">
-                            <span className="tfo-achievements-hint">Why this is important</span>
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-                                <circle cx="8" cy="8" r="7" stroke="#888" strokeWidth="1.2" />
-                                <path d="M8 7v4" stroke="#888" strokeWidth="1.2" strokeLinecap="round" />
-                                <circle cx="8" cy="5" r="0.7" fill="#888" />
-                            </svg>
+                    <div
+                        className={`tfo-achievements-body-wrap${achievementsExpanded ? ' expanded' : ''}`}
+                        style={achievementsExpanded ? { maxHeight: 'none' } : {}}
+                    >
+                        <div
+                            className="tfo-achievements-body"
+                            style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}
+                        >
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    width: '100%',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <span
+                                    className="tfo-achievements-hint"
+                                    style={{ textDecoration: 'none', cursor: 'default' }}
+                                >
+                                    Why this is important
+                                </span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                                    <circle cx="8" cy="8" r="7" stroke="#888" strokeWidth="1.2" />
+                                    <path d="M8 7v4" stroke="#888" strokeWidth="1.2" strokeLinecap="round" />
+                                    <circle cx="8" cy="5" r="0.7" fill="#888" />
+                                </svg>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '12px', color: '#555555', lineHeight: '1.4' }}>
+                                {taskDescription || 'Tìm hiểu cách hoàn thành nhiệm vụ này để đạt được mục tiêu dự án.'}
+                            </p>
                         </div>
                     </div>
                 </div>

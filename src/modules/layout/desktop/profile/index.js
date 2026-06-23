@@ -68,8 +68,8 @@ const ProfileComponent = (props) => {
         user?.gender === MALE
             ? translate.formatMessage(commonMessage.male)
             : user?.gender
-                ? translate.formatMessage(commonMessage.female)
-                : '';
+              ? translate.formatMessage(commonMessage.female)
+              : '';
     const navigation = useNavigate();
     const params = useParams();
 
@@ -77,10 +77,10 @@ const ProfileComponent = (props) => {
     const { execute: executeUpdateProfile } = useFetch(apiConfig.user.updateProfile);
     const { execute: executeStudentUpdate } = useFetch(apiConfig.student.clientUpdate);
 
-    const [ categories, setCategories ] = useState([]);
-    const [ organizations, setOrganizations ] = useState([]);
-    const [ selectedSpecializations, setSelectedSpecializations ] = useState([]);
-    const [ selectedOrganizations, setSelectedOrganizations ] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [organizations, setOrganizations] = useState([]);
+    const [selectedSpecializations, setSelectedSpecializations] = useState([]);
+    const [selectedOrganizations, setSelectedOrganizations] = useState([]);
 
     const { execute: fetchCategories, loading: categoriesLoading } = useFetch(apiConfig.category.autoComplete);
     const { execute: fetchOrganizations, loading: organizationsLoading } = useFetch(apiConfig.organization.list);
@@ -94,8 +94,8 @@ const ProfileComponent = (props) => {
                         const categoriesArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                                ? res.data.content
-                                : [];
+                              ? res.data.content
+                              : [];
                         setCategories(categoriesArray);
                     }
                 },
@@ -106,14 +106,14 @@ const ProfileComponent = (props) => {
                         const orgArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                                ? res.data.content
-                                : [];
+                              ? res.data.content
+                              : [];
                         setOrganizations(orgArray);
                     }
                 },
             });
         }
-    }, [ isStudent, fetchCategories, fetchOrganizations ]);
+    }, [isStudent, fetchCategories, fetchOrganizations]);
 
     useEffect(() => {
         if (user && isStudent) {
@@ -124,18 +124,18 @@ const ProfileComponent = (props) => {
             setSelectedSpecializations(specIds);
             setSelectedOrganizations(orgIds);
         }
-    }, [ user, isStudent ]);
+    }, [user, isStudent]);
 
     const { form, mixinFuncs, onValuesChange } = useBasicForm({
         onSubmit,
         setIsChangedFormValues,
     });
 
-    const [ imageUrl, setImageUrl ] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
     const editingFieldRef = useRef(null);
-    const [ editingField, setEditingField ] = useState(null);
+    const [editingField, setEditingField] = useState(null);
 
     const getAvatarUrl = (path) => {
         if (!path) return '';
@@ -178,7 +178,7 @@ const ProfileComponent = (props) => {
         if (imageUrl) {
             form.setFieldValue('avatarPath', imageUrl);
         }
-    }, [ imageUrl ]);
+    }, [imageUrl]);
 
     const onFinish = () => {
         const values = form.getFieldsValue();
@@ -262,7 +262,7 @@ const ProfileComponent = (props) => {
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
         }
-    }, [ user, form, editingField ]);
+    }, [user, form, editingField]);
 
     const handleSetEditingField = (field) => {
         if (editingFieldRef.current === field) {
@@ -616,10 +616,12 @@ const ProfileComponent = (props) => {
                                                         value={selectedSpecializations}
                                                         onChange={setSelectedSpecializations}
                                                         style={{ width: '100%' }}
-                                                        options={(Array.isArray(categories) ? categories : []).map((cat) => ({
-                                                            label: cat.name,
-                                                            value: cat.id,
-                                                        }))}
+                                                        options={(Array.isArray(categories) ? categories : []).map(
+                                                            (cat) => ({
+                                                                label: cat.name,
+                                                                value: cat.id,
+                                                            }),
+                                                        )}
                                                         loading={categoriesLoading}
                                                     />
                                                 </div>
@@ -642,16 +644,30 @@ const ProfileComponent = (props) => {
                                                         onChange={setSelectedOrganizations}
                                                         style={{ width: '100%' }}
                                                         optionLabelProp="labelName"
-                                                        options={(Array.isArray(organizations) ? organizations : []).map((org) => {
+                                                        options={(Array.isArray(organizations)
+                                                            ? organizations
+                                                            : []
+                                                        ).map((org) => {
                                                             const logo = getAvatarUrl(org.logoUrl);
                                                             return {
                                                                 label: (
-                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                                    <div
+                                                                        style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            gap: 8,
+                                                                        }}
+                                                                    >
                                                                         {logo ? (
                                                                             <img
                                                                                 src={logo}
                                                                                 alt={org.name || org.shortName}
-                                                                                style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover' }}
+                                                                                style={{
+                                                                                    width: 20,
+                                                                                    height: 20,
+                                                                                    borderRadius: '50%',
+                                                                                    objectFit: 'cover',
+                                                                                }}
                                                                             />
                                                                         ) : (
                                                                             <div
@@ -668,7 +684,9 @@ const ProfileComponent = (props) => {
                                                                                     color: '#4a5568',
                                                                                 }}
                                                                             >
-                                                                                {(org.name || org.shortName || 'O').charAt(0).toUpperCase()}
+                                                                                {(org.name || org.shortName || 'O')
+                                                                                    .charAt(0)
+                                                                                    .toUpperCase()}
                                                                             </div>
                                                                         )}
                                                                         <span>{org.name || org.shortName}</span>
@@ -689,16 +707,30 @@ const ProfileComponent = (props) => {
                                             style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}
                                         >
                                             <div>
-                                                <div style={{ fontWeight: 500, fontSize: 13, color: '#718096', marginBottom: 6 }}>
+                                                <div
+                                                    style={{
+                                                        fontWeight: 500,
+                                                        fontSize: 13,
+                                                        color: '#718096',
+                                                        marginBottom: 6,
+                                                    }}
+                                                >
                                                     Chuyên ngành quan tâm:
                                                 </div>
                                                 {selectedSpecializations.length > 0 ? (
                                                     <div className={styles.preferencePillsContainer}>
                                                         {selectedSpecializations
-                                                            .map((id) => (Array.isArray(categories) ? categories : []).find((c) => c.id === id))
+                                                            .map((id) =>
+                                                                (Array.isArray(categories) ? categories : []).find(
+                                                                    (c) => c.id === id,
+                                                                ),
+                                                            )
                                                             .filter(Boolean)
                                                             .map((cat) => (
-                                                                <span key={cat.id} className={`${styles.preferencePill} ${styles.specialization}`}>
+                                                                <span
+                                                                    key={cat.id}
+                                                                    className={`${styles.preferencePill} ${styles.specialization}`}
+                                                                >
                                                                     {cat.name}
                                                                 </span>
                                                             ))}
@@ -712,23 +744,43 @@ const ProfileComponent = (props) => {
                                                 )}
                                             </div>
                                             <div>
-                                                <div style={{ fontWeight: 500, fontSize: 13, color: '#718096', marginBottom: 6 }}>
+                                                <div
+                                                    style={{
+                                                        fontWeight: 500,
+                                                        fontSize: 13,
+                                                        color: '#718096',
+                                                        marginBottom: 6,
+                                                    }}
+                                                >
                                                     Tổ chức quan tâm:
                                                 </div>
                                                 {selectedOrganizations.length > 0 ? (
                                                     <div className={styles.preferencePillsContainer}>
                                                         {selectedOrganizations
-                                                            .map((id) => (Array.isArray(organizations) ? organizations : []).find((o) => o.id === id))
+                                                            .map((id) =>
+                                                                (Array.isArray(organizations)
+                                                                    ? organizations
+                                                                    : []
+                                                                ).find((o) => o.id === id),
+                                                            )
                                                             .filter(Boolean)
                                                             .map((org) => {
                                                                 const logo = getAvatarUrl(org.logoUrl);
                                                                 return (
-                                                                    <span key={org.id} className={`${styles.preferencePill} ${styles.organization}`}>
+                                                                    <span
+                                                                        key={org.id}
+                                                                        className={`${styles.preferencePill} ${styles.organization}`}
+                                                                    >
                                                                         {logo ? (
                                                                             <img
                                                                                 src={logo}
                                                                                 alt={org.name || org.shortName}
-                                                                                style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover' }}
+                                                                                style={{
+                                                                                    width: 16,
+                                                                                    height: 16,
+                                                                                    borderRadius: '50%',
+                                                                                    objectFit: 'cover',
+                                                                                }}
                                                                             />
                                                                         ) : (
                                                                             <div
@@ -745,7 +797,9 @@ const ProfileComponent = (props) => {
                                                                                     color: '#1e40af',
                                                                                 }}
                                                                             >
-                                                                                {(org.name || org.shortName || 'O').charAt(0).toUpperCase()}
+                                                                                {(org.name || org.shortName || 'O')
+                                                                                    .charAt(0)
+                                                                                    .toUpperCase()}
                                                                             </div>
                                                                         )}
                                                                         <span>{org.name || org.shortName}</span>

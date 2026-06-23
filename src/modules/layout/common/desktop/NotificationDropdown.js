@@ -8,7 +8,7 @@ import useFetch from '@hooks/useFetch';
 import styles from './NotificationDropdown.module.scss';
 
 function NotificationDropdown() {
-    const [ open, setOpen ] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const {
         data: notificationsData,
