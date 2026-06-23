@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function TaskDoingSidebar({
     taskNumber = 1,
@@ -10,11 +11,19 @@ export default function TaskDoingSidebar({
     onSelectParentTask = () => {},
 }) {
     const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
+    const { id } = useParams();
+    const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        if (id) {
+            navigate(`/simulations/${id}`);
+        }
+    };
 
     return (
         <aside className="tfo-sidebar">
             {/* Logo area */}
-            <div className="tfo-sidebar-logo-area">
+            <div className="tfo-sidebar-logo-area" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                 {companyLogo ? (
                     <img src={companyLogo} alt="Company logo" className="tfo-sidebar-logo-img" />
                 ) : (
