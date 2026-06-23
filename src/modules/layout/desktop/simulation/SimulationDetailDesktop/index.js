@@ -14,9 +14,9 @@ import styles from './detail.module.scss';
 const parseOverviewData = (overviewStr) => {
     const fallbackTemplate = {
         introduction: '',
-        bager: [ 'Tự học theo tốc độ riêng', '1–2 giờ', 'Không có điểm số', 'Không có bài kiểm tra nào', 'Giới thiệu' ],
+        bager: ['Tự học theo tốc độ riêng', '1–2 giờ', 'Không có điểm số', 'Không có bài kiểm tra nào', 'Giới thiệu'],
         content: '',
-        skills: [ 'Chú ý chi tiết', 'Giải quyết vấn đề', 'Giao tiếp', 'Tư duy phản biện', 'Làm việc nhóm' ],
+        skills: ['Chú ý chi tiết', 'Giải quyết vấn đề', 'Giao tiếp', 'Tư duy phản biện', 'Làm việc nhóm'],
     };
     if (!overviewStr) return fallbackTemplate;
     if (typeof overviewStr === 'object') {
@@ -25,8 +25,8 @@ const parseOverviewData = (overviewStr) => {
             bager: Array.isArray(overviewStr.bager)
                 ? overviewStr.bager
                 : Array.isArray(overviewStr.barger)
-                    ? overviewStr.barger
-                    : fallbackTemplate.bager,
+                  ? overviewStr.barger
+                  : fallbackTemplate.bager,
             content: overviewStr.content || '',
             skills: Array.isArray(overviewStr.skills) ? overviewStr.skills : fallbackTemplate.skills,
         };
@@ -39,10 +39,10 @@ const parseOverviewData = (overviewStr) => {
                 bager: Array.isArray(parsed.bager)
                     ? parsed.bager
                     : Array.isArray(parsed.barger)
-                        ? parsed.barger
-                        : Array.isArray(parsed.hero?.badges)
-                            ? parsed.hero.badges
-                            : fallbackTemplate.bager,
+                      ? parsed.barger
+                      : Array.isArray(parsed.hero?.badges)
+                        ? parsed.hero.badges
+                        : fallbackTemplate.bager,
                 content: parsed.content || parsed.intro?.content || '',
                 skills: Array.isArray(parsed.skills) ? parsed.skills : fallbackTemplate.skills,
             };
@@ -89,12 +89,12 @@ function SimulationDetailDesktop({
     onUpdateReview = () => {},
 }) {
     const { profile } = useAuth();
-    const [ activeTab, setActiveTab ] = useState('overview');
-    const [ activeTaskId, setActiveTaskId ] = useState(null);
-    const [ isEditingReview, setIsEditingReview ] = useState(false);
-    const [ reviewStar, setReviewStar ] = useState(5);
-    const [ reviewContent, setReviewContent ] = useState('');
-    const [ isSubmitting, setIsSubmitting ] = useState(false);
+    const [activeTab, setActiveTab] = useState('overview');
+    const [activeTaskId, setActiveTaskId] = useState(null);
+    const [isEditingReview, setIsEditingReview] = useState(false);
+    const [reviewStar, setReviewStar] = useState(5);
+    const [reviewContent, setReviewContent] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // ✅ FIX: chỉ lấy id của subtask đầu tiên (kind=2), không dùng task cha (kind=1)
     const defaultActiveTaskId = useMemo(() => {
@@ -115,12 +115,12 @@ function SimulationDetailDesktop({
 
         // Trả về id subtask đầu tiên; fallback về task cha nếu không có sub
         return firstSub?.id ?? firstParent.id;
-    }, [ tasks, activeTaskId ]);
+    }, [tasks, activeTaskId]);
 
     // ✅ FIX: đếm task cha (kind=1) để hiển thị số nhiệm vụ đúng
-    const parentTaskCount = useMemo(() => tasks.filter((t) => t.kind === 1).length, [ tasks ]);
+    const parentTaskCount = useMemo(() => tasks.filter((t) => t.kind === 1).length, [tasks]);
 
-    const overviewData = useMemo(() => parseOverviewData(simulation.overview), [ simulation.overview ]);
+    const overviewData = useMemo(() => parseOverviewData(simulation.overview), [simulation.overview]);
 
     const handleTaskSelect = (taskId) => setActiveTaskId(taskId);
 
@@ -136,7 +136,7 @@ function SimulationDetailDesktop({
                 f.student?.profileAccountDto?.email === profile.email ||
                 f.student?.profileAccountDto?.username === profile.username,
         );
-    }, [ isAuthenticated, profile, feedbacks ]);
+    }, [isAuthenticated, profile, feedbacks]);
 
     const handleStartEdit = () => {
         if (myReview) {
@@ -389,7 +389,7 @@ function SimulationDetailDesktop({
                             <p className={styles.enrollNote}>
                                 {isEnrolled
                                     ? // ✅ FIX: hiển thị số task cha, không phải tổng tasks
-                                    `${parentTaskCount} nhiệm vụ · ${simulation?.duration || ''}`
+                                      `${parentTaskCount} nhiệm vụ · ${simulation?.duration || ''}`
                                     : 'Hoàn toàn miễn phí · Không cần thẻ tín dụng'}
                             </p>
                         </div>
@@ -567,7 +567,7 @@ function SimulationDetailDesktop({
                             <div className={styles.reviewsSummary}>
                                 <div className={styles.reviewsScore}>{simulation?.avgStar?.toFixed(1) || '—'}</div>
                                 <div className={styles.reviewsStars}>
-                                    {[ 1, 2, 3, 4, 5 ].map((n) => (
+                                    {[1, 2, 3, 4, 5].map((n) => (
                                         <span
                                             key={n}
                                             className={

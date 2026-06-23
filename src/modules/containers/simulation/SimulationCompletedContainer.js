@@ -10,8 +10,8 @@ function SimulationCompletedContainer() {
     const { id: simulationId } = useParams();
     const navigate = useNavigate();
     const { profile } = useAuth();
-    const [ isGeneratingCert, setIsGeneratingCert ] = useState(false);
-    const [ hasTried, setHasTried ] = useState(false);
+    const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+    const [hasTried, setHasTried] = useState(false);
 
     // Fetch simulation detail
     const {
@@ -53,12 +53,12 @@ function SimulationCompletedContainer() {
             });
             fetchAchievements();
         }
-    }, [ simulationId, fetchSimulationDetail, fetchAchievements ]);
+    }, [simulationId, fetchSimulationDetail, fetchAchievements]);
 
     const currentAch = useMemo(() => {
         if (!achievementsData) return null;
         return achievementsData.find((ach) => ach.simulation?.id === parseInt(simulationId, 10));
-    }, [ achievementsData, simulationId ]);
+    }, [achievementsData, simulationId]);
 
     // Auto-generate certificate if missing filePath
     useEffect(() => {

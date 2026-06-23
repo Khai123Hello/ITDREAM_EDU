@@ -28,7 +28,7 @@ const appReducer = createReducer(
         reducerName: 'app',
         initialState,
         storage: {
-            whiteList: [ 'theme', 'locale' ],
+            whiteList: ['theme', 'locale'],
         },
     },
     {

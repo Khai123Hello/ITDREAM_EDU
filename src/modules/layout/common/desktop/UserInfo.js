@@ -38,19 +38,19 @@ function UserInfo() {
     const navigation = useNavigate();
 
     return (
-    // <Tooltip
-    //     align="center"
-    //     side="bottom"
-    //     trigger={
-    //         <div className={styles.userInfo}>
-    //             <div className={styles.avatar}>
-    //                 <img alt="avatar" src={user?.avatar ? AppConstants.contentRootUrl + user?.avatar : avatar} />
-    //             </div>
-    //         </div>
-    //     }
-    // >
+        // <Tooltip
+        //     align="center"
+        //     side="bottom"
+        //     trigger={
+        //         <div className={styles.userInfo}>
+        //             <div className={styles.avatar}>
+        //                 <img alt="avatar" src={user?.avatar ? AppConstants.contentRootUrl + user?.avatar : avatar} />
+        //             </div>
+        //         </div>
+        //     }
+        // >
 
-    // </Tooltip>
+        // </Tooltip>
 
         <DropdownMenu
             align="end"

@@ -5,6 +5,6 @@ export async function delay(ms) {
 }
 
 export async function delayResult(promise, time) {
-    const result = await Promise.all([ promise, delay(time) ]);
+    const result = await Promise.all([promise, delay(time)]);
     return result[0];
 }
