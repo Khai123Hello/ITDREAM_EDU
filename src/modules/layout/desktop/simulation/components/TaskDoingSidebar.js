@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function TaskDoingSidebar({
     taskNumber = 1,
@@ -14,7 +15,7 @@ export default function TaskDoingSidebar({
     return (
         <aside className="tfo-sidebar">
             {/* Logo area */}
-            <div className="tfo-sidebar-logo-area">
+            <div className="tfo-sidebar-logo-area" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                 {companyLogo ? (
                     <img src={companyLogo} alt="Company logo" className="tfo-sidebar-logo-img" />
                 ) : (
