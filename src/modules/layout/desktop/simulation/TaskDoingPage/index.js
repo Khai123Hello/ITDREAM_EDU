@@ -134,9 +134,9 @@ function QuizBlock({
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
 }) {
-    const [selected, setSelected] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
-    const [isRetrying, setIsRetrying] = useState(false);
+    const [ selected, setSelected ] = useState(null);
+    const [ submitted, setSubmitted ] = useState(false);
+    const [ isRetrying, setIsRetrying ] = useState(false);
 
     const correct = (block.options || []).findIndex((o) => o.answer === true);
     const savedAnswer = submittedAnswer?.answer;
@@ -159,7 +159,7 @@ function QuizBlock({
 
         prevQuestionIdRef.current = questionId;
         prevSavedAnswerRef.current = savedAnswer;
-    }, [questionId, savedAnswer]);
+    }, [ questionId, savedAnswer ]);
 
     const effectiveSelected = savedAnswer && !isRetrying ? savedOptionIndex : selected;
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
@@ -258,116 +258,116 @@ function BlockItem({
     hasCompleted = false,
 }) {
     switch (block.type) {
-        case 'meta':
-            return (
-                <div className="tfo-block-meta">
-                    <span className="tfo-block-meta-val">{block.duration}</span>
-                    <span className="tfo-block-meta-dot">·</span>
-                    <span className="tfo-block-meta-val">{block.level}</span>
-                </div>
-            );
+                    case 'meta':
+                        return (
+                            <div className="tfo-block-meta">
+                                <span className="tfo-block-meta-val">{block.duration}</span>
+                                <span className="tfo-block-meta-dot">·</span>
+                                <span className="tfo-block-meta-val">{block.level}</span>
+                            </div>
+                        );
 
-        case 'section':
-            return (
-                <div className="tfo-block-section">
-                    <div className="tfo-block-section-header">
-                        <span className="tfo-block-section-icon">{block.icon}</span>
-                        <span className="tfo-block-section-title">{block.title}</span>
-                    </div>
-                    <ul className="tfo-block-section-list">
-                        {(block.bullets || []).filter(Boolean).map((b, i) => (
-                            <li key={i}>{b}</li>
-                        ))}
-                    </ul>
-                </div>
-            );
+                    case 'section':
+                        return (
+                            <div className="tfo-block-section">
+                                <div className="tfo-block-section-header">
+                                    <span className="tfo-block-section-icon">{block.icon}</span>
+                                    <span className="tfo-block-section-title">{block.title}</span>
+                                </div>
+                                <ul className="tfo-block-section-list">
+                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
+                                        <li key={i}>{b}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
 
-        case 'text':
-            return <p className="tfo-block-text">{block.content}</p>;
+                    case 'text':
+                        return <p className="tfo-block-text">{block.content}</p>;
 
-        case 'h1':
-            return <h2 className="tfo-block-h1">{block.content}</h2>;
+                    case 'h1':
+                        return <h2 className="tfo-block-h1">{block.content}</h2>;
 
-        case 'h2':
-            return <h3 className="tfo-block-h2">{block.content}</h3>;
+                    case 'h2':
+                        return <h3 className="tfo-block-h2">{block.content}</h3>;
 
-        case 'h3':
-            return <h4 className="tfo-block-h3">{block.content}</h4>;
+                    case 'h3':
+                        return <h4 className="tfo-block-h3">{block.content}</h4>;
 
-        case 'bullet':
-            return (
-                <div className="tfo-block-bullet-wrap">
-                    <span className="tfo-block-bullet-dot">•</span>
-                    <span className="tfo-block-bullet-text">{block.content}</span>
-                </div>
-            );
+                    case 'bullet':
+                        return (
+                            <div className="tfo-block-bullet-wrap">
+                                <span className="tfo-block-bullet-dot">•</span>
+                                <span className="tfo-block-bullet-text">{block.content}</span>
+                            </div>
+                        );
 
-        case 'numbered': {
-            const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
-            return (
-                <div className="tfo-block-bullet-wrap">
-                    <span className="tfo-block-num-label">{num}.</span>
-                    <span className="tfo-block-bullet-text">{block.content}</span>
-                </div>
-            );
-        }
-
-        case 'divider':
-            return <hr className="tfo-block-divider" />;
-
-        case 'callout':
-            return (
-                <div className="tfo-block-callout">
-                    <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
-                    <span className="tfo-block-callout-text">{block.content}</span>
-                </div>
-            );
-
-        case 'code':
-            return (
-                <div className="tfo-block-code">
-                    <pre>{block.content}</pre>
-                </div>
-            );
-
-        case 'step': {
-            const renderStepBody = (text) => {
-                if (!text) return '';
-                const parts = text.split(/(`[^`]+`)/g);
-                return parts.map((part, pi) => {
-                    if (part.startsWith('`') && part.endsWith('`')) {
-                        return <code key={pi}>{part.slice(1, -1)}</code>;
+                    case 'numbered': {
+                        const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
+                        return (
+                            <div className="tfo-block-bullet-wrap">
+                                <span className="tfo-block-num-label">{num}.</span>
+                                <span className="tfo-block-bullet-text">{block.content}</span>
+                            </div>
+                        );
                     }
-                    return part;
-                });
-            };
-            return (
-                <div className="tfo-block-step">
-                    <div className="tfo-block-step-badge">{idx + 1}</div>
-                    <div className="tfo-block-step-content">
-                        <span className="tfo-block-step-label">{block.label}</span>
-                        <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
-                    </div>
-                </div>
-            );
-        }
 
-        case 'quiz': {
-            const questionKey = (block.question || '').trim();
-            const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
-            return (
-                <QuizBlock
-                    block={block}
-                    submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
-                    questionId={questionId}
-                    onQuizAnswerSubmit={onQuizAnswerSubmit}
-                    hasCompleted={hasCompleted}
-                />
-            );
-        }
+                    case 'divider':
+                        return <hr className="tfo-block-divider" />;
 
-        default:
-            return null;
+                    case 'callout':
+                        return (
+                            <div className="tfo-block-callout">
+                                <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
+                                <span className="tfo-block-callout-text">{block.content}</span>
+                            </div>
+                        );
+
+                    case 'code':
+                        return (
+                            <div className="tfo-block-code">
+                                <pre>{block.content}</pre>
+                            </div>
+                        );
+
+                    case 'step': {
+                        const renderStepBody = (text) => {
+                            if (!text) return '';
+                            const parts = text.split(/(`[^`]+`)/g);
+                            return parts.map((part, pi) => {
+                                if (part.startsWith('`') && part.endsWith('`')) {
+                                    return <code key={pi}>{part.slice(1, -1)}</code>;
+                                }
+                                return part;
+                            });
+                        };
+                        return (
+                            <div className="tfo-block-step">
+                                <div className="tfo-block-step-badge">{idx + 1}</div>
+                                <div className="tfo-block-step-content">
+                                    <span className="tfo-block-step-label">{block.label}</span>
+                                    <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    case 'quiz': {
+                        const questionKey = (block.question || '').trim();
+                        const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
+                        return (
+                            <QuizBlock
+                                block={block}
+                                submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
+                                questionId={questionId}
+                                onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                hasCompleted={hasCompleted}
+                            />
+                        );
+                    }
+
+                    default:
+                        return null;
     }
 }
 
@@ -386,7 +386,7 @@ function BlocksContent({
         } catch {
             return [];
         }
-    }, [blocksJson]);
+    }, [ blocksJson ]);
 
     return (
         <div className="tfo-blocks-content">
@@ -415,7 +415,7 @@ function ContentRenderer({
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
 }) {
-    const type = useMemo(() => detectContentType(content), [content]);
+    const type = useMemo(() => detectContentType(content), [ content ]);
     if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
         return (
@@ -434,17 +434,33 @@ function ContentRenderer({
 
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
 
+const isExternalUrl = (str) => {
+    if (!str || typeof str !== 'string') return false;
+    return /^(https?:\/\/|www\.)/i.test(str.trim());
+};
+
 function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
-    const [dragging, setDragging] = useState(false);
-    const [file, setFile] = useState(null);
+    // Xác định mode mặc định dựa vào submission trước đó
+    const defaultMode = previousFile && isExternalUrl(previousFile) ? 'link' : 'file';
+    const [ mode, setMode ] = useState(defaultMode);
+    const [ dragging, setDragging ] = useState(false);
+    const [ file, setFile ] = useState(null);
+    const [ linkInput, setLinkInput ] = useState('');
 
     useEffect(() => {
         setFile(null);
-    }, [previousFile]);
+        setLinkInput('');
+        // Khi previousFile thay đổi, cập nhật lại mode mặc định
+        if (previousFile && isExternalUrl(previousFile)) {
+            setMode('link');
+        } else if (previousFile) {
+            setMode('file');
+        }
+    }, [ previousFile ]);
 
     const handleDrop = (e) => {
         e.preventDefault();
-        if (disabled) return;
+        if (disabled || mode !== 'file') return;
         setDragging(false);
         const f = e.dataTransfer.files?.[0];
         if (f) {
@@ -453,12 +469,24 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         }
     };
 
-    const handleChange = (e) => {
+    const handleFileChange = (e) => {
         if (disabled) return;
         const f = e.target.files?.[0];
         if (f) {
             setFile(f);
             onFileChange(f);
+        }
+    };
+
+    const handleLinkSubmit = () => {
+        if (disabled || !linkInput.trim()) return;
+        onFileChange(linkInput.trim());
+        setLinkInput('');
+    };
+
+    const handleLinkKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleLinkSubmit();
         }
     };
 
@@ -468,59 +496,145 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         return decodeURIComponent(parts[parts.length - 1]);
     };
 
-    const displayFileName = file ? file.name : previousFile ? getFileName(previousFile) : '';
+    const displayFileName = file ? file.name : (previousFile && mode === 'file') ? getFileName(previousFile) : '';
 
     return (
         <div className={`tfo-upload-card${disabled ? ' disabled' : ''}`}>
             <div className="tfo-upload-label">Nộp Bài Làm Của Bạn</div>
-            <label
-                className={`tfo-dropzone${dragging ? ' dragging' : ''}${disabled ? ' disabled' : ''}`}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    if (!disabled) setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={handleDrop}
-            >
-                {!disabled && <input type="file" style={{ display: 'none' }} onChange={handleChange} />}
-                <svg className="tfo-dropzone-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path
-                        d="M8 1v10M4 5l4-4 4 4"
-                        stroke="#5f5e5e"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                    <path
-                        d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"
-                        stroke="#5f5e5e"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                    />
-                </svg>
-                {displayFileName ? (
-                    <span className="tfo-file-chosen">
-                        {previousFile && !file ? (
+
+            {/* Tab switcher - chỉ hiển thị khi chưa hoàn thành */}
+            {!disabled && (
+                <div className="tfo-submit-mode-tabs">
+                    <button
+                        type="button"
+                        className={`tfo-submit-mode-tab${mode === 'file' ? ' active' : ''}`}
+                        onClick={() => setMode('file')}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6 }}>
+                            <path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V6L9 1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9 1v5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Tải file lên
+                    </button>
+                    <button
+                        type="button"
+                        className={`tfo-submit-mode-tab${mode === 'link' ? ' active' : ''}`}
+                        onClick={() => setMode('link')}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ marginRight: 6 }}>
+                            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Nhập đường dẫn / URL
+                    </button>
+                </div>
+            )}
+
+            {/* File upload mode */}
+            {mode === 'file' && (
+                <label
+                    className={`tfo-dropzone${dragging ? ' dragging' : ''}${disabled ? ' disabled' : ''}`}
+                    onDragOver={(e) => {
+                        e.preventDefault();
+                        if (!disabled) setDragging(true);
+                    }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={handleDrop}
+                >
+                    {!disabled && <input type="file" style={{ display: 'none' }} onChange={handleFileChange} />}
+                    <svg className="tfo-dropzone-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path
+                            d="M8 1v10M4 5l4-4 4 4"
+                            stroke="#5f5e5e"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                        <path
+                            d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"
+                            stroke="#5f5e5e"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                    {displayFileName ? (
+                        <span className="tfo-file-chosen">
+                            {previousFile && !file ? (
+                                <a
+                                    href={previousFile.startsWith('http') ? previousFile : `${urlBase}${previousFile}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="tfo-file-download-link"
+                                >
+                                    {displayFileName} (Tải xuống)
+                                </a>
+                            ) : (
+                                displayFileName
+                            )}
+                        </span>
+                    ) : (
+                        <>
+                            <span className="tfo-dropzone-select">Chọn một tệp</span>
+                            <span className="tfo-dropzone-hint">hoặc kéo thả vào đây.</span>
+                        </>
+                    )}
+                </label>
+            )}
+
+            {/* Link / path input mode */}
+            {mode === 'link' && (
+                <div className="tfo-link-input-wrapper">
+                    {previousFile && isExternalUrl(previousFile) && (
+                        <div className="tfo-link-submitted">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
                             <a
-                                href={previousFile.startsWith('http') ? previousFile : `${urlBase}${previousFile}`}
+                                href={previousFile}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="tfo-file-download-link"
+                                className="tfo-file-download-link tfo-link-submitted-url"
                             >
-                                {displayFileName} (Tải xuống)
+                                {previousFile}
                             </a>
-                        ) : (
-                            displayFileName
-                        )}
-                    </span>
-                ) : (
-                    <>
-                        <span className="tfo-dropzone-select">Chọn một tệp</span>
-                        <span className="tfo-dropzone-hint">hoặc kéo thả vào đây.</span>
-                    </>
-                )}
-            </label>
+                        </div>
+                    )}
+                    {previousFile && !isExternalUrl(previousFile) && (
+                        <div className="tfo-link-submitted">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
+                            <span className="tfo-link-submitted-path">{previousFile}</span>
+                        </div>
+                    )}
+                    {!disabled && (
+                        <div className="tfo-link-input-row">
+                            <input
+                                type="text"
+                                className="tfo-link-input"
+                                placeholder="Nhập URL hoặc đường dẫn file (vd: https://drive.google.com/...)"
+                                value={linkInput}
+                                onChange={(e) => setLinkInput(e.target.value)}
+                                onKeyDown={handleLinkKeyDown}
+                                disabled={disabled}
+                            />
+                            <button
+                                type="button"
+                                className="tfo-link-submit-btn"
+                                onClick={handleLinkSubmit}
+                                disabled={disabled || !linkInput.trim()}
+                            >
+                                Nộp
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -625,18 +739,18 @@ export default function TaskDoingPage({
     onSendComment = () => {},
     onUpdateComment = () => {},
 }) {
-    const [textInput, setTextInput] = useState('');
+    const [ textInput, setTextInput ] = useState('');
 
     useEffect(() => {
         setTextInput(previousText || '');
-    }, [previousText]);
+    }, [ previousText ]);
 
     const renderMedia = () => {
         if (!mediaPath) return null;
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
         const ext = mediaPath.split('.').pop().toLowerCase();
 
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -645,7 +759,7 @@ export default function TaskDoingPage({
                 </div>
             );
         }
-        if (['mp4', 'webm', 'ogg'].includes(ext)) {
+        if ([ 'mp4', 'webm', 'ogg' ].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">

@@ -16,5 +16,5 @@ export default function createCtx(componentName, defaultContext) {
         throw new Error(`use${componentName}Context must be used within a ${componentName}Provider`);
     }
 
-    return [Provider, useContext];
+    return [ Provider, useContext ];
 }
