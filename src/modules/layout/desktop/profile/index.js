@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TbBriefcase, TbCamera, TbCheck, TbEdit, TbMail, TbPhone, TbUser, TbX } from 'react-icons/tb';
+import { TbBriefcase, TbCamera, TbCheck, TbEdit, TbMail, TbPhone, TbUser, TbX, TbCalendar } from 'react-icons/tb';
 import { defineMessages } from 'react-intl';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { ReactComponent as IconClose } from '@assets/icons/closeModal.svg';
 import { Form } from '@components/common/elements/Form';
 import Grid from '@components/common/elements/Grid';
 import { InputField } from '@components/common/elements/Input';
+import DatePickerField from '@components/common/elements/DatePicker/DatePickerField';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 import { AppConstants, MALE, USER_KIND_STUDENT } from '@constants';
 import apiConfig from '@constants/apiConfig';
 import { commonMessage } from '@constants/intl';
@@ -68,8 +72,8 @@ const ProfileComponent = (props) => {
         user?.gender === MALE
             ? translate.formatMessage(commonMessage.male)
             : user?.gender
-              ? translate.formatMessage(commonMessage.female)
-              : '';
+                ? translate.formatMessage(commonMessage.female)
+                : '';
     const navigation = useNavigate();
     const params = useParams();
 
@@ -77,10 +81,10 @@ const ProfileComponent = (props) => {
     const { execute: executeUpdateProfile } = useFetch(apiConfig.user.updateProfile);
     const { execute: executeStudentUpdate } = useFetch(apiConfig.student.clientUpdate);
 
-    const [categories, setCategories] = useState([]);
-    const [organizations, setOrganizations] = useState([]);
-    const [selectedSpecializations, setSelectedSpecializations] = useState([]);
-    const [selectedOrganizations, setSelectedOrganizations] = useState([]);
+    const [ categories, setCategories ] = useState([]);
+    const [ organizations, setOrganizations ] = useState([]);
+    const [ selectedSpecializations, setSelectedSpecializations ] = useState([]);
+    const [ selectedOrganizations, setSelectedOrganizations ] = useState([]);
 
     const { execute: fetchCategories, loading: categoriesLoading } = useFetch(apiConfig.category.autoComplete);
     const { execute: fetchOrganizations, loading: organizationsLoading } = useFetch(apiConfig.organization.list);
@@ -94,8 +98,8 @@ const ProfileComponent = (props) => {
                         const categoriesArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                              ? res.data.content
-                              : [];
+                                ? res.data.content
+                                : [];
                         setCategories(categoriesArray);
                     }
                 },
@@ -106,14 +110,14 @@ const ProfileComponent = (props) => {
                         const orgArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                              ? res.data.content
-                              : [];
+                                ? res.data.content
+                                : [];
                         setOrganizations(orgArray);
                     }
                 },
             });
         }
-    }, [isStudent, fetchCategories, fetchOrganizations]);
+    }, [ isStudent, fetchCategories, fetchOrganizations ]);
 
     useEffect(() => {
         if (user && isStudent) {
@@ -124,18 +128,18 @@ const ProfileComponent = (props) => {
             setSelectedSpecializations(specIds);
             setSelectedOrganizations(orgIds);
         }
-    }, [user, isStudent]);
+    }, [ user, isStudent ]);
 
     const { form, mixinFuncs, onValuesChange } = useBasicForm({
         onSubmit,
         setIsChangedFormValues,
     });
 
-    const [imageUrl, setImageUrl] = useState(null);
+    const [ imageUrl, setImageUrl ] = useState(null);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
     const editingFieldRef = useRef(null);
-    const [editingField, setEditingField] = useState(null);
+    const [ editingField, setEditingField ] = useState(null);
 
     const getAvatarUrl = (path) => {
         if (!path) return '';
@@ -178,7 +182,7 @@ const ProfileComponent = (props) => {
         if (imageUrl) {
             form.setFieldValue('avatarPath', imageUrl);
         }
-    }, [imageUrl]);
+    }, [ imageUrl ]);
 
     const onFinish = () => {
         const values = form.getFieldsValue();
@@ -207,8 +211,8 @@ const ProfileComponent = (props) => {
                     avatarPath: imageUrl || user?.avatar || user?.avatarPath || '',
                     fullname,
                     phone: values.phone || user?.phone || user?.account?.phone || '',
-                    birthday: user?.birthday || user?.account?.birthday || null,
-                    username: user?.username || user?.account?.username || '',
+                    birthday: values.birthday ? dayjs(values.birthday).format('DD/MM/YYYY 00:00:00') : user?.birthday || user?.account?.birthday || null,
+                    username: values.username || user?.username || user?.account?.username || '',
                     preferences,
                 },
                 onCompleted: () => {
@@ -262,7 +266,7 @@ const ProfileComponent = (props) => {
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
         }
-    }, [user, form, editingField]);
+    }, [ user, form, editingField ]);
 
     const handleSetEditingField = (field) => {
         if (editingFieldRef.current === field) {
@@ -399,6 +403,61 @@ const ProfileComponent = (props) => {
                 </div>
 
                 <div className={styles.body}>
+                    {/* Username Row */}
+                    <div className={`${styles.fieldCard} ${editingField === 'username' ? styles.editing : ''}`}>
+                        <div className={styles.fieldHeader}>
+                            <div className={styles.fieldLabelSection}>
+                                <div className={styles.fieldIconTitle}>
+                                    <TbUser className={styles.fieldIcon} />
+                                    <span className={styles.fieldTitle}>Tên đăng nhập</span>
+                                </div>
+                                {editingField === 'username' ? (
+                                    <div className={styles.fieldEditor}>
+                                        <div className={styles.editorSubtitle}>
+                                            Thông tin cá nhân
+                                        </div>
+                                        <div className={styles.editorInputs}>
+                                            <InputField
+                                                name="username"
+                                                required
+                                                placeholder="Nhập tên đăng nhập"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={styles.fieldValue}>
+                                        {user?.username || user?.account?.username || '—'}
+                                    </div>
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                className={`${styles.editBtn} ${editingField === 'username' ? styles.cancel : ''}`}
+                                onClick={() => handleSetEditingField('username')}
+                            >
+                                {editingField === 'username' ? (
+                                    <>
+                                        <TbX />
+                                        <span>Huỷ</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TbEdit />
+                                        <span>Thay đổi</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                        {editingField === 'username' && (
+                            <div className={styles.fieldActions}>
+                                <button type="button" className={styles.btnUpdate} onClick={onFinish}>
+                                    <TbCheck style={{ marginRight: '6px' }} />
+                                    Lưu thay đổi
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     {/* Full Name Row */}
                     <div className={`${styles.fieldCard} ${editingField === 'fullName' ? styles.editing : ''}`}>
                         <div className={styles.fieldHeader}>
@@ -469,62 +528,6 @@ const ProfileComponent = (props) => {
                         )}
                     </div>
 
-                    {/* Email Row */}
-                    <div className={`${styles.fieldCard} ${editingField === 'email' ? styles.editing : ''}`}>
-                        <div className={styles.fieldHeader}>
-                            <div className={styles.fieldLabelSection}>
-                                <div className={styles.fieldIconTitle}>
-                                    <TbMail className={styles.fieldIcon} />
-                                    <span className={styles.fieldTitle}>{translate.formatMessage(messages.email)}</span>
-                                </div>
-                                {editingField === 'email' ? (
-                                    <div className={styles.fieldEditor}>
-                                        <div className={styles.editorSubtitle}>
-                                            {translate.formatMessage(messages.personalInformation)}
-                                        </div>
-                                        <div className={styles.editorInputs}>
-                                            <InputField
-                                                name="email"
-                                                required
-                                                type="email"
-                                                placeholder={translate.formatMessage(messages.enterEmail)}
-                                            />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className={styles.fieldValue}>
-                                        {user?.email || user?.account?.email || '—'}
-                                    </div>
-                                )}
-                            </div>
-                            <button
-                                type="button"
-                                className={`${styles.editBtn} ${editingField === 'email' ? styles.cancel : ''}`}
-                                onClick={() => handleSetEditingField('email')}
-                            >
-                                {editingField === 'email' ? (
-                                    <>
-                                        <TbX />
-                                        <span>Huỷ</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <TbEdit />
-                                        <span>Thay đổi</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                        {editingField === 'email' && (
-                            <div className={styles.fieldActions}>
-                                <button type="button" className={styles.btnUpdate} onClick={onFinish}>
-                                    <TbCheck style={{ marginRight: '6px' }} />
-                                    Lưu thay đổi
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
                     {/* Phone Row */}
                     <div className={`${styles.fieldCard} ${editingField === 'phone' ? styles.editing : ''}`}>
                         <div className={styles.fieldHeader}>
@@ -571,6 +574,63 @@ const ProfileComponent = (props) => {
                             </button>
                         </div>
                         {editingField === 'phone' && (
+                            <div className={styles.fieldActions}>
+                                <button type="button" className={styles.btnUpdate} onClick={onFinish}>
+                                    <TbCheck style={{ marginRight: '6px' }} />
+                                    Lưu thay đổi
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Birthday Row */}
+                    <div className={`${styles.fieldCard} ${editingField === 'birthday' ? styles.editing : ''}`}>
+                        <div className={styles.fieldHeader}>
+                            <div className={styles.fieldLabelSection}>
+                                <div className={styles.fieldIconTitle}>
+                                    <TbCalendar className={styles.fieldIcon} />
+                                    <span className={styles.fieldTitle}>Ngày sinh</span>
+                                </div>
+                                {editingField === 'birthday' ? (
+                                    <div className={styles.fieldEditor}>
+                                        <div className={styles.editorSubtitle}>
+                                            Thông tin cá nhân
+                                        </div>
+                                        <div className={styles.editorInputs}>
+                                            <DatePickerField
+                                                name="birthday"
+                                                format="DD/MM/YYYY"
+                                                placeholder="Chọn ngày sinh"
+                                                showTime={false}
+                                                style={{ width: '100%' }}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={styles.fieldValue}>
+                                        {user?.birthday || user?.account?.birthday ? dayjs(user?.birthday || user?.account?.birthday, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY') : '—'}
+                                    </div>
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                className={`${styles.editBtn} ${editingField === 'birthday' ? styles.cancel : ''}`}
+                                onClick={() => handleSetEditingField('birthday')}
+                            >
+                                {editingField === 'birthday' ? (
+                                    <>
+                                        <TbX />
+                                        <span>Huỷ</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TbEdit />
+                                        <span>Thay đổi</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                        {editingField === 'birthday' && (
                             <div className={styles.fieldActions}>
                                 <button type="button" className={styles.btnUpdate} onClick={onFinish}>
                                     <TbCheck style={{ marginRight: '6px' }} />

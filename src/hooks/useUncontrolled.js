@@ -6,15 +6,15 @@ export default function useUncontrolled({
     onChange,
     mappingOnChange = (e) => e?.target?.value ?? e,
 } = {}) {
-    const [unControlledValue, setUnControlledValue] = useState(defaultValue);
+    const [ unControlledValue, setUnControlledValue ] = useState(defaultValue);
     const handleUncontrolledChange = (e) => {
         setUnControlledValue(mappingOnChange(e));
         onChange?.(e);
     };
 
     if (value !== undefined) {
-        return [value, onChange];
+        return [ value, onChange ];
     }
 
-    return [unControlledValue, handleUncontrolledChange];
+    return [ unControlledValue, handleUncontrolledChange ];
 }

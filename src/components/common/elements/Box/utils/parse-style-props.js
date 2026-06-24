@@ -49,7 +49,7 @@ export function parseStyleProps({ styleProps, data }) {
                 const propertyData = data[styleProp];
                 const properties = Array.isArray(propertyData.property)
                     ? propertyData.property
-                    : [propertyData.property];
+                    : [ propertyData.property ];
                 const baseValue = getBaseValue(styleProps[styleProp]);
 
                 if (!hasResponsiveStyles(styleProps[styleProp])) {

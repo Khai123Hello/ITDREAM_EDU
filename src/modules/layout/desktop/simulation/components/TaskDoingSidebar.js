@@ -10,7 +10,15 @@ export default function TaskDoingSidebar({
     selectedParentTaskId = null,
     onSelectParentTask = () => {},
 }) {
-    const [achievementsExpanded, setAchievementsExpanded] = useState(true);
+    const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
+    const { id } = useParams();
+    const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        if (id) {
+            navigate(`/simulations/${id}`);
+        }
+    };
 
     return (
         <aside className="tfo-sidebar">

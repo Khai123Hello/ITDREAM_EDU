@@ -19,6 +19,9 @@ $shadowHover: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
     cursor: pointer;
     transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s ease, border-color 0.22s;
     outline: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 
     &:hover {
         transform: translateY(-4px);
@@ -113,6 +116,9 @@ $shadowHover: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
 
 .body {
     padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .title {
@@ -173,7 +179,7 @@ $shadowHover: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 12px;
+    margin-top: auto;
     padding-top: 10px;
     border-top: 1px solid $border;
 }

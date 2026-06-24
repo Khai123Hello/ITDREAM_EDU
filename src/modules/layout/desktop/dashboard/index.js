@@ -68,7 +68,7 @@ function DashboardDesktop({
     const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
     const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
 
-    const completionStatus = [hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization];
+    const completionStatus = [ hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization ];
     const completedCount = completionStatus.filter(Boolean).length;
     const missingCount = 5 - completedCount;
     const isProfileComplete = completedCount === 5;

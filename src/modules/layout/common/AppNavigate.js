@@ -12,7 +12,7 @@ const AppNavigate = () => {
             root.scrollTop = 0;
         }
         if (location.pathname.includes('availability')) root.scrollTop = 0;
-    }, [location.pathname, navigateType]);
+    }, [ location.pathname, navigateType ]);
 
     return <Outlet />;
 };

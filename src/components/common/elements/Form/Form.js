@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 import styles from './Form.module.scss';
 
-const [FormProvider, useFormContext] = createCtx('FormProvider');
+const [ FormProvider, useFormContext ] = createCtx('FormProvider');
 
 export function Form({
     formId,
@@ -86,13 +86,13 @@ function Item({ name = '', children, className, classNames = {}, style, ...props
                     typeof children === 'function'
                         ? children(control, meta, form)
                         : React.cloneElement(children, {
-                              ...control,
-                              onChange: (e) => {
-                                  control.onChange(e);
-                                  children.props.onChange?.(e);
-                              },
-                              error: !!meta.errors.length || undefined,
-                          });
+                            ...control,
+                            onChange: (e) => {
+                                control.onChange(e);
+                                children.props.onChange?.(e);
+                            },
+                            error: !!meta.errors.length || undefined,
+                        });
 
                 return (
                     <div ref={itemRef(name)} style={style} className={cls(styles.field, className, classNames.root)}>

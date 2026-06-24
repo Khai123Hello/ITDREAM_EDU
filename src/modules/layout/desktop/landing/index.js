@@ -5,7 +5,7 @@ import SliderScroll from '@components/common/elements/SliderScroll';
 
 import styles from './index.module.scss';
 
-const companies = ['FPT Software', 'VNG Corporation', 'Tiki', 'Grab Vietnam', 'Momo'];
+const companies = [ 'FPT Software', 'VNG Corporation', 'Tiki', 'Grab Vietnam', 'Momo' ];
 
 const levelText = {
     1: 'Cơ bản',
@@ -52,9 +52,9 @@ const testimonials = [
 function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
     const navigate = useNavigate();
     const sliderRef = useRef(null);
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [ activeIndex, setActiveIndex ] = useState(0);
 
-    const cards = useMemo(() => simulations || [], [simulations]);
+    const cards = useMemo(() => simulations || [], [ simulations ]);
     const totalCards = cards.length + 1;
 
     const handleSelectCard = (id) => {
