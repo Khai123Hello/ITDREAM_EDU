@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..700&display=swap');
+
 // ═══════════════════════════════════════════
 // TOKENS (Unified with detail.module.scss)
 // ═══════════════════════════════════════════
@@ -15,8 +17,8 @@ $green-light: #f2faf4;
 $green-soft:  rgba(5, 150, 105, 0.1);
 $green-border:rgba(5, 150, 105, 0.18);
 
-$font-display: 'Lora', 'Georgia', serif;
-$font-body:    'DM Sans', 'Helvetica Neue', sans-serif;
+$font-display: 'Be Vietnam Pro', 'DM Sans', 'Helvetica Neue', sans-serif;
+$font-body:    'Be Vietnam Pro', 'DM Sans', 'Helvetica Neue', sans-serif;
 $font-mono:    'JetBrains Mono', monospace;
 
 $radius-sm:   6px;

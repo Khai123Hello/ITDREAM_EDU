@@ -24,10 +24,34 @@ const parseSubtaskName = (name = '') => {
 const isFilePath = (str = '') => {
     if (!str || typeof str !== 'string') return false;
     const trimmed = str.trim();
+
+    // 1. URL with http/https or www.
+    if (/^(https?:\/\/|www\.)/i.test(trimmed)) {
+        return true;
+    }
+
+    // 2. Windows local or network path
+    if (/^[a-zA-Z]:\\/i.test(trimmed) || trimmed.startsWith('\\\\')) {
+        return true;
+    }
+
+    // 3. Server upload/media paths
+    if (trimmed.startsWith('/uploads') || trimmed.startsWith('/media')) {
+        return true;
+    }
+
+    // 4. No-space string with file extension or root-level path
     const noSpaces = !/\s/.test(trimmed);
-    const hasExtension = /\.[a-zA-Z0-9]{2,5}$/.test(trimmed);
-    const isUrlOrPath = trimmed.startsWith('/') || trimmed.startsWith('http://') || trimmed.startsWith('https://');
-    return noSpaces && (hasExtension || isUrlOrPath);
+    if (noSpaces) {
+        if (/\.[a-zA-Z0-9]{2,6}(\/|$)/.test(trimmed)) {
+            return true;
+        }
+        if (trimmed.startsWith('/') || trimmed.startsWith('\\')) {
+            return true;
+        }
+    }
+
+    return false;
 };
 
 const getSubmissionAnswer = (submission = {}) => submission.answer || submission.answear || '';
@@ -960,23 +984,41 @@ function TaskDoingContainer() {
         });
     }, [ quizBlocks, quizSubmissionMap, questionMap ]);
 
-    // Handle file upload - lưu file vào studentSubmission
+    // Handle file upload - lưu file hoặc đường dẫn vào studentSubmission
     const handleFileUpload = useCallback(
-        async (file) => {
+        async (fileOrPath) => {
             if (hasCompleted) return;
             if (!currentSubtaskProgress?.taskProgressId) {
                 message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
                 return;
             }
             try {
-                const uploadRes = await uploadFile({
-                    data: {
-                        file,
-                        type: 'DOCUMENT',
-                    },
-                });
-                if (uploadRes?.result === true) {
-                    const filePath = uploadRes.data.filePath;
+                let filePath = '';
+
+                if (typeof fileOrPath === 'string') {
+                    // Người dùng nhập đường dẫn hoặc URL - nộp trực tiếp không cần upload
+                    filePath = fileOrPath.trim();
+                    if (!filePath) {
+                        message.error('Vui lòng nhập đường dẫn hợp lệ!');
+                        return;
+                    }
+                } else {
+                    // Người dùng chọn file thực - upload lên server trước
+                    const uploadRes = await uploadFile({
+                        data: {
+                            file: fileOrPath,
+                            type: 'DOCUMENT',
+                        },
+                    });
+                    if (uploadRes?.result === true) {
+                        filePath = uploadRes.data.filePath;
+                    } else {
+                        message.error('Tải file lên thất bại. Vui lòng thử lại!');
+                        return;
+                    }
+                }
+
+                if (filePath) {
                     const submitRes = await createQuizHistory({
                         dataBody: {
                             studentTaskProgressId: currentSubtaskProgress.taskProgressId,
@@ -986,16 +1028,14 @@ function TaskDoingContainer() {
                         },
                     });
                     if (submitRes) {
-                        message.success('Tải file lên và lưu bài làm thành công!');
+                        message.success('Nộp bài thành công!');
                         fetchProgressDetail({
                             pathParams: { id: currentSubtaskProgress.taskProgressId },
                         });
                     }
-                } else {
-                    message.error('Tải file lên thất bại. Vui lòng thử lại!');
                 }
             } catch (err) {
-                message.error('Có lỗi xảy ra khi tải file!');
+                message.error('Có lỗi xảy ra khi nộp bài!');
             }
         },
         [ currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail, hasCompleted ],

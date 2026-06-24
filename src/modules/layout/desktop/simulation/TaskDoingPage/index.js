@@ -434,17 +434,33 @@ function ContentRenderer({
 
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
 
+const isExternalUrl = (str) => {
+    if (!str || typeof str !== 'string') return false;
+    return /^(https?:\/\/|www\.)/i.test(str.trim());
+};
+
 function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
+    // Xác định mode mặc định dựa vào submission trước đó
+    const defaultMode = previousFile && isExternalUrl(previousFile) ? 'link' : 'file';
+    const [ mode, setMode ] = useState(defaultMode);
     const [ dragging, setDragging ] = useState(false);
     const [ file, setFile ] = useState(null);
+    const [ linkInput, setLinkInput ] = useState('');
 
     useEffect(() => {
         setFile(null);
+        setLinkInput('');
+        // Khi previousFile thay đổi, cập nhật lại mode mặc định
+        if (previousFile && isExternalUrl(previousFile)) {
+            setMode('link');
+        } else if (previousFile) {
+            setMode('file');
+        }
     }, [ previousFile ]);
 
     const handleDrop = (e) => {
         e.preventDefault();
-        if (disabled) return;
+        if (disabled || mode !== 'file') return;
         setDragging(false);
         const f = e.dataTransfer.files?.[0];
         if (f) {
@@ -453,12 +469,24 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         }
     };
 
-    const handleChange = (e) => {
+    const handleFileChange = (e) => {
         if (disabled) return;
         const f = e.target.files?.[0];
         if (f) {
             setFile(f);
             onFileChange(f);
+        }
+    };
+
+    const handleLinkSubmit = () => {
+        if (disabled || !linkInput.trim()) return;
+        onFileChange(linkInput.trim());
+        setLinkInput('');
+    };
+
+    const handleLinkKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleLinkSubmit();
         }
     };
 
@@ -468,59 +496,145 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         return decodeURIComponent(parts[parts.length - 1]);
     };
 
-    const displayFileName = file ? file.name : previousFile ? getFileName(previousFile) : '';
+    const displayFileName = file ? file.name : (previousFile && mode === 'file') ? getFileName(previousFile) : '';
 
     return (
         <div className={`tfo-upload-card${disabled ? ' disabled' : ''}`}>
             <div className="tfo-upload-label">Nộp Bài Làm Của Bạn</div>
-            <label
-                className={`tfo-dropzone${dragging ? ' dragging' : ''}${disabled ? ' disabled' : ''}`}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    if (!disabled) setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={handleDrop}
-            >
-                {!disabled && <input type="file" style={{ display: 'none' }} onChange={handleChange} />}
-                <svg className="tfo-dropzone-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path
-                        d="M8 1v10M4 5l4-4 4 4"
-                        stroke="#5f5e5e"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                    <path
-                        d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"
-                        stroke="#5f5e5e"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                    />
-                </svg>
-                {displayFileName ? (
-                    <span className="tfo-file-chosen">
-                        {previousFile && !file ? (
+
+            {/* Tab switcher - chỉ hiển thị khi chưa hoàn thành */}
+            {!disabled && (
+                <div className="tfo-submit-mode-tabs">
+                    <button
+                        type="button"
+                        className={`tfo-submit-mode-tab${mode === 'file' ? ' active' : ''}`}
+                        onClick={() => setMode('file')}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6 }}>
+                            <path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V6L9 1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9 1v5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Tải file lên
+                    </button>
+                    <button
+                        type="button"
+                        className={`tfo-submit-mode-tab${mode === 'link' ? ' active' : ''}`}
+                        onClick={() => setMode('link')}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ marginRight: 6 }}>
+                            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Nhập đường dẫn / URL
+                    </button>
+                </div>
+            )}
+
+            {/* File upload mode */}
+            {mode === 'file' && (
+                <label
+                    className={`tfo-dropzone${dragging ? ' dragging' : ''}${disabled ? ' disabled' : ''}`}
+                    onDragOver={(e) => {
+                        e.preventDefault();
+                        if (!disabled) setDragging(true);
+                    }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={handleDrop}
+                >
+                    {!disabled && <input type="file" style={{ display: 'none' }} onChange={handleFileChange} />}
+                    <svg className="tfo-dropzone-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path
+                            d="M8 1v10M4 5l4-4 4 4"
+                            stroke="#5f5e5e"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                        <path
+                            d="M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2"
+                            stroke="#5f5e5e"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                    {displayFileName ? (
+                        <span className="tfo-file-chosen">
+                            {previousFile && !file ? (
+                                <a
+                                    href={previousFile.startsWith('http') ? previousFile : `${urlBase}${previousFile}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="tfo-file-download-link"
+                                >
+                                    {displayFileName} (Tải xuống)
+                                </a>
+                            ) : (
+                                displayFileName
+                            )}
+                        </span>
+                    ) : (
+                        <>
+                            <span className="tfo-dropzone-select">Chọn một tệp</span>
+                            <span className="tfo-dropzone-hint">hoặc kéo thả vào đây.</span>
+                        </>
+                    )}
+                </label>
+            )}
+
+            {/* Link / path input mode */}
+            {mode === 'link' && (
+                <div className="tfo-link-input-wrapper">
+                    {previousFile && isExternalUrl(previousFile) && (
+                        <div className="tfo-link-submitted">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
                             <a
-                                href={previousFile.startsWith('http') ? previousFile : `${urlBase}${previousFile}`}
+                                href={previousFile}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="tfo-file-download-link"
+                                className="tfo-file-download-link tfo-link-submitted-url"
                             >
-                                {displayFileName} (Tải xuống)
+                                {previousFile}
                             </a>
-                        ) : (
-                            displayFileName
-                        )}
-                    </span>
-                ) : (
-                    <>
-                        <span className="tfo-dropzone-select">Chọn một tệp</span>
-                        <span className="tfo-dropzone-hint">hoặc kéo thả vào đây.</span>
-                    </>
-                )}
-            </label>
+                        </div>
+                    )}
+                    {previousFile && !isExternalUrl(previousFile) && (
+                        <div className="tfo-link-submitted">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
+                            <span className="tfo-link-submitted-path">{previousFile}</span>
+                        </div>
+                    )}
+                    {!disabled && (
+                        <div className="tfo-link-input-row">
+                            <input
+                                type="text"
+                                className="tfo-link-input"
+                                placeholder="Nhập URL hoặc đường dẫn file (vd: https://drive.google.com/...)"
+                                value={linkInput}
+                                onChange={(e) => setLinkInput(e.target.value)}
+                                onKeyDown={handleLinkKeyDown}
+                                disabled={disabled}
+                            />
+                            <button
+                                type="button"
+                                className="tfo-link-submit-btn"
+                                onClick={handleLinkSubmit}
+                                disabled={disabled || !linkInput.trim()}
+                            >
+                                Nộp
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
