@@ -70,19 +70,15 @@
 }
 
 .dropdownContent {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 15px rgba(0, 0, 0, 0.1);
   width: 360px;
   max-width: 90vw;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -97,13 +93,19 @@
   }
 }
 
+.dropdownArrow {
+  fill: #e5e7eb;
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid #f3f4f6;
-  background-color: #ffffff;
+  padding: 16px;
+  border-bottom: 1px solid #d1d5db;
+  background-color: #e5e7eb;
+  border-top-left-radius: 11px;
+  border-top-right-radius: 11px;
 
   h3 {
     margin: 0;
@@ -137,8 +139,10 @@
 }
 
 .listContainer {
-  max-height: 380px;
+  max-height: 400px;
   overflow-y: auto;
+  border-bottom-left-radius: 11px;
+  border-bottom-right-radius: 11px;
   background-color: #ffffff;
 
   &::-webkit-scrollbar {
@@ -175,8 +179,8 @@
   }
 
   &.unread {
-    background-color: #f0fdf4; // subtle green for unread
-    border-left-color: #22c55e; // left indicator line
+    background-color: #fef2f2; // subtle red for unread
+    border-left-color: #ef4444; // left indicator line
 
     .title {
       font-weight: 600;
@@ -192,7 +196,7 @@
 .dot {
   width: 8px;
   height: 8px;
-  background-color: #22c55e; // green dot for unread
+  background-color: #ef4444; // red dot for unread
   border-radius: 50%;
   margin-top: 6px;
   flex-shrink: 0;
@@ -231,4 +235,54 @@
     margin: 0;
     font-size: 14px;
   }
+}
+
+.dateInline {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.inlineDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detailRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.detailIcon {
+  font-size: 16px;
+  color: #10b981; /* Primary green */
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.detailText {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.detailTextRegular {
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.5;
+  padding-left: 2px;
 }
