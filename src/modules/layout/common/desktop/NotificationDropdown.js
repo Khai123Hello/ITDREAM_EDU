@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { IoNotificationsOffOutline, IoNotificationsOutline } from 'react-icons/io5';
+import { 
+    IoNotificationsOffOutline, 
+    IoNotificationsOutline,
+    IoDocumentTextOutline,
+    IoPersonOutline,
+    IoBusinessOutline
+} from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import DropdownMenu from '@components/common/elements/DropdownMenu';
 import apiConfig from '@constants/apiConfig';
@@ -9,6 +15,8 @@ import styles from './NotificationDropdown.module.scss';
 
 function NotificationDropdown() {
     const [ open, setOpen ] = useState(false);
+    const [ expandedId, setExpandedId ] = useState(null);
+    const [ details, setDetails ] = useState({});
 
     const {
         data: notificationsData,
@@ -28,16 +36,59 @@ function NotificationDropdown() {
     const hasReadNotifications = notificationsList.some((item) => item.readFlag);
 
     const handleNotificationClick = async (item) => {
-        if (!item.readFlag && !loadingUpdate) {
+        if (expandedId === item.id) {
+            setExpandedId(null);
+            return;
+        }
+        setExpandedId(item.id);
+
+        if (!details[item.id] || !item.readFlag) {
             try {
-                await updateRead({
+                const response = await updateRead({
                     data: { id: item.id },
                 });
-                fetchNotifications();
+                
+                if (response && response.result && response.data) {
+                    setDetails((prev) => ({ ...prev, [item.id]: response.data }));
+                    if (!item.readFlag) {
+                        fetchNotifications();
+                    }
+                }
             } catch (error) {
-                toast.error('Không thể cập nhật trạng thái thông báo');
+                toast.error('Không thể lấy chi tiết thông báo');
             }
         }
+    };
+
+    const renderDetailMessage = (message) => {
+        if (!message) return null;
+        const lines = message.split('\n');
+        return (
+            <div className={styles.inlineDetail}>
+                {lines.map((line, idx) => {
+                    const cleanLine = line.trim();
+                    if (!cleanLine) return null;
+                    
+                    let icon = null;
+                    let text = cleanLine.replace(/^\?+\s*/, '');
+                    
+                    if (cleanLine.includes('Bài mô phỏng')) {
+                        icon = <IoDocumentTextOutline className={styles.detailIcon} />;
+                    } else if (cleanLine.includes('Người đánh giá')) {
+                        icon = <IoPersonOutline className={styles.detailIcon} />;
+                    } else if (cleanLine.includes('Tổ chức')) {
+                        icon = <IoBusinessOutline className={styles.detailIcon} />;
+                    }
+
+                    return (
+                        <div key={idx} className={styles.detailRow}>
+                            {icon}
+                            <span className={icon ? styles.detailText : styles.detailTextRegular}>{text}</span>
+                        </div>
+                    );
+                })}
+            </div>
+        );
     };
 
     const handleClearAll = async (e) => {
@@ -58,8 +109,10 @@ function NotificationDropdown() {
             <DropdownMenu
                 align="end"
                 side="bottom"
+                sideOffset={2}
                 open={open}
                 onOpenChange={setOpen}
+                className={styles.dropdownContent}
                 trigger={
                     <button className={styles.bellButton} aria-label="Notifications">
                         <IoNotificationsOutline />
@@ -67,43 +120,48 @@ function NotificationDropdown() {
                     </button>
                 }
             >
-                <div className={styles.dropdownContent}>
-                    <div className={styles.header}>
-                        <h3>Thông báo</h3>
-                        <button
-                            className={styles.clearButton}
-                            onClick={handleClearAll}
-                            disabled={!hasReadNotifications || loadingClear}
-                        >
-                            Xóa hết đã đọc
-                        </button>
-                    </div>
+                <DropdownMenu.Arrow className={styles.dropdownArrow} width={32} height={16} />
+                <div className={styles.header}>
+                    <h3>Thông báo</h3>
+                    <button
+                        className={styles.clearButton}
+                        onClick={handleClearAll}
+                        disabled={!hasReadNotifications || loadingClear}
+                    >
+                        Xóa hết đã đọc
+                    </button>
+                </div>
 
-                    <div className={styles.listContainer}>
-                        {loadingList && notificationsList.length === 0 ? (
-                            <div className={styles.emptyState}>
-                                <p>Đang tải thông báo...</p>
-                            </div>
-                        ) : notificationsList.length > 0 ? (
-                            notificationsList.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className={`${styles.notificationItem} ${!item.readFlag ? styles.unread : ''}`}
-                                    onClick={() => handleNotificationClick(item)}
-                                >
-                                    <div className={styles.contentWrapper}>
-                                        <span className={styles.title}>{item.title}</span>
-                                    </div>
-                                    {!item.readFlag && <span className={styles.dot} />}
+                <div className={styles.listContainer}>
+                    {loadingList && notificationsList.length === 0 ? (
+                        <div className={styles.emptyState}>
+                            <p>Đang tải thông báo...</p>
+                        </div>
+                    ) : notificationsList.length > 0 ? (
+                        notificationsList.map((item) => (
+                            <div
+                                key={item.id}
+                                className={`${styles.notificationItem} ${!item.readFlag ? styles.unread : ''}`}
+                                onClick={() => handleNotificationClick(item)}
+                            >
+                                <div className={styles.contentWrapper}>
+                                    <span className={styles.title}>{item.title}</span>
+                                    {expandedId === item.id && details[item.id] && (
+                                        <>
+                                            <span className={styles.dateInline}>{details[item.id].createdDate}</span>
+                                            {renderDetailMessage(details[item.id].message)}
+                                        </>
+                                    )}
                                 </div>
-                            ))
-                        ) : (
-                            <div className={styles.emptyState}>
-                                <IoNotificationsOffOutline />
-                                <p>Không có thông báo nào</p>
+                                {!item.readFlag && <span className={styles.dot} />}
                             </div>
-                        )}
-                    </div>
+                        ))
+                    ) : (
+                        <div className={styles.emptyState}>
+                            <IoNotificationsOffOutline />
+                            <p>Không có thông báo nào</p>
+                        </div>
+                    )}
                 </div>
             </DropdownMenu>
         </div>
