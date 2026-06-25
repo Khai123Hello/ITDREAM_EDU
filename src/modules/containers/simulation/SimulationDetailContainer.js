@@ -8,6 +8,9 @@ import SimulationDetailDesktop from '@modules/layout/desktop/simulation/Simulati
 import { getCacheUserKind } from '@services/userService';
 import { message } from 'antd';
 
+export const FEEDBACKS_PAGE_SIZE = 5;
+export const INITIAL_PAGE = 0;
+
 /**
  * SimulationDetailContainer
  * Fetch simulation data (uses student_get if authenticated, guestDetail otherwise)
@@ -21,6 +24,8 @@ function SimulationDetailContainer() {
     const [ isEnrolled, setIsEnrolled ] = useState(false);
     const [ enrollmentLoading, setEnrollmentLoading ] = useState(false);
     const [ simulationEnrollmentId, setSimulationEnrollmentId ] = useState(null);
+    const [ feedbacksPage, setFeedbacksPage ] = useState(INITIAL_PAGE);
+    const [ allFeedbacks, setAllFeedbacks ] = useState([]);
 
     // Fetch simulation detail - guest version
     const {
@@ -81,6 +86,31 @@ function SimulationDetailContainer() {
         },
         false, // Don't auto-fetch
     );
+
+    // Update allFeedbacks when feedbacksData changes
+    React.useEffect(() => {
+        if (feedbacksData?.content) {
+            if (feedbacksPage === INITIAL_PAGE) {
+                setAllFeedbacks(feedbacksData.content);
+            } else {
+                setAllFeedbacks((prev) => {
+                    // Prevent duplicate appends in strict mode or rapid calls
+                    const newItems = feedbacksData.content.filter(item => !prev.some(p => p.id === item.id));
+                    return [ ...prev, ...newItems ];
+                });
+            }
+        } else if (feedbacksPage === INITIAL_PAGE) {
+            setAllFeedbacks([]);
+        }
+    }, [ feedbacksData, feedbacksPage ]);
+
+    const handleLoadMoreFeedbacks = useCallback(() => {
+        const nextPage = feedbacksPage + 1;
+        setFeedbacksPage(nextPage);
+        fetchFeedbacks({
+            params: { simulationId: parseInt(simulationId), page: nextPage, size: FEEDBACKS_PAGE_SIZE },
+        });
+    }, [ feedbacksPage, simulationId, fetchFeedbacks ]);
 
     // Create feedback
     const { execute: createReview } = useFetch(
@@ -147,8 +177,10 @@ function SimulationDetailContainer() {
     // Check enrollment and feedback status on mount if authenticated
     React.useEffect(() => {
         if (simulationId) {
+            setFeedbacksPage(INITIAL_PAGE);
+            setAllFeedbacks([]);
             fetchFeedbacks({
-                params: { simulationId: parseInt(simulationId) },
+                params: { simulationId: parseInt(simulationId), page: INITIAL_PAGE, size: FEEDBACKS_PAGE_SIZE },
             });
             if (isAuthenticated) {
                 checkEnrollment({
@@ -181,8 +213,10 @@ function SimulationDetailContainer() {
             } else {
                 fetchGuest({ pathParams });
             }
+            setFeedbacksPage(INITIAL_PAGE);
+            setAllFeedbacks([]);
             fetchFeedbacks({
-                params: { simulationId: parseInt(simulationId) },
+                params: { simulationId: parseInt(simulationId), page: INITIAL_PAGE, size: FEEDBACKS_PAGE_SIZE },
             });
         }
         if (isAuthenticated) {
@@ -299,15 +333,15 @@ function SimulationDetailContainer() {
                 });
                 const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
                 if (isSuccess) {
-                    message.success('Gửi nhận xét thành công!');
+                    message.success('Gửi cảm nhận thành công!');
                     handleRetry();
                     return true;
                 } else {
-                    message.error(result?.message || 'Gửi nhận xét thất bại');
+                    message.error(result?.message || 'Gửi cảm nhận thất bại');
                     return false;
                 }
             } catch (err) {
-                message.error('Gửi nhận xét thất bại');
+                message.error('Gửi cảm nhận thất bại');
                 return false;
             }
         },
@@ -326,15 +360,15 @@ function SimulationDetailContainer() {
                 });
                 const isSuccess = result?.result === true || result?.code === 'SUCCESS' || (result && !result.error);
                 if (isSuccess) {
-                    message.success('Cập nhật nhận xét thành công!');
+                    message.success('Cập nhật cảm nhận thành công!');
                     handleRetry();
                     return true;
                 } else {
-                    message.error(result?.message || 'Cập nhật nhận xét thất bại');
+                    message.error(result?.message || 'Cập nhật cảm nhận thất bại');
                     return false;
                 }
             } catch (err) {
-                message.error('Cập nhật nhận xét thất bại');
+                message.error('Cập nhật cảm nhận thất bại');
                 return false;
             }
         },
@@ -355,8 +389,10 @@ function SimulationDetailContainer() {
             onEnroll={handleEnroll}
             onLogin={handleLogin}
             onStartTask={handleStartTask}
-            feedbacks={feedbacksData?.content || []}
+            feedbacks={allFeedbacks}
             feedbacksLoading={feedbacksLoading}
+            hasMoreFeedbacks={feedbacksData?.totalPages !== undefined ? feedbacksData.totalPages > feedbacksPage + 1 : feedbacksData?.content?.length === FEEDBACKS_PAGE_SIZE}
+            onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
             hasCompleted={hasCompleted}
             onSubmitReview={handleSubmitReview}
             onUpdateReview={handleUpdateReview}
