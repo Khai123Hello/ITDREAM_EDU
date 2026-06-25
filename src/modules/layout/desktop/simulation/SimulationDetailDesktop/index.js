@@ -79,14 +79,16 @@ function SimulationDetailDesktop({
     isStudent = false,
     isEnrolled = false,
     enrollmentLoading = false,
-    onEnroll = () => {},
-    onLogin = () => {},
-    onStartTask = () => {},
+    onEnroll = () => { },
+    onLogin = () => { },
+    onStartTask = () => { },
     feedbacks = [],
     feedbacksLoading = false,
+    hasMoreFeedbacks = false,
+    onLoadMoreFeedbacks = () => { },
     hasCompleted = false,
-    onSubmitReview = () => {},
-    onUpdateReview = () => {},
+    onSubmitReview = () => { },
+    onUpdateReview = () => { },
 }) {
     const { profile } = useAuth();
     const [ activeTab, setActiveTab ] = useState('overview');
@@ -126,8 +128,6 @@ function SimulationDetailDesktop({
 
     const getLevelLabel = (level) =>
         ({ 0: 'Giới thiệu', 1: 'Cơ bản', 2: 'Trung cấp', 3: 'Nâng cao' })[level] ?? 'Giới thiệu';
-
-    const getStarCount = (avgStar) => Math.round(avgStar || 0);
 
     const myReview = useMemo(() => {
         if (!isAuthenticated || !profile || !feedbacks.length) return null;
@@ -241,7 +241,7 @@ function SimulationDetailDesktop({
         { key: 'overview', label: 'Tổng quan' },
         // ✅ FIX: dùng parentTaskCount thay vì tasks.length
         { key: 'tasks', label: `Nhiệm vụ${parentTaskCount ? ` (${parentTaskCount})` : ''}` },
-        { key: 'reviews', label: 'Đánh giá' },
+        { key: 'reviews', label: 'Chia sẻ cảm nhận' },
     ];
 
     return (
@@ -566,21 +566,14 @@ function SimulationDetailDesktop({
                             {/* Summary Card */}
                             <div className={styles.reviewsSummary}>
                                 <div className={styles.reviewsScore}>{simulation?.avgStar?.toFixed(1) || '—'}</div>
-                                <div className={styles.reviewsStars}>
-                                    {[ 1, 2, 3, 4, 5 ].map((n) => (
-                                        <span
-                                            key={n}
-                                            className={
-                                                n <= getStarCount(simulation?.avgStar)
-                                                    ? styles.starFilled
-                                                    : styles.starEmpty
-                                            }
-                                        >
-                                            ★
-                                        </span>
-                                    ))}
+                                <div className={styles.reviewsStars} style={{ marginBottom: 8 }}>
+                                    <RatingStar
+                                        value={simulation?.avgStar || 0}
+                                        readOnly
+                                        style={{ maxWidth: 120 }}
+                                    />
                                 </div>
-                                <div className={styles.reviewsTotal}>{feedbacks.length} đánh giá</div>
+                                <div className={styles.reviewsTotal}>{feedbacks.length} chia sẻ cảm nhận</div>
                             </div>
 
                             {/* User Review Actions (Form / Status Prompts) */}
@@ -596,19 +589,19 @@ function SimulationDetailDesktop({
                                     >
                                         đăng nhập
                                     </a>{' '}
-                                    để gửi nhận xét.
+                                    để chia sẻ cảm nhận.
                                 </div>
                             ) : !isStudent ? (
                                 <div className={styles.completePrompt}>
-                                    Tính năng gửi nhận xét chỉ dành cho học viên.
+                                    Tính năng chia sẻ cảm nhận chỉ dành cho học viên.
                                 </div>
                             ) : !hasCompleted ? (
                                 <div className={styles.completePrompt}>
-                                    Bạn cần hoàn thành bài mô phỏng này để có thể gửi nhận xét.
+                                    Bạn cần hoàn thành bài mô phỏng này để có thể chia sẻ cảm nhận.
                                 </div>
                             ) : myReview && !isEditingReview ? (
                                 <div className={styles.reviewForm}>
-                                    <h4 className={styles.formTitle}>Nhận xét của bạn</h4>
+                                    <h4 className={styles.formTitle}>Cảm nhận của bạn</h4>
                                     <div className={styles.reviewsStars} style={{ marginBottom: 8 }}>
                                         <RatingStar value={myReview.star} readOnly style={{ maxWidth: 100 }} />
                                     </div>
@@ -627,10 +620,10 @@ function SimulationDetailDesktop({
                             ) : (
                                 <form className={styles.reviewForm} onSubmit={handleSubmit}>
                                     <h4 className={styles.formTitle}>
-                                        {myReview ? 'Chỉnh sửa nhận xét' : 'Gửi nhận xét của bạn'}
+                                        {myReview ? 'Chỉnh sửa cảm nhận' : 'Gửi cảm nhận của bạn'}
                                     </h4>
                                     <div className={styles.formStars}>
-                                        <span>Đánh giá sao:</span>
+                                        <span>Mức độ hài lòng:</span>
                                         <RatingStar
                                             value={reviewStar}
                                             onChange={setReviewStar}
@@ -640,7 +633,7 @@ function SimulationDetailDesktop({
                                     <textarea
                                         className={styles.formTextarea}
                                         rows={4}
-                                        placeholder="Nhập nội dung nhận xét của bạn về bài mô phỏng này..."
+                                        placeholder="Nhập nội dung cảm nhận của bạn về bài mô phỏng này..."
                                         value={reviewContent}
                                         onChange={(e) => setReviewContent(e.target.value)}
                                         required
@@ -660,7 +653,7 @@ function SimulationDetailDesktop({
                                             className={styles.submitBtn}
                                             disabled={isSubmitting || !reviewContent.trim()}
                                         >
-                                            {isSubmitting ? 'Đang gửi...' : myReview ? 'Cập nhật' : 'Gửi nhận xét'}
+                                            {isSubmitting ? 'Đang gửi...' : myReview ? 'Cập nhật' : 'Gửi cảm nhận'}
                                         </button>
                                     </div>
                                 </form>
@@ -669,7 +662,7 @@ function SimulationDetailDesktop({
                             {/* Feedbacks List */}
                             <div className={styles.reviewsList}>
                                 <h3 className={styles.sectionTitle} style={{ fontSize: '18px', marginTop: '16px' }}>
-                                    Nhận xét từ các học viên khác
+                                    Nội dung chia sẻ từ các học viên khác
                                 </h3>
                                 {feedbacksLoading && feedbacks.length === 0 ? (
                                     <div className={styles.emptyWrap}>
@@ -695,7 +688,7 @@ function SimulationDetailDesktop({
                                                                     'Học viên'}
                                                             </span>
                                                             <span className={styles.reviewDate}>
-                                                                {dayjs(item.modifiedDate).format('DD/MM/YYYY HH:mm')}
+                                                                {item.modifiedDate ? item.modifiedDate.split(' ')[0] : ''}
                                                             </span>
                                                         </div>
                                                         <div className={styles.reviewHeaderRight}>
@@ -713,7 +706,19 @@ function SimulationDetailDesktop({
                                     })
                                 ) : (
                                     <div className={styles.emptyWrap} style={{ padding: '40px 0' }}>
-                                        <Empty description="Chưa có nhận xét nào" />
+                                        <Empty description="Chưa có phản hồi cảm nhận nào" />
+                                    </div>
+                                )}
+                                {hasMoreFeedbacks && (
+                                    <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                                        <button
+                                            className={styles.cancelBtn}
+                                            style={{ border: '1px solid #d9d9d9', background: 'transparent', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                                            onClick={onLoadMoreFeedbacks}
+                                            disabled={feedbacksLoading}
+                                        >
+                                            {feedbacksLoading ? 'Đang tải...' : 'Xem thêm'}
+                                        </button>
                                     </div>
                                 )}
                             </div>

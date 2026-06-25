@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DownloadOutlined } from '@ant-design/icons';
 import { getDownloadUrl } from '@utils';
+import { Button,Modal, Spin } from 'antd';
 
 import styles from './index.module.scss';
 
@@ -45,6 +47,31 @@ function DashboardDesktop({
 }) {
     const navigate = useNavigate();
     const name = profile?.fullName || profile?.account?.fullName || '';
+
+    const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
+    const [ previewLoading, setPreviewLoading ] = useState(false);
+    const [ previewUrl, setPreviewUrl ] = useState(null);
+    const [ currentDownloadUrl, setCurrentDownloadUrl ] = useState(null);
+    const [ currentFileName, setCurrentFileName ] = useState('');
+
+    const handlePreviewCertificate = async (e, downloadUrl, fileName) => {
+        e.preventDefault();
+        setPreviewModalVisible(true);
+        setPreviewLoading(true);
+        setPreviewUrl(null);
+        setCurrentDownloadUrl(downloadUrl);
+        setCurrentFileName(fileName);
+        try {
+            const response = await fetch(downloadUrl);
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            setPreviewUrl(objectUrl);
+        } catch (error) {
+            console.error("Failed to load certificate preview:", error);
+        } finally {
+            setPreviewLoading(false);
+        }
+    };
 
     const handleCardClick = (simId) => {
         navigate(`/simulations/${simId}`);
@@ -404,9 +431,8 @@ function DashboardDesktop({
                                                 <p className={styles.achievementDesc}>Chứng chỉ đã hoàn thành</p>
                                                 {fullFilePath && (
                                                     <a
-                                                        href={fullFilePath}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                        href="#"
+                                                        onClick={(e) => handlePreviewCertificate(e, fullFilePath, sim.title || 'Chứng chỉ')}
                                                         className={styles.certificateBtn}
                                                     >
                                                         Xem chứng chỉ
@@ -469,6 +495,62 @@ function DashboardDesktop({
                     </div>
                 </div>
             </main>
+
+            <Modal
+                title={`Chứng chỉ: ${currentFileName}`}
+                open={previewModalVisible}
+                onCancel={() => {
+                    setPreviewModalVisible(false);
+                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                }}
+                footer={[
+                    <Button key="close" onClick={() => {
+                        setPreviewModalVisible(false);
+                        if (previewUrl) URL.revokeObjectURL(previewUrl);
+                    }}>
+                        Đóng
+                    </Button>,
+                    <Button
+                        key="download"
+                        type="primary"
+                        icon={<DownloadOutlined />}
+                        href={currentDownloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                    >
+                        Tải về
+                    </Button>,
+                ]}
+                width={800}
+                destroyOnClose
+            >
+                {previewLoading ? (
+                    <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                        <Spin tip="Đang tải chứng chỉ..." size="large" />
+                    </div>
+                ) : previewUrl ? (
+                    <div style={{ width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', position: 'relative', borderRadius: '8px', backgroundColor: '#f0f2f5' }}>
+                        <iframe
+                            src={`${previewUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
+                            title="Certificate Preview"
+                            style={{
+                                position: 'absolute',
+                                top: '-20%',
+                                left: '-20%',
+                                width: '140%',
+                                height: '140%',
+                                border: 'none',
+                                display: 'block',
+                            }}
+                        />
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', padding: '40px 0', color: 'red' }}>
+                        Không thể tải trước chứng chỉ. Vui lòng nhấn Tải về để xem.
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 }
