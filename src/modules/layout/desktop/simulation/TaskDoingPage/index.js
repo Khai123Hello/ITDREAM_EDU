@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
@@ -492,70 +493,18 @@ function ContentRenderer({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    onQuestionRendered = () => {},
 }) {
-    const type = useMemo(() => detectContentType(content), [ content ]);
-    const legacyBlocksJson = useMemo(() => {
-        if (type !== 'tiptap') return null;
-        if (content.trim().startsWith('{"type":"doc"')) {
-            try {
-                const doc = JSON.parse(content);
-                const quizNodes = [];
-                const walk = (nodes) =>
-                    (nodes || []).forEach((n) => {
-                        if (n.type === 'quiz') {
-                            const options = (n.content || []).filter((c) => c.type === 'option');
-                            quizNodes.push({
-                                type: 'quiz',
-                                question: n.attrs?.question || '',
-                                options: options.map((o, i) => ({
-                                    answer: o.attrs?.correct === true,
-                                    option: o.content?.[0]?.text || '',
-                                    value: o.content?.[0]?.text || '',
-                                })),
-                            });
-                        }
-                        if (n.content) walk(n.content);
-                    });
-                walk(doc.content);
-                const blocks =
-                    quizNodes.length > 0 ? [ { type: 'text', content: flattenTipTapText(doc) }, ...quizNodes ] : null;
-                return blocks ? JSON.stringify(blocks) : null;
-            } catch {
-                return null;
-            }
-        }
-        const blocks = extractBlocksFromMarkdoc(content);
-        return blocks ? JSON.stringify(blocks) : null;
-    }, [ type, content ]);
-
-    if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
-    if (type === 'blocks') {
-        return (
-            <BlocksContent
-                blocksJson={content}
-                quizSubmissionMap={quizSubmissionMap}
-                questionMap={questionMap}
-                onQuizAnswerSubmit={onQuizAnswerSubmit}
-                hasCompleted={hasCompleted}
-            />
-        );
-    }
-    if (type === 'tiptap') {
-        if (legacyBlocksJson) {
-            return (
-                <BlocksContent
-                    blocksJson={legacyBlocksJson}
-                    quizSubmissionMap={quizSubmissionMap}
-                    questionMap={questionMap}
-                    onQuizAnswerSubmit={onQuizAnswerSubmit}
-                    hasCompleted={hasCompleted}
-                />
-            );
-        }
-        return <MarkdownContent text={content} />;
-    }
-    if (type === 'markdown') return <MarkdownContent text={content} />;
-    return <PlainTextContent text={content} />;
+    return (
+        <TipTapJsonRenderer
+            content={content}
+            quizSubmissionMap={quizSubmissionMap}
+            questionMap={questionMap}
+            onQuizAnswerSubmit={onQuizAnswerSubmit}
+            hasCompleted={hasCompleted}
+            onQuestionRendered={onQuestionRendered}
+        />
+    );
 }
 
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
@@ -915,10 +864,15 @@ export default function TaskDoingPage({
     onUpdateComment = () => {},
 }) {
     const [ textInput, setTextInput ] = useState('');
+    const [ inlineQuestionIds, setInlineQuestionIds ] = useState([]);
 
     useEffect(() => {
         setTextInput(previousText || '');
     }, [ previousText ]);
+
+    useEffect(() => {
+        setInlineQuestionIds([]);
+    }, [ selectedSubtaskId ]);
 
     const renderMedia = () => {
         if (!mediaPath) return null;
@@ -1104,33 +1058,43 @@ export default function TaskDoingPage({
                                                         questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                         hasCompleted={hasCompleted}
+                                                        onQuestionRendered={setInlineQuestionIds}
                                                     />
                                                 )}
 
                                                 {/* Render questions fetched from API */}
                                                 {quizBlocks && quizBlocks.length > 0 && (
                                                     <div className="tfo-blocks-content" style={{ marginTop: 24 }}>
-                                                        {quizBlocks.map((block, idx) => {
-                                                            const questionId = block.id
-                                                                ? String(block.id)
-                                                                : block.question
-                                                                    ? questionMap[block.question.trim()]
-                                                                    : null;
-                                                            return (
-                                                                <QuizBlock
-                                                                    key={questionId || idx}
-                                                                    block={block}
-                                                                    submittedAnswer={
-                                                                        questionId
-                                                                            ? quizSubmissionMap[questionId]
-                                                                            : null
-                                                                    }
-                                                                    questionId={questionId}
-                                                                    onQuizAnswerSubmit={onQuizAnswerSubmit}
-                                                                    hasCompleted={hasCompleted}
-                                                                />
-                                                            );
-                                                        })}
+                                                        {quizBlocks
+                                                            .filter((block) => {
+                                                                const questionId = block.id
+                                                                    ? String(block.id)
+                                                                    : block.question
+                                                                        ? questionMap[block.question.trim()]
+                                                                        : null;
+                                                                return !inlineQuestionIds.includes(String(questionId));
+                                                            })
+                                                            .map((block, idx) => {
+                                                                const questionId = block.id
+                                                                    ? String(block.id)
+                                                                    : block.question
+                                                                        ? questionMap[block.question.trim()]
+                                                                        : null;
+                                                                return (
+                                                                    <QuizBlock
+                                                                        key={questionId || idx}
+                                                                        block={block}
+                                                                        submittedAnswer={
+                                                                            questionId
+                                                                                ? quizSubmissionMap[questionId]
+                                                                                : null
+                                                                        }
+                                                                        questionId={questionId}
+                                                                        onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                                                        hasCompleted={hasCompleted}
+                                                                    />
+                                                                );
+                                                            })}
                                                     </div>
                                                 )}
 
