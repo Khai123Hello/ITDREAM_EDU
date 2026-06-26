@@ -550,6 +550,18 @@ const apiConfig = {
             headers: baseHeader,
         },
     },
+    reviewSubmission: {
+        studentList: {
+            baseURL: `${apiUrl}v1/review_submission/students_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        studentGet: {
+            baseURL: `${apiUrl}v1/review_submission/student_get/:id`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+    },
 };
 
 export default apiConfig;

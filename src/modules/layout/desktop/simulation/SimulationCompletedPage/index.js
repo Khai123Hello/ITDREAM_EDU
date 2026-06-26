@@ -125,6 +125,8 @@ function SimulationCompletedPage({
     currentAch = null,
     profile = {},
     onBackToDetail = () => {},
+    subtaskFeedbacks = [],
+    feedbacksLoading = false,
 }) {
     // Parse the PDF certificate URL
     const filePath = currentAch?.filePath;
@@ -354,6 +356,46 @@ function SimulationCompletedPage({
                             </svg>
                             Trở về Chi tiết Bài Mô phỏng
                         </button>
+                    </div>
+
+                    {/* Educator reviews section */}
+                    <div className="tfo-feedback-section">
+                        <div className="tfo-feedback-header">
+                            <span className="tfo-feedback-header-icon">💬</span>
+                            <h2 className="tfo-feedback-header-title">Nhận xét từ Giảng viên</h2>
+                        </div>
+                        {feedbacksLoading ? (
+                            <div className="tfo-feedback-loading">
+                                <Spin size="small" />
+                                <span style={{ marginLeft: 8, color: '#64748b', fontSize: '14px' }}>Đang tải nhận xét...</span>
+                            </div>
+                        ) : subtaskFeedbacks.length === 0 ? (
+                            <div className="tfo-feedback-empty">
+                                Chưa có nhận xét nào từ giảng viên cho bài làm của bạn.
+                            </div>
+                        ) : (
+                            <div className="tfo-feedback-list">
+                                {subtaskFeedbacks.map((item, idx) => (
+                                    <div key={item.subtask?.id || idx} className="tfo-feedback-card">
+                                        <div className="tfo-feedback-subtask-title">
+                                            Nhiệm vụ: {item.subtask?.title || item.subtask?.name || 'Bài học'}
+                                        </div>
+                                        <div className="tfo-feedback-comments">
+                                            {item.reviews.map((review) => (
+                                                <div key={review.id} className="tfo-feedback-comment-item">
+                                                    <div className="tfo-feedback-comment-header">
+                                                        <span className="tfo-feedback-educator-badge">Giảng viên nhận xét</span>
+                                                    </div>
+                                                    <div className="tfo-feedback-comment-content">
+                                                        {review.content}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -7,20 +7,6 @@ import useTaskHierarchy from '@hooks/useTaskHierarchy';
 import TaskDoingPage from '@modules/layout/desktop/simulation/TaskDoingPage';
 import { message } from 'antd';
 
-const parseSubtaskName = (name = '') => {
-    const match = name.match(/^SUB_T(\d+)_S(\d+)(_.*)?$/);
-    if (!match) return null;
-
-    const suffix = match[3] || '';
-    return {
-        parentOrder: parseInt(match[1], 10),
-        subtaskOrder: parseInt(match[2], 10),
-        suffix,
-        requiresFileUpload: suffix === '_FILE' || suffix === '_FILE_TEXT',
-        requiresTextResponse: suffix === '_TEXT' || suffix === '_FILE_TEXT',
-    };
-};
-
 const isFilePath = (str = '') => {
     if (!str || typeof str !== 'string') return false;
     const trimmed = str.trim();
@@ -326,6 +312,19 @@ function TaskDoingContainer() {
         false,
     );
 
+    // Fetch educator reviews
+    const {
+        data: reviewData,
+        execute: fetchReviews,
+    } = useFetch(
+        apiConfig.reviewSubmission.studentList,
+        {
+            params: {},
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
     // Comments state & fetches
     const [ showComments, setShowComments ] = useState(false);
 
@@ -404,14 +403,17 @@ function TaskDoingContainer() {
         }
     }, [ simulationId, fetchTaskList ]);
 
-    // Load task progress on mount
+    // Load task progress & educator reviews on mount
     React.useEffect(() => {
         if (simulationEnrollmentId) {
             refetchProgress({
                 params: { simulationEnrollmentId },
             });
+            fetchReviews({
+                params: { simulationEnrollmentId },
+            });
         }
-    }, [ simulationEnrollmentId, refetchProgress ]);
+    }, [ simulationEnrollmentId, refetchProgress, fetchReviews ]);
 
     const hasCompleted = useMemo(() => {
         if (enrollmentData?.content) {
@@ -650,25 +652,27 @@ function TaskDoingContainer() {
             return;
         }
 
-        // Sort: parentOrder tăng dần, subtaskOrder tăng dần
-        const sortedProgress = progressList
+        // Tìm subtask có tiến độ mới nhất bằng cách tra vị trí trong allSubtasksOrdered
+        // (đã được sắp xếp đúng thứ tự parent→subtask từ trước)
+        const subtaskProgressList = progressList.filter((p) => p.task?.kind === 2);
+
+        if (subtaskProgressList.length === 0) {
+            return;
+        }
+
+        const sortedProgress = subtaskProgressList
             .map((progress) => ({
                 progress,
-                parsed: parseSubtaskName(progress.task?.name),
+                orderIndex: allSubtasksOrdered.findIndex((s) => s.id === progress.task?.id),
             }))
-            .filter((item) => item.parsed)
-            .sort((a, b) => {
-                if (a.parsed.parentOrder !== b.parsed.parentOrder) {
-                    return a.parsed.parentOrder - b.parsed.parentOrder;
-                }
-                return a.parsed.subtaskOrder - b.parsed.subtaskOrder;
-            });
+            .filter((item) => item.orderIndex !== -1)
+            .sort((a, b) => a.orderIndex - b.orderIndex);
 
         if (sortedProgress.length === 0) {
             return;
         }
 
-        // Phần tử cuối cùng có x, y cao nhất
+        // Phần tử cuối cùng theo thứ tự = subtask tiến xa nhất
         const latestItem = sortedProgress[sortedProgress.length - 1];
         let latestTask = latestItem.progress.task;
         const isCompleted = latestItem.progress.status === 'completed';
@@ -697,40 +701,77 @@ function TaskDoingContainer() {
         setSelectedSubtaskId(latestTask.id);
     }, [ parentTasks, progressList, taskListData, allSubtasksOrdered, ensureTaskProgress ]);
 
-    // Tự động đảm bảo có progress khi người dùng chọn bất kỳ subtask nào (Giải quyết triệt để lỗi Tiến độ nhiệm vụ chưa sẵn sàng)
+    // Tự động đảm bảo có progress khi người dùng chọn bất kỳ subtask nào (Giải quyết triệt để lỗi Tiến độ nhiệm vụ chưa sẵn sàng và lỗi hoàn thành Task Cha)
     React.useEffect(() => {
         if (
             selectedSubtaskId &&
+            selectedParentTaskId &&
             simulationEnrollmentId &&
             taskProgressData &&
-            !progressLoading &&
-            !creatingProgressTasksRef.current.has(selectedSubtaskId) &&
-            !attemptedProgressCreationRef.current.has(selectedSubtaskId)
+            !progressLoading
         ) {
-            const existing = taskProgressMap[selectedSubtaskId];
-            if (!existing) {
-                attemptedProgressCreationRef.current.add(selectedSubtaskId);
-                creatingProgressTasksRef.current.add(selectedSubtaskId);
-                ensureTaskProgress(selectedSubtaskId)
-                    .then((res) => {
+            const checkAndCreateProgress = async () => {
+                const existingSub = taskProgressMap[selectedSubtaskId];
+                const existingParent = taskProgressMap[selectedParentTaskId];
+
+                let progressChanged = false;
+
+                // 1. Tạo tiến độ cho Task Cha nếu chưa có
+                if (
+                    !existingParent &&
+                    !creatingProgressTasksRef.current.has(selectedParentTaskId) &&
+                    !attemptedProgressCreationRef.current.has(selectedParentTaskId)
+                ) {
+                    attemptedProgressCreationRef.current.add(selectedParentTaskId);
+                    creatingProgressTasksRef.current.add(selectedParentTaskId);
+                    try {
+                        const res = await ensureTaskProgress(selectedParentTaskId);
+                        if (res && res.result === false) {
+                            message.error(res.message || 'Không thể tạo tiến độ cho nhiệm vụ cha này. Vui lòng thử lại.');
+                        } else {
+                            progressChanged = true;
+                        }
+                    } catch {
+                        message.error('Không thể tạo tiến độ cho nhiệm vụ cha này. Vui lòng thử lại.');
+                    } finally {
+                        creatingProgressTasksRef.current.delete(selectedParentTaskId);
+                    }
+                }
+
+                // 2. Tạo tiến độ cho Task Con nếu chưa có
+                if (
+                    !existingSub &&
+                    !creatingProgressTasksRef.current.has(selectedSubtaskId) &&
+                    !attemptedProgressCreationRef.current.has(selectedSubtaskId)
+                ) {
+                    attemptedProgressCreationRef.current.add(selectedSubtaskId);
+                    creatingProgressTasksRef.current.add(selectedSubtaskId);
+                    try {
+                        const res = await ensureTaskProgress(selectedSubtaskId);
                         if (res && res.result === false) {
                             message.error(res.message || 'Không thể tạo tiến độ cho nhiệm vụ này. Vui lòng thử lại.');
                         } else {
-                            refetchProgress({
-                                params: { simulationEnrollmentId },
-                            });
+                            progressChanged = true;
                         }
-                    })
-                    .catch(() => {
+                    } catch {
                         message.error('Không thể tạo tiến độ cho nhiệm vụ này. Vui lòng thử lại.');
-                    })
-                    .finally(() => {
+                    } finally {
                         creatingProgressTasksRef.current.delete(selectedSubtaskId);
+                    }
+                }
+
+                if (progressChanged) {
+                    refetchProgress({
+                        params: { simulationEnrollmentId },
                     });
-            }
+                }
+            };
+
+            checkAndCreateProgress();
         }
     }, [
         selectedSubtaskId,
+        selectedParentTaskId,
         simulationEnrollmentId,
         taskProgressData,
         progressLoading,
@@ -884,6 +925,14 @@ function TaskDoingContainer() {
         return taskProgressMap[selectedSubtaskId] || null;
     }, [ selectedSubtaskId, taskProgressMap ]);
 
+    // Filter educator reviews for the current subtask
+    const currentSubtaskReviews = useMemo(() => {
+        if (!reviewData?.content || !currentSubtaskProgress?.taskProgressId) return [];
+        return reviewData.content.filter(
+            (r) => r.studentTaskProgressId === currentSubtaskProgress.taskProgressId,
+        );
+    }, [ reviewData, currentSubtaskProgress?.taskProgressId ]);
+
     // Handle parent task selection
     const handleSelectParentTask = useCallback((parentTaskId) => {
         setSelectedParentTaskId(parentTaskId);
@@ -933,11 +982,11 @@ function TaskDoingContainer() {
         }
     }, [ currentSubtaskProgress?.taskProgressId, fetchProgressDetail, setProgressDetail ]);
 
-    // Parse subtask name để xác định loại nhiệm vụ
-    const subtaskName = subtaskDetail?.name || '';
-    const parsedSubtaskName = useMemo(() => parseSubtaskName(subtaskName), [ subtaskName ]);
-    const requiresFileUpload = parsedSubtaskName?.requiresFileUpload || false;
-    const requiresTextResponse = parsedSubtaskName?.requiresTextResponse || false;
+    // Xác định yêu cầu nộp bài từ submissionType của subtask:
+    // 0 = không yêu cầu, 1 = file, 2 = text, 3 = file + text
+    const submissionType = Number(subtaskDetail?.submissionType) || 0;
+    const requiresFileUpload = submissionType === 1 || submissionType === 3;
+    const requiresTextResponse = submissionType === 2 || submissionType === 3;
 
     // Extract và sắp xếp submissions từ data.content của studentGet (Sắp xếp tăng dần theo thời gian/id để phần tử mới nhất ở cuối)
     const submissions = useMemo(() => {
@@ -1539,6 +1588,9 @@ function TaskDoingContainer() {
         // Profile details
         profile,
 
+        // Educator feedback / reviews
+        currentSubtaskReviews,
+
         // Certificate and congrats
         isGeneratingCert,
         isContinuing,
@@ -1590,6 +1642,11 @@ function TaskDoingContainer() {
                 refetchProgress({
                     params: { simulationEnrollmentId },
                 });
+                if (simulationEnrollmentId) {
+                    fetchReviews({
+                        params: { simulationEnrollmentId },
+                    });
+                }
                 if (selectedSubtaskId) {
                     fetchSubtaskDetail({
                         pathParams: { id: selectedSubtaskId },

@@ -849,6 +849,9 @@ export default function TaskDoingPage({
     onQuizAnswerSubmit = () => {},
     quizBlocks = [],
 
+    // Educator reviews
+    currentSubtaskReviews = [],
+
     // Certificate and congrats
     isGeneratingCert = false,
 
@@ -969,6 +972,7 @@ export default function TaskDoingPage({
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed' || hasCompleted;
+    const isNavigationBlocked = !isCompleted;
 
     return (
         <>
@@ -992,6 +996,7 @@ export default function TaskDoingPage({
                                 parentTasks={parentTasks}
                                 selectedParentTaskId={selectedParentTaskId}
                                 onSelectParentTask={onSelectParentTask}
+                                isNavigationBlocked={isNavigationBlocked}
                             />
 
                             <main className="tfo-pane">
@@ -1002,15 +1007,22 @@ export default function TaskDoingPage({
                                             <div className="tfo-pane-title">{pageTitle}</div>
                                             {subtasks && subtasks.length > 0 && (
                                                 <div className="tfo-step-pagination">
-                                                    {subtasks.map((st, index) => (
-                                                        <button
-                                                            key={st.id}
-                                                            className={`tfo-step-btn${st.id === selectedSubtaskId ? ' active' : ''}`}
-                                                            onClick={() => onSelectSubtask(st.id)}
-                                                        >
-                                                            {index + 1}
-                                                        </button>
-                                                    ))}
+                                                    {subtasks.map((st, index) => {
+                                                        const isCurrent = st.id === selectedSubtaskId;
+                                                        return (
+                                                            <button
+                                                                key={st.id}
+                                                                className={`tfo-step-btn${isCurrent ? ' active' : ''}`}
+                                                                onClick={() => {
+                                                                    if (isNavigationBlocked && !isCurrent) return;
+                                                                    onSelectSubtask(st.id);
+                                                                }}
+                                                                disabled={isNavigationBlocked && !isCurrent}
+                                                            >
+                                                                {index + 1}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             )}
                                         </div>
@@ -1100,6 +1112,23 @@ export default function TaskDoingPage({
                                                 )}
 
                                                 {renderMedia()}
+
+                                                {/* Educator feedback for this subtask */}
+                                                {currentSubtaskReviews && currentSubtaskReviews.length > 0 && (
+                                                    <div className="tfo-subtask-feedback-card">
+                                                        <div className="tfo-subtask-feedback-header">
+                                                            <span className="tfo-subtask-feedback-icon">💬</span>
+                                                            <span className="tfo-subtask-feedback-title">Nhận xét từ Giảng viên</span>
+                                                        </div>
+                                                        <div className="tfo-subtask-feedback-comments">
+                                                            {currentSubtaskReviews.map((review) => (
+                                                                <div key={review.id} className="tfo-subtask-feedback-comment-item">
+                                                                    {review.content}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
 
                                                 {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
 

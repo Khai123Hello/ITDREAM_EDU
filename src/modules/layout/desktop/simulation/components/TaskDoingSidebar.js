@@ -9,6 +9,7 @@ export default function TaskDoingSidebar({
     parentTasks = [],
     selectedParentTaskId = null,
     onSelectParentTask = () => {},
+    isNavigationBlocked = false,
 }) {
     const navigate = useNavigate();
     const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
@@ -42,7 +43,11 @@ export default function TaskDoingSidebar({
                             <div className="tfo-task-timeline">
                                 <button
                                     className={`tfo-task-circle${isActive ? ' active' : ''}`}
-                                    onClick={() => onSelectParentTask(task.id)}
+                                    onClick={() => {
+                                        if (isNavigationBlocked && !isActive) return;
+                                        onSelectParentTask(task.id);
+                                    }}
+                                    disabled={isNavigationBlocked && !isActive}
                                     aria-label={`Task ${idx + 1}`}
                                 >
                                     {idx + 1}
@@ -53,7 +58,11 @@ export default function TaskDoingSidebar({
                             {/* Content column */}
                             <button
                                 className={`tfo-task-content-btn${isActive ? ' active' : ''}`}
-                                onClick={() => onSelectParentTask(task.id)}
+                                onClick={() => {
+                                    if (isNavigationBlocked && !isActive) return;
+                                    onSelectParentTask(task.id);
+                                }}
+                                disabled={isNavigationBlocked && !isActive}
                             >
                                 <div className={`tfo-task-title${isActive ? ' active' : ''}`}>
                                     {task.title || task.name}

@@ -25,7 +25,7 @@ const parseDate = (dateStr) => {
         const parts = dateStr.split(' ');
         const datePart = parts[0];
         const timePart = parts[1] || '00:00:00';
-        const [day, month, year] = datePart.split('/');
+        const [ day, month, year ] = datePart.split('/');
         return new Date(`${year}-${month}-${day}T${timePart}`);
     }
     return new Date(dateStr);

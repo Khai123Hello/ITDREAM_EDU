@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef,useState } from 'react';
-import { markdocToTipTapJson, blocksToMarkdoc } from '@utils/markdocBlockConverter';
+import { blocksToMarkdoc,markdocToTipTapJson } from '@utils/markdocBlockConverter';
 
 const MARKS = {
     bold: (ch) => <strong key="b">{ch}</strong>,
