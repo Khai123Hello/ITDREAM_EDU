@@ -336,7 +336,7 @@ function TaskDoingContainer() {
     } = useFetch(
         apiConfig.comment.userList,
         {
-            params: { taskId: selectedSubtaskId || '', size: 1000 },
+            params: { taskId: selectedSubtaskId || '', simulationEnrollmentId: simulationEnrollmentId || '', size: 1000 },
             mappingData: (res) => res.data || {},
         },
         false,
@@ -352,6 +352,14 @@ function TaskDoingContainer() {
 
     const { execute: updateCommentApi } = useFetch(
         apiConfig.comment.update,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    const { execute: deleteCommentApi } = useFetch(
+        apiConfig.comment.delete,
         {
             mappingData: (res) => res.data || {},
         },
@@ -786,45 +794,46 @@ function TaskDoingContainer() {
 
     // Fetch comments when subtask selection changes
     React.useEffect(() => {
-        if (selectedSubtaskId) {
+        if (selectedSubtaskId && simulationEnrollmentId) {
             fetchComments({
-                params: { taskId: selectedSubtaskId, size: 1000 },
+                params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
             });
         }
-    }, [ selectedSubtaskId, fetchComments ]);
+    }, [ selectedSubtaskId, simulationEnrollmentId, fetchComments ]);
 
     const handleCreateComment = useCallback(
         async (content, parentId = 0) => {
-            if (!selectedSubtaskId) {
-                message.error('Không tìm thấy nhiệm vụ hiện tại');
+            if (!selectedSubtaskId || !simulationEnrollmentId) {
+                message.error('Không tìm thấy nhiệm vụ hoặc thông tin đăng ký hiện tại');
                 return;
             }
             try {
                 const res = await createCommentApi({
                     dataBody: {
                         content,
-                        parentId,
+                        parentId: parentId === 0 ? null : parentId,
                         taskId: selectedSubtaskId,
+                        simulationEnrollmentId,
                     },
                 });
-                if (res?.result !== false) {
+                if (res?.result === true) {
                     message.success('Đăng bình luận thành công!');
                     fetchComments({
-                        params: { taskId: selectedSubtaskId, size: 1000 },
+                        params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
                     });
                 } else {
-                    message.error(res?.message || 'Không thể đăng bình luận. Vui lòng thử lại.');
+                    message.error(res?.response?.data?.message || res?.message || 'Không thể đăng bình luận. Vui lòng thử lại.');
                 }
             } catch {
                 message.error('Có lỗi xảy ra khi đăng bình luận.');
             }
         },
-        [ selectedSubtaskId, createCommentApi, fetchComments ],
+        [ selectedSubtaskId, simulationEnrollmentId, createCommentApi, fetchComments ],
     );
 
     const handleUpdateComment = useCallback(
         async (id, content) => {
-            if (!selectedSubtaskId) return;
+            if (!selectedSubtaskId || !simulationEnrollmentId) return;
             try {
                 const res = await updateCommentApi({
                     dataBody: {
@@ -832,19 +841,41 @@ function TaskDoingContainer() {
                         content,
                     },
                 });
-                if (res?.result !== false) {
+                if (res?.result === true) {
                     message.success('Cập nhật bình luận thành công!');
                     fetchComments({
-                        params: { taskId: selectedSubtaskId, size: 1000 },
+                        params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
                     });
                 } else {
-                    message.error(res?.message || 'Không thể cập nhật bình luận. Vui lòng thử lại.');
+                    message.error(res?.response?.data?.message || res?.message || 'Không thể cập nhật bình luận. Vui lòng thử lại.');
                 }
             } catch {
                 message.error('Có lỗi xảy ra khi cập nhật bình luận.');
             }
         },
-        [ selectedSubtaskId, updateCommentApi, fetchComments ],
+        [ selectedSubtaskId, simulationEnrollmentId, updateCommentApi, fetchComments ],
+    );
+
+    const handleDeleteComment = useCallback(
+        async (id) => {
+            if (!selectedSubtaskId || !simulationEnrollmentId) return;
+            try {
+                const res = await deleteCommentApi({
+                    pathParams: { id },
+                });
+                if (res?.result === true) {
+                    message.success('Xóa bình luận thành công!');
+                    fetchComments({
+                        params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
+                    });
+                } else {
+                    message.error(res?.response?.data?.message || res?.message || 'Không thể xóa bình luận. Vui lòng thử lại.');
+                }
+            } catch {
+                message.error('Có lỗi xảy ra khi xóa bình luận.');
+            }
+        },
+        [ selectedSubtaskId, simulationEnrollmentId, deleteCommentApi, fetchComments ],
     );
 
     // Get current subtask progress info
@@ -1519,6 +1550,7 @@ function TaskDoingContainer() {
         setShowComments,
         onSendComment: handleCreateComment,
         onUpdateComment: handleUpdateComment,
+        onDeleteComment: handleDeleteComment,
     };
 
     const loading =

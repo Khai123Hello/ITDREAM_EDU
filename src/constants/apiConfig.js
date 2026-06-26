@@ -510,6 +510,11 @@ const apiConfig = {
             method: 'PUT',
             headers: baseHeader,
         },
+        delete: {
+            baseURL: `${apiUrl}v1/comment/delete/:id`,
+            method: 'DELETE',
+            headers: baseHeader,
+        },
     },
     notification: {
         studentList: {

@@ -862,6 +862,7 @@ export default function TaskDoingPage({
     setShowComments = () => {},
     onSendComment = () => {},
     onUpdateComment = () => {},
+    onDeleteComment = () => {},
 }) {
     const [ textInput, setTextInput ] = useState('');
     const [ inlineQuestionIds, setInlineQuestionIds ] = useState([]);
@@ -1155,6 +1156,7 @@ export default function TaskDoingPage({
                                             onClose={() => setShowComments(false)}
                                             onSendComment={onSendComment}
                                             onUpdateComment={onUpdateComment}
+                                            onDeleteComment={onDeleteComment}
                                         />
                                     )}
                                 </div>

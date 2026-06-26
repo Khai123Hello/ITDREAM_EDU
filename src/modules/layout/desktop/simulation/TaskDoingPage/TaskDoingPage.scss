@@ -1879,6 +1879,17 @@
     border-radius: 8px;
     background-color: #f8fafc;
   }
+
+  &.teacher-comment {
+    background-color: #f0f9ff;
+    border-color: #bae6fd;
+    border-left: 4px solid #0284c7;
+
+    &.reply {
+      background-color: #f0f9ff;
+      border-color: #bae6fd;
+    }
+  }
 }
 
 .tfo-comment-card-header {
