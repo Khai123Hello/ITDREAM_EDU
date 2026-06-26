@@ -79,16 +79,16 @@ function SimulationDetailDesktop({
     isStudent = false,
     isEnrolled = false,
     enrollmentLoading = false,
-    onEnroll = () => { },
-    onLogin = () => { },
-    onStartTask = () => { },
+    onEnroll = () => {},
+    onLogin = () => {},
+    onStartTask = () => {},
     feedbacks = [],
     feedbacksLoading = false,
     hasMoreFeedbacks = false,
-    onLoadMoreFeedbacks = () => { },
+    onLoadMoreFeedbacks = () => {},
     hasCompleted = false,
-    onSubmitReview = () => { },
-    onUpdateReview = () => { },
+    onSubmitReview = () => {},
+    onUpdateReview = () => {},
 }) {
     const { profile } = useAuth();
     const [ activeTab, setActiveTab ] = useState('overview');
@@ -567,11 +567,7 @@ function SimulationDetailDesktop({
                             <div className={styles.reviewsSummary}>
                                 <div className={styles.reviewsScore}>{simulation?.avgStar?.toFixed(1) || '—'}</div>
                                 <div className={styles.reviewsStars} style={{ marginBottom: 8 }}>
-                                    <RatingStar
-                                        value={simulation?.avgStar || 0}
-                                        readOnly
-                                        style={{ maxWidth: 120 }}
-                                    />
+                                    <RatingStar value={simulation?.avgStar || 0} readOnly style={{ maxWidth: 120 }} />
                                 </div>
                                 <div className={styles.reviewsTotal}>{feedbacks.length} chia sẻ cảm nhận</div>
                             </div>
@@ -688,7 +684,9 @@ function SimulationDetailDesktop({
                                                                     'Học viên'}
                                                             </span>
                                                             <span className={styles.reviewDate}>
-                                                                {item.modifiedDate ? item.modifiedDate.split(' ')[0] : ''}
+                                                                {item.modifiedDate
+                                                                    ? item.modifiedDate.split(' ')[0]
+                                                                    : ''}
                                                             </span>
                                                         </div>
                                                         <div className={styles.reviewHeaderRight}>
@@ -713,7 +711,13 @@ function SimulationDetailDesktop({
                                     <div style={{ textAlign: 'center', marginTop: '16px' }}>
                                         <button
                                             className={styles.cancelBtn}
-                                            style={{ border: '1px solid #d9d9d9', background: 'transparent', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+                                            style={{
+                                                border: '1px solid #d9d9d9',
+                                                background: 'transparent',
+                                                padding: '8px 16px',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                            }}
                                             onClick={onLoadMoreFeedbacks}
                                             disabled={feedbacksLoading}
                                         >

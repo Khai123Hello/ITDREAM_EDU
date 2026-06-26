@@ -95,7 +95,7 @@ function SimulationDetailContainer() {
             } else {
                 setAllFeedbacks((prev) => {
                     // Prevent duplicate appends in strict mode or rapid calls
-                    const newItems = feedbacksData.content.filter(item => !prev.some(p => p.id === item.id));
+                    const newItems = feedbacksData.content.filter((item) => !prev.some((p) => p.id === item.id));
                     return [ ...prev, ...newItems ];
                 });
             }
@@ -391,7 +391,11 @@ function SimulationDetailContainer() {
             onStartTask={handleStartTask}
             feedbacks={allFeedbacks}
             feedbacksLoading={feedbacksLoading}
-            hasMoreFeedbacks={feedbacksData?.totalPages !== undefined ? feedbacksData.totalPages > feedbacksPage + 1 : feedbacksData?.content?.length === FEEDBACKS_PAGE_SIZE}
+            hasMoreFeedbacks={
+                feedbacksData?.totalPages !== undefined
+                    ? feedbacksData.totalPages > feedbacksPage + 1
+                    : feedbacksData?.content?.length === FEEDBACKS_PAGE_SIZE
+            }
             onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
             hasCompleted={hasCompleted}
             onSubmitReview={handleSubmitReview}

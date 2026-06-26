@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TbBriefcase, TbCalendar,TbCamera, TbCheck, TbEdit, TbMail, TbPhone, TbUser, TbX } from 'react-icons/tb';
+import { TbBriefcase, TbCalendar, TbCamera, TbCheck, TbEdit, TbMail, TbPhone, TbUser, TbX } from 'react-icons/tb';
 import { defineMessages } from 'react-intl';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { ReactComponent as IconClose } from '@assets/icons/closeModal.svg';
@@ -211,7 +211,9 @@ const ProfileComponent = (props) => {
                     avatarPath: imageUrl || user?.avatar || user?.avatarPath || '',
                     fullname,
                     phone: values.phone || user?.phone || user?.account?.phone || '',
-                    birthday: values.birthday ? dayjs(values.birthday).format('DD/MM/YYYY 00:00:00') : user?.birthday || user?.account?.birthday || null,
+                    birthday: values.birthday
+                        ? dayjs(values.birthday).format('DD/MM/YYYY 00:00:00')
+                        : user?.birthday || user?.account?.birthday || null,
                     username: values.username || user?.username || user?.account?.username || '',
                     preferences,
                 },
@@ -413,15 +415,9 @@ const ProfileComponent = (props) => {
                                 </div>
                                 {editingField === 'username' ? (
                                     <div className={styles.fieldEditor}>
-                                        <div className={styles.editorSubtitle}>
-                                            Thông tin cá nhân
-                                        </div>
+                                        <div className={styles.editorSubtitle}>Thông tin cá nhân</div>
                                         <div className={styles.editorInputs}>
-                                            <InputField
-                                                name="username"
-                                                required
-                                                placeholder="Nhập tên đăng nhập"
-                                            />
+                                            <InputField name="username" required placeholder="Nhập tên đăng nhập" />
                                         </div>
                                     </div>
                                 ) : (
@@ -593,9 +589,7 @@ const ProfileComponent = (props) => {
                                 </div>
                                 {editingField === 'birthday' ? (
                                     <div className={styles.fieldEditor}>
-                                        <div className={styles.editorSubtitle}>
-                                            Thông tin cá nhân
-                                        </div>
+                                        <div className={styles.editorSubtitle}>Thông tin cá nhân</div>
                                         <div className={styles.editorInputs}>
                                             <DatePickerField
                                                 name="birthday"
@@ -608,7 +602,12 @@ const ProfileComponent = (props) => {
                                     </div>
                                 ) : (
                                     <div className={styles.fieldValue}>
-                                        {user?.birthday || user?.account?.birthday ? dayjs(user?.birthday || user?.account?.birthday, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY') : '—'}
+                                        {user?.birthday || user?.account?.birthday
+                                            ? dayjs(
+                                                user?.birthday || user?.account?.birthday,
+                                                'DD/MM/YYYY HH:mm:ss',
+                                            ).format('DD/MM/YYYY')
+                                            : '—'}
                                     </div>
                                 )}
                             </div>

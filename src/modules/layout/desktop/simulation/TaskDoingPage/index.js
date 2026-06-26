@@ -12,6 +12,7 @@ import './TaskDoingPage.scss';
 function detectContentType(content) {
     if (!content || typeof content !== 'string') return 'empty';
     const trimmed = content.trim();
+    if (!trimmed) return 'empty';
     if (trimmed.startsWith('[')) {
         try {
             const p = JSON.parse(trimmed);
@@ -20,6 +21,7 @@ function detectContentType(content) {
             // ignore
         }
     }
+    if (trimmed.startsWith('{"type":"doc"') || /{%\s*(callout|step|section|quiz)\b/.test(trimmed)) return 'tiptap';
     if (/^#{1,3}\s|\*\s|\*\*/m.test(trimmed)) return 'markdown';
     return 'text';
 }
@@ -406,7 +408,83 @@ function BlocksContent({
     );
 }
 
+/* ─────────────────────── TipTap / Markdoc helpers ─────────────────── */
+
+function parseMarkdocAttrs(str) {
+    const attrs = {};
+    const re = /(\w+)\s*=\s*"([^"]*)"/g;
+    let m;
+    while ((m = re.exec(str)) !== null) attrs[m[1]] = m[2];
+    return attrs;
+}
+
+function extractBlocksFromMarkdoc(markdoc) {
+    const blocks = [];
+    const tagRe = /\{%\s*(callout|step|section|quiz)\b([^%]*?)%}([\s\S]*?){%\s*\/\1\s*%}/g;
+    let lastIdx = 0;
+    let match;
+
+    while ((match = tagRe.exec(markdoc)) !== null) {
+        const before = markdoc.slice(lastIdx, match.index).trim();
+        if (before) blocks.push({ type: 'text', content: before });
+
+        const tag = match[1];
+        const attrs = parseMarkdocAttrs(match[2]);
+        const body = match[3];
+
+        switch (tag) {
+                        case 'callout':
+                            blocks.push({ type: 'callout', icon: attrs.icon || '💡', content: body.trim() });
+                            break;
+                        case 'step':
+                            blocks.push({ type: 'step', label: attrs.label || '', body: body.trim() });
+                            break;
+                        case 'section':
+                            blocks.push({
+                                type: 'section',
+                                icon: attrs.icon || '🎓',
+                                title: attrs.title || '',
+                                bullets: body
+                                    .split('\n')
+                                    .filter((l) => l.trim())
+                                    .map((l) => l.replace(/^[-*]\s*/, '').trim()),
+                            });
+                            break;
+                        case 'quiz': {
+                            const optRe = /\{%\s*option\b([^%]*?)%}([\s\S]*?){%\s*\/option\s*%}/g;
+                            const options = [];
+                            let om;
+                            while ((om = optRe.exec(body)) !== null) {
+                                const optAttrs = parseMarkdocAttrs(om[1]);
+                                const optText = om[2].trim();
+                                options.push({
+                                    answer: optAttrs.correct === 'true',
+                                    option: optText,
+                                    value: optText,
+                                });
+                            }
+                            if (options.length > 0) {
+                                blocks.push({ type: 'quiz', question: attrs.question || '', options });
+                            }
+                            break;
+                        }
+        }
+        lastIdx = match.index + match[0].length;
+    }
+
+    const after = markdoc.slice(lastIdx).trim();
+    if (after) blocks.push({ type: 'text', content: after });
+
+    return blocks.length > 0 ? blocks : null;
+}
+
 /* ─────────────────────────── Content Router ─────────────────────────── */
+
+function flattenTipTapText(node) {
+    if (!node) return '';
+    if (node.type === 'text') return node.text || '';
+    return (node.content || []).map(flattenTipTapText).join(' ');
+}
 
 function ContentRenderer({
     content,
@@ -416,6 +494,40 @@ function ContentRenderer({
     hasCompleted = false,
 }) {
     const type = useMemo(() => detectContentType(content), [ content ]);
+    const legacyBlocksJson = useMemo(() => {
+        if (type !== 'tiptap') return null;
+        if (content.trim().startsWith('{"type":"doc"')) {
+            try {
+                const doc = JSON.parse(content);
+                const quizNodes = [];
+                const walk = (nodes) =>
+                    (nodes || []).forEach((n) => {
+                        if (n.type === 'quiz') {
+                            const options = (n.content || []).filter((c) => c.type === 'option');
+                            quizNodes.push({
+                                type: 'quiz',
+                                question: n.attrs?.question || '',
+                                options: options.map((o, i) => ({
+                                    answer: o.attrs?.correct === true,
+                                    option: o.content?.[0]?.text || '',
+                                    value: o.content?.[0]?.text || '',
+                                })),
+                            });
+                        }
+                        if (n.content) walk(n.content);
+                    });
+                walk(doc.content);
+                const blocks =
+                    quizNodes.length > 0 ? [ { type: 'text', content: flattenTipTapText(doc) }, ...quizNodes ] : null;
+                return blocks ? JSON.stringify(blocks) : null;
+            } catch {
+                return null;
+            }
+        }
+        const blocks = extractBlocksFromMarkdoc(content);
+        return blocks ? JSON.stringify(blocks) : null;
+    }, [ type, content ]);
+
     if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
     if (type === 'blocks') {
         return (
@@ -427,6 +539,20 @@ function ContentRenderer({
                 hasCompleted={hasCompleted}
             />
         );
+    }
+    if (type === 'tiptap') {
+        if (legacyBlocksJson) {
+            return (
+                <BlocksContent
+                    blocksJson={legacyBlocksJson}
+                    quizSubmissionMap={quizSubmissionMap}
+                    questionMap={questionMap}
+                    onQuizAnswerSubmit={onQuizAnswerSubmit}
+                    hasCompleted={hasCompleted}
+                />
+            );
+        }
+        return <MarkdownContent text={content} />;
     }
     if (type === 'markdown') return <MarkdownContent text={content} />;
     return <PlainTextContent text={content} />;
@@ -496,7 +622,7 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         return decodeURIComponent(parts[parts.length - 1]);
     };
 
-    const displayFileName = file ? file.name : (previousFile && mode === 'file') ? getFileName(previousFile) : '';
+    const displayFileName = file ? file.name : previousFile && mode === 'file' ? getFileName(previousFile) : '';
 
     return (
         <div className={`tfo-upload-card${disabled ? ' disabled' : ''}`}>
@@ -511,8 +637,20 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
                         onClick={() => setMode('file')}
                     >
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6 }}>
-                            <path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V6L9 1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M9 1v5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path
+                                d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V6L9 1z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                            <path
+                                d="M9 1v5h5"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
                         </svg>
                         Tải file lên
                     </button>
@@ -522,8 +660,20 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
                         onClick={() => setMode('link')}
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ marginRight: 6 }}>
-                            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path
+                                d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                            <path
+                                d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
                         </svg>
                         Nhập đường dẫn / URL
                     </button>
@@ -588,8 +738,20 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
                     {previousFile && isExternalUrl(previousFile) && (
                         <div className="tfo-link-submitted">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path
+                                    d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                                    stroke="#0062E3"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <path
+                                    d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                                    stroke="#0062E3"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
                             </svg>
                             <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
                             <a
@@ -605,8 +767,20 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
                     {previousFile && !isExternalUrl(previousFile) && (
                         <div className="tfo-link-submitted">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#0062E3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path
+                                    d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                                    stroke="#0062E3"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                                <path
+                                    d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                                    stroke="#0062E3"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
                             </svg>
                             <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
                             <span className="tfo-link-submitted-path">{previousFile}</span>
@@ -724,6 +898,7 @@ export default function TaskDoingPage({
     quizSubmissionMap = {},
     questionMap = {},
     onQuizAnswerSubmit = () => {},
+    quizBlocks = [],
 
     // Certificate and congrats
     isGeneratingCert = false,
@@ -930,6 +1105,33 @@ export default function TaskDoingPage({
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                         hasCompleted={hasCompleted}
                                                     />
+                                                )}
+
+                                                {/* Render questions fetched from API */}
+                                                {quizBlocks && quizBlocks.length > 0 && (
+                                                    <div className="tfo-blocks-content" style={{ marginTop: 24 }}>
+                                                        {quizBlocks.map((block, idx) => {
+                                                            const questionId = block.id
+                                                                ? String(block.id)
+                                                                : block.question
+                                                                    ? questionMap[block.question.trim()]
+                                                                    : null;
+                                                            return (
+                                                                <QuizBlock
+                                                                    key={questionId || idx}
+                                                                    block={block}
+                                                                    submittedAnswer={
+                                                                        questionId
+                                                                            ? quizSubmissionMap[questionId]
+                                                                            : null
+                                                                    }
+                                                                    questionId={questionId}
+                                                                    onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                                                    hasCompleted={hasCompleted}
+                                                                />
+                                                            );
+                                                        })}
+                                                    </div>
                                                 )}
 
                                                 {renderMedia()}

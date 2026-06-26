@@ -107,18 +107,6 @@ const isQuizSubmissionCorrect = (submission = {}, correctAnswersMap = {}) => {
     return questionId != null && Boolean(answer);
 };
 
-const extractQuizBlocks = (content) => {
-    if (!content || typeof content !== 'string') return [];
-
-    try {
-        const blocks = JSON.parse(content.trim());
-        if (!Array.isArray(blocks)) return [];
-        return blocks.filter((block) => block?.type === 'quiz');
-    } catch {
-        return [];
-    }
-};
-
 const normalizeQuestionText = (text = '') => (typeof text === 'string' ? text.trim() : '');
 
 const buildQuestionMap = (questions = []) => {
@@ -302,7 +290,12 @@ function TaskDoingContainer() {
     const { execute: uploadCertificate } = useFetch(apiConfig.file.uploadCertificate, {}, false);
     const { execute: fetchAchievements } = useFetch(apiConfig.achievement.studentList, {}, false);
     const { execute: updateAchievement } = useFetch(apiConfig.achievement.update, {}, false);
-    const { execute: fetchTaskQuestions } = useFetch(
+    const {
+        data: taskQuestions = [],
+        loading: taskQuestionsLoading,
+        execute: fetchTaskQuestions,
+        setData: setTaskQuestions,
+    } = useFetch(
         apiConfig.taskQuestion.studentList,
         {
             mappingData: (res) => res.data?.content || [],
@@ -546,8 +539,15 @@ function TaskDoingContainer() {
                 }));
                 return newProgress;
             }
-            if (result?.result === false || result?.message) {
-                return result;
+
+            const errorMsg = result?.response?.data?.message || result?.data?.message || result?.message;
+            const isError = result?.result === false || result?.response?.data?.result === false || errorMsg;
+            if (isError) {
+                return {
+                    result: false,
+                    message: errorMsg || 'Không thể tạo tiến độ cho nhiệm vụ này.',
+                    code: result?.code || result?.response?.data?.code,
+                };
             }
             return null;
         },
@@ -762,6 +762,8 @@ function TaskDoingContainer() {
     // Fetch task questions and build question mapping when selectedSubtaskId changes
     React.useEffect(() => {
         if (selectedSubtaskId) {
+            setTaskQuestions([]);
+            setQuestionMap({});
             fetchTaskQuestions({
                 params: { taskId: selectedSubtaskId },
             })
@@ -777,9 +779,10 @@ function TaskDoingContainer() {
                     setQuestionMap({});
                 });
         } else {
+            setTaskQuestions([]);
             setQuestionMap({});
         }
-    }, [ selectedSubtaskId, fetchTaskQuestions ]);
+    }, [ selectedSubtaskId, fetchTaskQuestions, setTaskQuestions ]);
 
     // Fetch comments when subtask selection changes
     React.useEffect(() => {
@@ -932,23 +935,106 @@ function TaskDoingContainer() {
         return found ? getSubmissionAnswer(found) : '';
     }, [ submissions, requiresTextResponse ]);
 
-    // Extract quiz blocks từ content của subtask
-    const quizBlocks = useMemo(() => extractQuizBlocks(subtaskDetail?.content), [ subtaskDetail?.content ]);
-
-    // Bản đồ đáp án đúng lấy từ blocks để làm quiz correctness fallback (Sửa BUG-10)
+    // Bản đồ đáp án đúng lấy từ API questions
     const correctAnswersMap = useMemo(() => {
         const map = {};
-        quizBlocks.forEach((block) => {
-            const questionId = getQuestionIdFromMap(questionMap, block.question);
-            if (questionId) {
-                const correctOpt = (block.options || []).find((o) => o.answer === true);
+        const questionsList = Array.isArray(taskQuestions) ? taskQuestions : [];
+        questionsList.forEach((q) => {
+            if (q.id != null) {
+                let parsedOptions = [];
+                const rawOptions = q.options ?? q.answers ?? q.choices ?? q.questionOptions ?? q.taskQuestionOptions;
+                if (rawOptions) {
+                    if (Array.isArray(rawOptions)) {
+                        parsedOptions = rawOptions;
+                    } else if (typeof rawOptions === 'string') {
+                        try {
+                            parsedOptions = JSON.parse(rawOptions);
+                        } catch {
+                            parsedOptions = [];
+                        }
+                    }
+                }
+                const correctOpt = parsedOptions.find(
+                    (o) =>
+                        o.answer === true ||
+                        o.isCorrect === true ||
+                        o.is_correct === true ||
+                        o.correct === true ||
+                        o.isAnswer === true ||
+                        o.is_answer === true,
+                );
                 if (correctOpt) {
-                    map[questionId] = correctOpt.option || correctOpt.value || '';
+                    map[String(q.id)] =
+                        correctOpt.option ||
+                        correctOpt.value ||
+                        correctOpt.content ||
+                        correctOpt.text ||
+                        correctOpt.choice ||
+                        correctOpt.answer ||
+                        correctOpt.optionText ||
+                        correctOpt.optionContent ||
+                        '';
                 }
             }
         });
         return map;
-    }, [ quizBlocks, questionMap ]);
+    }, [ taskQuestions ]);
+
+    const quizBlocksFromQuestions = useMemo(() => {
+        const questionsList = Array.isArray(taskQuestions) ? taskQuestions : [];
+        return questionsList.map((q) => {
+            let parsedOptions = [];
+            const rawOptions = q.options ?? q.answers ?? q.choices ?? q.questionOptions ?? q.taskQuestionOptions;
+            if (rawOptions) {
+                if (Array.isArray(rawOptions)) {
+                    parsedOptions = rawOptions;
+                } else if (typeof rawOptions === 'string') {
+                    try {
+                        parsedOptions = JSON.parse(rawOptions);
+                    } catch {
+                        parsedOptions = [];
+                    }
+                }
+            }
+
+            const mappedOptions = parsedOptions.map((opt) => ({
+                option:
+                    opt.option ??
+                    opt.content ??
+                    opt.value ??
+                    opt.text ??
+                    opt.choice ??
+                    opt.answer ??
+                    opt.optionText ??
+                    opt.optionContent ??
+                    '',
+                answer:
+                    opt.answer === true ||
+                    opt.isCorrect === true ||
+                    opt.is_correct === true ||
+                    opt.correct === true ||
+                    opt.isAnswer === true ||
+                    opt.is_answer === true,
+                value:
+                    opt.value ??
+                    opt.option ??
+                    opt.content ??
+                    opt.text ??
+                    opt.choice ??
+                    opt.answer ??
+                    opt.optionText ??
+                    opt.optionContent ??
+                    '',
+            }));
+
+            return {
+                id: q.id,
+                type: 'quiz',
+                question: q.question ?? q.content ?? '',
+                options: mappedOptions,
+            };
+        });
+    }, [ taskQuestions ]);
 
     // Map quiz submissions theo taskQuestionId (chỉ câu đã có taskQuestion.id mới là trắc nghiệm) (Sửa BUG-10)
     const quizSubmissionMap = useMemo(() => {
@@ -970,19 +1056,19 @@ function TaskDoingContainer() {
         });
 
         return map;
-    }, [ submissions, localQuizAnswers ]);
+    }, [ submissions, localQuizAnswers, correctAnswersMap ]);
 
     // Kiểm tra xem toàn bộ câu hỏi trắc nghiệm đã được trả lời đúng chưa
     const hasRequiredQuizSubmissions = useMemo(() => {
-        if (quizBlocks.length === 0) {
+        if (quizBlocksFromQuestions.length === 0) {
             return true;
         }
 
-        return quizBlocks.every((block) => {
-            const questionId = getQuestionIdFromMap(questionMap, block.question);
+        return quizBlocksFromQuestions.every((block) => {
+            const questionId = block.id ? String(block.id) : getQuestionIdFromMap(questionMap, block.question);
             return questionId && quizSubmissionMap[questionId] && quizSubmissionMap[questionId].isCorrect;
         });
-    }, [ quizBlocks, quizSubmissionMap, questionMap ]);
+    }, [ quizBlocksFromQuestions, quizSubmissionMap, questionMap ]);
 
     // Handle file upload - lưu file hoặc đường dẫn vào studentSubmission
     const handleFileUpload = useCallback(
@@ -1231,7 +1317,11 @@ function TaskDoingContainer() {
             const nextSubtask = subtasks[activeSubtaskIndex + 1];
             if (nextSubtask) {
                 // Tạo tiến độ cho Task Con tiếp theo nếu chưa có
-                await ensureTaskProgress(nextSubtask.id);
+                const res = await ensureTaskProgress(nextSubtask.id);
+                if (res && res.result === false) {
+                    message.error(res.message || 'Không thể tạo tiến độ cho nhiệm vụ tiếp theo.');
+                    return;
+                }
                 setSelectedSubtaskId(nextSubtask.id);
                 refetchProgress({
                     params: { simulationEnrollmentId },
@@ -1311,9 +1401,17 @@ function TaskDoingContainer() {
             const nextParentSubtasks = getSubtasksForParent(nextParentTask.id);
             const firstNextSubtask = nextParentSubtasks[0];
 
-            await ensureTaskProgress(nextParentTask.id);
+            const resParent = await ensureTaskProgress(nextParentTask.id);
+            if (resParent && resParent.result === false) {
+                message.error(resParent.message || 'Không thể tạo tiến độ cho nhiệm vụ tiếp theo.');
+                return;
+            }
             if (firstNextSubtask) {
-                await ensureTaskProgress(firstNextSubtask.id);
+                const resSub = await ensureTaskProgress(firstNextSubtask.id);
+                if (resSub && resSub.result === false) {
+                    message.error(resSub.message || 'Không thể tạo tiến độ cho nhiệm vụ tiếp theo.');
+                    return;
+                }
             }
 
             setSelectedParentTaskId(nextParentTask.id);
@@ -1405,6 +1503,7 @@ function TaskDoingContainer() {
         quizSubmissionMap,
         questionMap,
         onQuizAnswerSubmit: handleQuizAnswerSubmit,
+        quizBlocks: quizBlocksFromQuestions,
 
         // Profile details
         profile,
@@ -1428,6 +1527,7 @@ function TaskDoingContainer() {
         taskListLoading ||
         progressDetailLoading ||
         enrollmentLoading ||
+        taskQuestionsLoading ||
         !enrollmentData;
     const error = progressError || detailError || taskListError;
 

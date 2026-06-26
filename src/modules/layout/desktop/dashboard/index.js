@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined } from '@ant-design/icons';
 import { getDownloadUrl } from '@utils';
-import { Button,Modal, Spin } from 'antd';
+import { Button, Modal, Spin } from 'antd';
 
 import styles from './index.module.scss';
 
@@ -67,7 +67,7 @@ function DashboardDesktop({
             const objectUrl = URL.createObjectURL(blob);
             setPreviewUrl(objectUrl);
         } catch (error) {
-            console.error("Failed to load certificate preview:", error);
+            console.error('Failed to load certificate preview:', error);
         } finally {
             setPreviewLoading(false);
         }
@@ -432,7 +432,13 @@ function DashboardDesktop({
                                                 {fullFilePath && (
                                                     <a
                                                         href="#"
-                                                        onClick={(e) => handlePreviewCertificate(e, fullFilePath, sim.title || 'Chứng chỉ')}
+                                                        onClick={(e) =>
+                                                            handlePreviewCertificate(
+                                                                e,
+                                                                fullFilePath,
+                                                                sim.title || 'Chứng chỉ',
+                                                            )
+                                                        }
                                                         className={styles.certificateBtn}
                                                     >
                                                         Xem chứng chỉ
@@ -504,10 +510,13 @@ function DashboardDesktop({
                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                 }}
                 footer={[
-                    <Button key="close" onClick={() => {
-                        setPreviewModalVisible(false);
-                        if (previewUrl) URL.revokeObjectURL(previewUrl);
-                    }}>
+                    <Button
+                        key="close"
+                        onClick={() => {
+                            setPreviewModalVisible(false);
+                            if (previewUrl) URL.revokeObjectURL(previewUrl);
+                        }}
+                    >
                         Đóng
                     </Button>,
                     <Button
@@ -530,7 +539,16 @@ function DashboardDesktop({
                         <Spin tip="Đang tải chứng chỉ..." size="large" />
                     </div>
                 ) : previewUrl ? (
-                    <div style={{ width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', position: 'relative', borderRadius: '8px', backgroundColor: '#f0f2f5' }}>
+                    <div
+                        style={{
+                            width: '100%',
+                            aspectRatio: '16 / 9',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            borderRadius: '8px',
+                            backgroundColor: '#f0f2f5',
+                        }}
+                    >
                         <iframe
                             src={`${previewUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
                             title="Certificate Preview"

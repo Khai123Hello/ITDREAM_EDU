@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-    IoNotificationsOffOutline, 
-    IoNotificationsOutline,
+import {
+    IoBusinessOutline,
     IoDocumentTextOutline,
+    IoNotificationsOffOutline,
+    IoNotificationsOutline,
     IoPersonOutline,
-    IoBusinessOutline
 } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import DropdownMenu from '@components/common/elements/DropdownMenu';
@@ -47,7 +47,7 @@ function NotificationDropdown() {
                 const response = await updateRead({
                     data: { id: item.id },
                 });
-                
+
                 if (response && response.result && response.data) {
                     setDetails((prev) => ({ ...prev, [item.id]: response.data }));
                     if (!item.readFlag) {
@@ -68,10 +68,10 @@ function NotificationDropdown() {
                 {lines.map((line, idx) => {
                     const cleanLine = line.trim();
                     if (!cleanLine) return null;
-                    
+
                     let icon = null;
                     let text = cleanLine.replace(/^\?+\s*/, '');
-                    
+
                     if (cleanLine.includes('Bài mô phỏng')) {
                         icon = <IoDocumentTextOutline className={styles.detailIcon} />;
                     } else if (cleanLine.includes('Người đánh giá')) {
