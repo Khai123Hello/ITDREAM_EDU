@@ -40,6 +40,48 @@ function SimulationCompletedContainer() {
         false,
     );
 
+    // Fetch enrollment
+    const {
+        data: enrollmentData,
+        loading: enrollmentLoading,
+        execute: checkEnrollment,
+    } = useFetch(
+        apiConfig.simulationEnrollment.studentList,
+        {
+            params: {},
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    // Fetch task progress
+    const {
+        data: taskProgressData,
+        loading: progressLoading,
+        execute: fetchProgress,
+    } = useFetch(
+        apiConfig.taskProgress.studentList,
+        {
+            params: {},
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    // Fetch reviews
+    const {
+        data: reviewData,
+        loading: reviewLoading,
+        execute: fetchReviews,
+    } = useFetch(
+        apiConfig.reviewSubmission.studentList,
+        {
+            params: {},
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
     // Create certificate API
     const { execute: uploadCertificate } = useFetch(apiConfig.file.uploadCertificate, {}, false);
 
@@ -52,8 +94,44 @@ function SimulationCompletedContainer() {
                 pathParams: { id: simulationId },
             });
             fetchAchievements();
+            checkEnrollment({
+                params: { simulationId: parseInt(simulationId) },
+            });
         }
-    }, [ simulationId, fetchSimulationDetail, fetchAchievements ]);
+    }, [ simulationId, fetchSimulationDetail, fetchAchievements, checkEnrollment ]);
+
+    const enrollment = useMemo(() => {
+        if (!enrollmentData?.content) return null;
+        return enrollmentData.content.find((e) => e.simulation?.id === parseInt(simulationId));
+    }, [ enrollmentData, simulationId ]);
+
+    const simulationEnrollmentId = enrollment?.id;
+
+    useEffect(() => {
+        if (simulationEnrollmentId) {
+            fetchProgress({
+                params: { simulationEnrollmentId },
+            });
+            fetchReviews({
+                params: { simulationEnrollmentId },
+            });
+        }
+    }, [ simulationEnrollmentId, fetchProgress, fetchReviews ]);
+
+    const subtaskFeedbacks = useMemo(() => {
+        if (!taskProgressData?.content || !reviewData?.content) return [];
+        const progressList = taskProgressData.content.filter((p) => p.task?.kind === 2);
+        const reviews = reviewData.content;
+        return progressList
+            .map((progress) => {
+                const taskReviews = reviews.filter((r) => r.studentTaskProgressId === progress.id);
+                return {
+                    subtask: progress.task,
+                    reviews: taskReviews,
+                };
+            })
+            .filter((item) => item.reviews.length > 0);
+    }, [ taskProgressData, reviewData ]);
 
     const currentAch = useMemo(() => {
         if (!achievementsData) return null;
@@ -124,6 +202,7 @@ function SimulationCompletedContainer() {
     ]);
 
     const loading = simLoading || achLoading;
+    const feedbacksLoading = progressLoading || reviewLoading || enrollmentLoading;
 
     const handleBackToDetail = () => {
         navigate(`/simulations/${simulationId}`);
@@ -138,6 +217,8 @@ function SimulationCompletedContainer() {
             profile={profile}
             simulationId={simulationId}
             onBackToDetail={handleBackToDetail}
+            subtaskFeedbacks={subtaskFeedbacks}
+            feedbacksLoading={feedbacksLoading}
         />
     );
 }

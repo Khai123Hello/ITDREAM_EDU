@@ -16,6 +16,7 @@ function SimulationListContainer() {
         title: params.get('title') || '',
         level: params.get('level') ? parseInt(params.get('level'), 10) : undefined,
         categoryId: params.get('categoryId') ? parseInt(params.get('categoryId'), 10) : undefined,
+        organizationId: params.get('organizationId') ? parseInt(params.get('organizationId'), 10) : undefined,
     });
     const [ pagination, setPagination ] = useState({
         page: params.get('page') ? parseInt(params.get('page'), 10) : 0,
@@ -32,6 +33,7 @@ function SimulationListContainer() {
             ...(filters.title && { title: filters.title }),
             ...(filters.level !== undefined && { level: filters.level }),
             ...(filters.categoryId !== undefined && { categoryId: filters.categoryId }),
+            ...(filters.organizationId !== undefined && { organizationId: filters.organizationId }),
         }),
         [ pagination, filters ],
     );
@@ -53,6 +55,12 @@ function SimulationListContainer() {
         mappingData: (res) => res.data?.content || [],
     });
 
+    // Fetch organizations for filter
+    const { data: organizationList, loading: orgLoading } = useFetch(apiConfig.organization.list, {
+        immediate: true,
+        mappingData: (res) => res.data?.content || res.data || [],
+    });
+
     const handleFilterChange = useCallback(
         (newFilters) => {
             setFilters(newFilters);
@@ -61,6 +69,7 @@ function SimulationListContainer() {
                 title: newFilters.title || '',
                 level: newFilters.level ? String(newFilters.level) : '',
                 categoryId: newFilters.categoryId ? String(newFilters.categoryId) : '',
+                organizationId: newFilters.organizationId ? String(newFilters.organizationId) : '',
                 page: '0',
                 size: String(pagination.size),
             });
@@ -95,7 +104,8 @@ function SimulationListContainer() {
             <SimulationListDesktop
                 simulations={simList?.content || []}
                 categories={categoryList}
-                loading={simLoading || catLoading}
+                organizations={organizationList}
+                loading={simLoading || catLoading || orgLoading}
                 error={simError}
                 onRetry={handleRetry}
                 filters={filters}

@@ -510,6 +510,11 @@ const apiConfig = {
             method: 'PUT',
             headers: baseHeader,
         },
+        delete: {
+            baseURL: `${apiUrl}v1/comment/delete/:id`,
+            method: 'DELETE',
+            headers: baseHeader,
+        },
     },
     notification: {
         studentList: {
@@ -542,6 +547,18 @@ const apiConfig = {
         update: {
             baseURL: `${apiUrl}v1/feedback/update`,
             method: 'PUT',
+            headers: baseHeader,
+        },
+    },
+    reviewSubmission: {
+        studentList: {
+            baseURL: `${apiUrl}v1/review_submission/students_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        studentGet: {
+            baseURL: `${apiUrl}v1/review_submission/student_get/:id`,
+            method: 'GET',
             headers: baseHeader,
         },
     },

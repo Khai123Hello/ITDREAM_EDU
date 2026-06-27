@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { FiCornerDownRight, FiEdit2, FiSend, FiX } from 'react-icons/fi';
+import { FiCornerDownRight, FiEdit2, FiSend, FiTrash2, FiX } from 'react-icons/fi';
 import { Spin } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -16,6 +16,19 @@ const getInitials = (fullName) => {
     const parts = fullName.trim().split(/\s+/);
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+};
+
+// Helper to parse date string (DD/MM/YYYY HH:mm:ss or ISO)
+const parseDate = (dateStr) => {
+    if (!dateStr) return new Date();
+    if (typeof dateStr === 'string' && dateStr.includes('/')) {
+        const parts = dateStr.split(' ');
+        const datePart = parts[0];
+        const timePart = parts[1] || '00:00:00';
+        const [ day, month, year ] = datePart.split('/');
+        return new Date(`${year}-${month}-${day}T${timePart}`);
+    }
+    return new Date(dateStr);
 };
 
 // Helper to generate consistent gradient background based on initials/username hash
@@ -44,6 +57,7 @@ export default function CommentPanel({
     onClose = () => {},
     onSendComment = () => {},
     onUpdateComment = () => {},
+    onDeleteComment = () => {},
 }) {
     const [ mainText, setMainText ] = useState('');
     const [ replyingToId, setReplyingToId ] = useState(null);
@@ -80,7 +94,7 @@ export default function CommentPanel({
 
         // Sort each replies array by createdDate ascending
         Object.keys(map).forEach((rootId) => {
-            map[rootId].sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
+            map[rootId].sort((a, b) => parseDate(a.createdDate) - parseDate(b.createdDate));
         });
 
         return map;
@@ -152,29 +166,60 @@ export default function CommentPanel({
         const isSelf = comment.user?.username === currentUsername;
         const isEditing = editingId === comment.id;
         const isReplying = replyingToId === comment.id;
+        const isStudent = comment.user?.username === profile?.username;
+        const isTeacher = !isStudent;
 
         return (
-            <div key={comment.id} className={`tfo-comment-card${isReply ? ' reply' : ''}`}>
+            <div key={comment.id} className={`tfo-comment-card${isReply ? ' reply' : ''}${isTeacher ? ' teacher-comment' : ''}`}>
                 <div className="tfo-comment-card-header">
                     {renderAvatar(comment.user)}
                     <div className="tfo-comment-user-info">
-                        <span className="tfo-comment-fullname">
-                            {comment.user?.fullName || comment.user?.username || 'Học viên'}
-                        </span>
-                        <span className="tfo-comment-time">{dayjs(comment.createdDate).fromNow()}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span className="tfo-comment-fullname">
+                                {comment.user?.fullName || comment.user?.username || 'Học viên'}
+                            </span>
+                            {isTeacher && (
+                                <span
+                                    style={{
+                                        fontSize: '9px',
+                                        fontWeight: 700,
+                                        backgroundColor: '#dbeafe',
+                                        color: '#1d4ed8',
+                                        padding: '2px 6px',
+                                        borderRadius: '10px',
+                                        lineHeight: '1.2',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.3px',
+                                        display: 'inline-block',
+                                    }}
+                                >
+                                    Giáo viên
+                                </span>
+                            )}
+                        </div>
+                        <span className="tfo-comment-time">{dayjs(parseDate(comment.createdDate)).fromNow()}</span>
                     </div>
                     {isSelf && !isEditing && (
-                        <button
-                            className="tfo-comment-edit-btn"
-                            onClick={() => {
-                                setEditingId(comment.id);
-                                setEditText(comment.content);
-                                setReplyingToId(null);
-                            }}
-                            title="Sửa bình luận"
-                        >
-                            <FiEdit2 size={12} />
-                        </button>
+                        <div className="tfo-comment-actions" style={{ display: 'flex', gap: 4 }}>
+                            <button
+                                className="tfo-comment-edit-btn"
+                                onClick={() => {
+                                    setEditingId(comment.id);
+                                    setEditText(comment.content);
+                                    setReplyingToId(null);
+                                }}
+                                title="Sửa bình luận"
+                            >
+                                <FiEdit2 size={12} />
+                            </button>
+                            <button
+                                className="tfo-comment-delete-btn"
+                                onClick={() => onDeleteComment(comment.id)}
+                                title="Xóa bình luận"
+                            >
+                                <FiTrash2 size={12} style={{ color: '#ff4d4f' }} />
+                            </button>
+                        </div>
                     )}
                 </div>
 
@@ -185,6 +230,11 @@ export default function CommentPanel({
                                 className="tfo-comment-input-textarea"
                                 value={editText}
                                 onChange={(e) => setEditText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.ctrlKey && e.key === 'Enter') {
+                                        handleEditSubmit(e, comment.id);
+                                    }
+                                }}
                                 rows={2}
                                 autoFocus
                             />
@@ -230,9 +280,14 @@ export default function CommentPanel({
                     <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="tfo-comment-reply-form">
                         <textarea
                             className="tfo-comment-input-textarea"
-                            placeholder={`Trả lời ${comment.user?.fullName || 'học viên'}...`}
+                            placeholder={`Trả lời ${comment.user?.fullName || 'học viên'}... (Ctrl + Enter để gửi)`}
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.ctrlKey && e.key === 'Enter') {
+                                    handleReplySubmit(e, comment.id);
+                                }
+                            }}
                             rows={2}
                             autoFocus
                         />
@@ -306,9 +361,14 @@ export default function CommentPanel({
             <form onSubmit={handleMainSubmit} className="tfo-comments-panel-footer">
                 <textarea
                     className="tfo-comments-main-textarea"
-                    placeholder="Viết bình luận của bạn..."
+                    placeholder="Viết bình luận của bạn... (Ctrl + Enter để gửi)"
                     value={mainText}
                     onChange={(e) => setMainText(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.ctrlKey && e.key === 'Enter') {
+                            handleMainSubmit(e);
+                        }
+                    }}
                     rows={2}
                 />
                 <button

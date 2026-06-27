@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
 
@@ -492,70 +493,18 @@ function ContentRenderer({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    onQuestionRendered = () => {},
 }) {
-    const type = useMemo(() => detectContentType(content), [ content ]);
-    const legacyBlocksJson = useMemo(() => {
-        if (type !== 'tiptap') return null;
-        if (content.trim().startsWith('{"type":"doc"')) {
-            try {
-                const doc = JSON.parse(content);
-                const quizNodes = [];
-                const walk = (nodes) =>
-                    (nodes || []).forEach((n) => {
-                        if (n.type === 'quiz') {
-                            const options = (n.content || []).filter((c) => c.type === 'option');
-                            quizNodes.push({
-                                type: 'quiz',
-                                question: n.attrs?.question || '',
-                                options: options.map((o, i) => ({
-                                    answer: o.attrs?.correct === true,
-                                    option: o.content?.[0]?.text || '',
-                                    value: o.content?.[0]?.text || '',
-                                })),
-                            });
-                        }
-                        if (n.content) walk(n.content);
-                    });
-                walk(doc.content);
-                const blocks =
-                    quizNodes.length > 0 ? [ { type: 'text', content: flattenTipTapText(doc) }, ...quizNodes ] : null;
-                return blocks ? JSON.stringify(blocks) : null;
-            } catch {
-                return null;
-            }
-        }
-        const blocks = extractBlocksFromMarkdoc(content);
-        return blocks ? JSON.stringify(blocks) : null;
-    }, [ type, content ]);
-
-    if (type === 'empty') return <p className="tfo-empty-content">Không có nội dung.</p>;
-    if (type === 'blocks') {
-        return (
-            <BlocksContent
-                blocksJson={content}
-                quizSubmissionMap={quizSubmissionMap}
-                questionMap={questionMap}
-                onQuizAnswerSubmit={onQuizAnswerSubmit}
-                hasCompleted={hasCompleted}
-            />
-        );
-    }
-    if (type === 'tiptap') {
-        if (legacyBlocksJson) {
-            return (
-                <BlocksContent
-                    blocksJson={legacyBlocksJson}
-                    quizSubmissionMap={quizSubmissionMap}
-                    questionMap={questionMap}
-                    onQuizAnswerSubmit={onQuizAnswerSubmit}
-                    hasCompleted={hasCompleted}
-                />
-            );
-        }
-        return <MarkdownContent text={content} />;
-    }
-    if (type === 'markdown') return <MarkdownContent text={content} />;
-    return <PlainTextContent text={content} />;
+    return (
+        <TipTapJsonRenderer
+            content={content}
+            quizSubmissionMap={quizSubmissionMap}
+            questionMap={questionMap}
+            onQuizAnswerSubmit={onQuizAnswerSubmit}
+            hasCompleted={hasCompleted}
+            onQuestionRendered={onQuestionRendered}
+        />
+    );
 }
 
 /* ─────────────────────────── File Dropzone ─────────────────────────── */
@@ -900,6 +849,9 @@ export default function TaskDoingPage({
     onQuizAnswerSubmit = () => {},
     quizBlocks = [],
 
+    // Educator reviews
+    currentSubtaskReviews = [],
+
     // Certificate and congrats
     isGeneratingCert = false,
 
@@ -913,12 +865,18 @@ export default function TaskDoingPage({
     setShowComments = () => {},
     onSendComment = () => {},
     onUpdateComment = () => {},
+    onDeleteComment = () => {},
 }) {
     const [ textInput, setTextInput ] = useState('');
+    const [ inlineQuestionIds, setInlineQuestionIds ] = useState([]);
 
     useEffect(() => {
         setTextInput(previousText || '');
     }, [ previousText ]);
+
+    useEffect(() => {
+        setInlineQuestionIds([]);
+    }, [ selectedSubtaskId ]);
 
     const renderMedia = () => {
         if (!mediaPath) return null;
@@ -1014,6 +972,7 @@ export default function TaskDoingPage({
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed' || hasCompleted;
+    const isNavigationBlocked = !isCompleted;
 
     return (
         <>
@@ -1037,6 +996,7 @@ export default function TaskDoingPage({
                                 parentTasks={parentTasks}
                                 selectedParentTaskId={selectedParentTaskId}
                                 onSelectParentTask={onSelectParentTask}
+                                isNavigationBlocked={isNavigationBlocked}
                             />
 
                             <main className="tfo-pane">
@@ -1047,15 +1007,22 @@ export default function TaskDoingPage({
                                             <div className="tfo-pane-title">{pageTitle}</div>
                                             {subtasks && subtasks.length > 0 && (
                                                 <div className="tfo-step-pagination">
-                                                    {subtasks.map((st, index) => (
-                                                        <button
-                                                            key={st.id}
-                                                            className={`tfo-step-btn${st.id === selectedSubtaskId ? ' active' : ''}`}
-                                                            onClick={() => onSelectSubtask(st.id)}
-                                                        >
-                                                            {index + 1}
-                                                        </button>
-                                                    ))}
+                                                    {subtasks.map((st, index) => {
+                                                        const isCurrent = st.id === selectedSubtaskId;
+                                                        return (
+                                                            <button
+                                                                key={st.id}
+                                                                className={`tfo-step-btn${isCurrent ? ' active' : ''}`}
+                                                                onClick={() => {
+                                                                    if (isNavigationBlocked && !isCurrent) return;
+                                                                    onSelectSubtask(st.id);
+                                                                }}
+                                                                disabled={isNavigationBlocked && !isCurrent}
+                                                            >
+                                                                {index + 1}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             )}
                                         </div>
@@ -1104,37 +1071,64 @@ export default function TaskDoingPage({
                                                         questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                         hasCompleted={hasCompleted}
+                                                        onQuestionRendered={setInlineQuestionIds}
                                                     />
                                                 )}
 
                                                 {/* Render questions fetched from API */}
                                                 {quizBlocks && quizBlocks.length > 0 && (
                                                     <div className="tfo-blocks-content" style={{ marginTop: 24 }}>
-                                                        {quizBlocks.map((block, idx) => {
-                                                            const questionId = block.id
-                                                                ? String(block.id)
-                                                                : block.question
-                                                                    ? questionMap[block.question.trim()]
-                                                                    : null;
-                                                            return (
-                                                                <QuizBlock
-                                                                    key={questionId || idx}
-                                                                    block={block}
-                                                                    submittedAnswer={
-                                                                        questionId
-                                                                            ? quizSubmissionMap[questionId]
-                                                                            : null
-                                                                    }
-                                                                    questionId={questionId}
-                                                                    onQuizAnswerSubmit={onQuizAnswerSubmit}
-                                                                    hasCompleted={hasCompleted}
-                                                                />
-                                                            );
-                                                        })}
+                                                        {quizBlocks
+                                                            .filter((block) => {
+                                                                const questionId = block.id
+                                                                    ? String(block.id)
+                                                                    : block.question
+                                                                        ? questionMap[block.question.trim()]
+                                                                        : null;
+                                                                return !inlineQuestionIds.includes(String(questionId));
+                                                            })
+                                                            .map((block, idx) => {
+                                                                const questionId = block.id
+                                                                    ? String(block.id)
+                                                                    : block.question
+                                                                        ? questionMap[block.question.trim()]
+                                                                        : null;
+                                                                return (
+                                                                    <QuizBlock
+                                                                        key={questionId || idx}
+                                                                        block={block}
+                                                                        submittedAnswer={
+                                                                            questionId
+                                                                                ? quizSubmissionMap[questionId]
+                                                                                : null
+                                                                        }
+                                                                        questionId={questionId}
+                                                                        onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                                                        hasCompleted={hasCompleted}
+                                                                    />
+                                                                );
+                                                            })}
                                                     </div>
                                                 )}
 
                                                 {renderMedia()}
+
+                                                {/* Educator feedback for this subtask */}
+                                                {currentSubtaskReviews && currentSubtaskReviews.length > 0 && (
+                                                    <div className="tfo-subtask-feedback-card">
+                                                        <div className="tfo-subtask-feedback-header">
+                                                            <span className="tfo-subtask-feedback-icon">💬</span>
+                                                            <span className="tfo-subtask-feedback-title">Nhận xét từ Giảng viên</span>
+                                                        </div>
+                                                        <div className="tfo-subtask-feedback-comments">
+                                                            {currentSubtaskReviews.map((review) => (
+                                                                <div key={review.id} className="tfo-subtask-feedback-comment-item">
+                                                                    {review.content}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
 
                                                 {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
 
@@ -1191,6 +1185,7 @@ export default function TaskDoingPage({
                                             onClose={() => setShowComments(false)}
                                             onSendComment={onSendComment}
                                             onUpdateComment={onUpdateComment}
+                                            onDeleteComment={onDeleteComment}
                                         />
                                     )}
                                 </div>

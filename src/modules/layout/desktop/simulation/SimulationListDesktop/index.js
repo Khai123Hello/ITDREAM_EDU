@@ -29,6 +29,7 @@ const SORT_OPTIONS = [
 function SimulationListDesktop({
     simulations = [],
     categories = [],
+    organizations = [],
     loading,
     error,
     onRetry,
@@ -74,6 +75,13 @@ function SimulationListDesktop({
         [ filters, onFilterChange ],
     );
 
+    const handleOrganizationChange = useCallback(
+        (value) => {
+            onFilterChange({ ...filters, organizationId: value });
+        },
+        [ filters, onFilterChange ],
+    );
+
     const handleCardClick = useCallback(
         (id) => {
             navigate(`/simulations/${id}`);
@@ -84,6 +92,11 @@ function SimulationListDesktop({
     const categoryOptions = useMemo(
         () => (Array.isArray(categories) ? categories.map((cat) => ({ value: cat.id, label: cat.name })) : []),
         [ categories ],
+    );
+
+    const organizationOptions = useMemo(
+        () => (Array.isArray(organizations) ? organizations.map((org) => ({ value: org.id, label: org.name })) : []),
+        [ organizations ],
     );
 
     const total = pagination.total || 0;
@@ -111,27 +124,10 @@ function SimulationListDesktop({
                             placeholder="Tìm kiếm bài mô phỏng..."
                             value={searchValue}
                             onChange={handleSearchChange}
+                            onPressEnter={handleSearchClick}
                             allowClear
                         />
                     </div>
-
-                    <Select
-                        placeholder="Độ khó"
-                        value={filters.level || undefined}
-                        onChange={handleLevelChange}
-                        options={LEVEL_OPTIONS}
-                        allowClear
-                        className={styles.selectFilter}
-                    />
-
-                    <Select
-                        placeholder="Danh mục"
-                        value={filters.categoryId || undefined}
-                        onChange={handleCategoryChange}
-                        options={categoryOptions}
-                        allowClear
-                        className={styles.selectFilter}
-                    />
 
                     <button className={styles.searchBtn} onClick={handleSearchClick}>
                         <svg
@@ -166,10 +162,39 @@ function SimulationListDesktop({
 
                     <div className={styles.filterDivider} />
 
-                    <button className={styles.filterChip}>Ngành nghề ▾</button>
-                    <button className={styles.filterChip}>Lĩnh vực ▾</button>
-                    <button className={styles.filterChip}>Tổ chức ▾</button>
-                    <button className={styles.filterChip}>Thời lượng ▾</button>
+                    <div className={styles.filterChip}>
+                        <Select
+                            placeholder="Danh mục"
+                            value={filters.categoryId || undefined}
+                            onChange={handleCategoryChange}
+                            options={categoryOptions}
+                            allowClear
+                            popupMatchSelectWidth={false}
+                            style={{ minWidth: 90 }}
+                        />
+                    </div>
+                    <div className={styles.filterChip}>
+                        <Select
+                            placeholder="Tổ chức"
+                            value={filters.organizationId || undefined}
+                            onChange={handleOrganizationChange}
+                            options={organizationOptions}
+                            allowClear
+                            popupMatchSelectWidth={false}
+                            style={{ minWidth: 80 }}
+                        />
+                    </div>
+                    <div className={styles.filterChip}>
+                        <Select
+                            placeholder="Độ khó"
+                            value={filters.level || undefined}
+                            onChange={handleLevelChange}
+                            options={LEVEL_OPTIONS}
+                            allowClear
+                            popupMatchSelectWidth={false}
+                            style={{ minWidth: 80 }}
+                        />
+                    </div>
                 </div>
             </section>
 
