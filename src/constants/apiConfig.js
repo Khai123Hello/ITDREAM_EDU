@@ -275,6 +275,11 @@ const apiConfig = {
         },
     },
     organization: {
+        guestList: {
+            baseURL: `${apiUrl}v1/organization/guest_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
         list: {
             baseURL: `${apiUrl}v1/organization/list`,
             method: 'GET',

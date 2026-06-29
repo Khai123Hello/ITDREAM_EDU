@@ -29,6 +29,11 @@ function DashboardPageContainer() {
         mappingData: (res) => res?.data || {},
     });
 
+    const { data: organizationList, loading: orgLoading } = useFetch(apiConfig.organization.list, {
+        immediate: true,
+        mappingData: (res) => res.data?.content || res.data || [],
+    });
+
     return (
         <>
             <AppHeader />
@@ -38,7 +43,8 @@ function DashboardPageContainer() {
                 enrolledUrlBase={enrolledRes?.urlBase || ''}
                 achievements={achievementRes?.data?.content || []}
                 allSimulations={allSimsRes?.content || []}
-                loading={simLoading || achLoading || allSimsLoading}
+                organizations={organizationList || []}
+                loading={simLoading || achLoading || allSimsLoading || orgLoading}
             />
             <AppFooter />
         </>

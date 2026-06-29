@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import DOMPurify from 'dompurify';
 
 import styles from './TaskPanel.module.scss';
 
@@ -54,7 +55,7 @@ function MarkdownContent({ text }) {
             elements.push(
                 <ul key={key++} className={styles.mdList}>
                     {listItems.map((li, i) => (
-                        <li key={i} dangerouslySetInnerHTML={{ __html: parseInline(li) }} />
+                        <li key={i} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(parseInline(li)) }} />
                     ))}
                 </ul>,
             );
@@ -106,7 +107,11 @@ function MarkdownContent({ text }) {
         }
         flushList();
         elements.push(
-            <p key={key++} className={styles.mdPara} dangerouslySetInnerHTML={{ __html: parseInline(line) }} />,
+            <p
+                key={key++}
+                className={styles.mdPara}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(parseInline(line)) }}
+            />,
         );
     });
     flushList();
@@ -123,7 +128,7 @@ function BlocksContent({ blocksJson }) {
         } catch {
             return [];
         }
-    }, [blocksJson]);
+    }, [ blocksJson ]);
 
     return (
         <div className={styles.blocksContent}>
@@ -136,76 +141,76 @@ function BlocksContent({ blocksJson }) {
 
 function BlockItem({ block, idx, allBlocks }) {
     switch (block.type) {
-        case 'meta':
-            return (
-                <div className={styles.blockMeta}>
-                    <span className={styles.blockMetaVal}>{block.duration}</span>
-                    <span className={styles.blockMetaDot}>·</span>
-                    <span className={styles.blockMetaVal}>{block.level}</span>
-                </div>
-            );
-        case 'section':
-            return (
-                <div className={styles.blockSection}>
-                    <div className={styles.blockSectionHeader}>
-                        <span className={styles.blockSectionIcon}>{block.icon}</span>
-                        <span className={styles.blockSectionTitle}>{block.title}</span>
-                    </div>
-                    <ul className={styles.blockSectionList}>
-                        {(block.bullets || []).filter(Boolean).map((b, i) => (
-                            <li key={i}>{b}</li>
-                        ))}
-                    </ul>
-                </div>
-            );
-        case 'text':
-            return <p className={styles.blockText}>{block.content}</p>;
-        case 'h1':
-            return <h2 className={styles.blockH1}>{block.content}</h2>;
-        case 'h2':
-            return <h3 className={styles.blockH2}>{block.content}</h3>;
-        case 'h3':
-            return <h4 className={styles.blockH3}>{block.content}</h4>;
-        case 'bullet':
-            return (
-                <div className={styles.blockBulletWrap}>
-                    <span className={styles.blockBulletDot}>•</span>
-                    <span className={styles.blockBulletText}>{block.content}</span>
-                </div>
-            );
-        case 'numbered': {
-            const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
-            return (
-                <div className={styles.blockBulletWrap}>
-                    <span className={styles.blockNumLabel}>{num}.</span>
-                    <span className={styles.blockBulletText}>{block.content}</span>
-                </div>
-            );
-        }
-        case 'divider':
-            return <hr className={styles.blockDivider} />;
-        case 'callout':
-            return (
-                <div className={styles.blockCallout}>
-                    <span className={styles.blockCalloutIcon}>{block.icon}</span>
-                    <span className={styles.blockCalloutText}>{block.content}</span>
-                </div>
-            );
-        case 'code':
-            return (
-                <div className={styles.blockCode}>
-                    <pre>{block.content}</pre>
-                </div>
-            );
-        case 'step':
-            return (
-                <div className={styles.blockStep}>
-                    <span className={styles.blockStepLabel}>{block.label}:</span>
-                    <span className={styles.blockStepBody}>{block.body}</span>
-                </div>
-            );
-        default:
-            return null;
+                    case 'meta':
+                        return (
+                            <div className={styles.blockMeta}>
+                                <span className={styles.blockMetaVal}>{block.duration}</span>
+                                <span className={styles.blockMetaDot}>·</span>
+                                <span className={styles.blockMetaVal}>{block.level}</span>
+                            </div>
+                        );
+                    case 'section':
+                        return (
+                            <div className={styles.blockSection}>
+                                <div className={styles.blockSectionHeader}>
+                                    <span className={styles.blockSectionIcon}>{block.icon}</span>
+                                    <span className={styles.blockSectionTitle}>{block.title}</span>
+                                </div>
+                                <ul className={styles.blockSectionList}>
+                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
+                                        <li key={i}>{b}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
+                    case 'text':
+                        return <p className={styles.blockText}>{block.content}</p>;
+                    case 'h1':
+                        return <h2 className={styles.blockH1}>{block.content}</h2>;
+                    case 'h2':
+                        return <h3 className={styles.blockH2}>{block.content}</h3>;
+                    case 'h3':
+                        return <h4 className={styles.blockH3}>{block.content}</h4>;
+                    case 'bullet':
+                        return (
+                            <div className={styles.blockBulletWrap}>
+                                <span className={styles.blockBulletDot}>•</span>
+                                <span className={styles.blockBulletText}>{block.content}</span>
+                            </div>
+                        );
+                    case 'numbered': {
+                        const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
+                        return (
+                            <div className={styles.blockBulletWrap}>
+                                <span className={styles.blockNumLabel}>{num}.</span>
+                                <span className={styles.blockBulletText}>{block.content}</span>
+                            </div>
+                        );
+                    }
+                    case 'divider':
+                        return <hr className={styles.blockDivider} />;
+                    case 'callout':
+                        return (
+                            <div className={styles.blockCallout}>
+                                <span className={styles.blockCalloutIcon}>{block.icon}</span>
+                                <span className={styles.blockCalloutText}>{block.content}</span>
+                            </div>
+                        );
+                    case 'code':
+                        return (
+                            <div className={styles.blockCode}>
+                                <pre>{block.content}</pre>
+                            </div>
+                        );
+                    case 'step':
+                        return (
+                            <div className={styles.blockStep}>
+                                <span className={styles.blockStepLabel}>{block.label}:</span>
+                                <span className={styles.blockStepBody}>{block.body}</span>
+                            </div>
+                        );
+                    default:
+                        return null;
     }
 }
 
@@ -213,7 +218,7 @@ function BlockItem({ block, idx, allBlocks }) {
 // Smart content renderer
 // ─────────────────────────────────────────
 function ContentRenderer({ content }) {
-    const type = useMemo(() => detectContentType(content), [content]);
+    const type = useMemo(() => detectContentType(content), [ content ]);
     if (type === 'empty') return <p className={styles.emptyContent}>Không có nội dung.</p>;
     if (type === 'blocks') return <BlocksContent blocksJson={content} />;
     if (type === 'markdown') return <MarkdownContent text={content} />;
@@ -236,7 +241,7 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
     // Tách task cha (kind=1) và subtask (kind=2)
     const parentTasks = useMemo(
         () => tasks.filter((t) => t.kind === 1).sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0)),
-        [tasks],
+        [ tasks ],
     );
 
     // Map parentId → subtasks[], sắp xếp theo orderInParent
@@ -255,14 +260,14 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
             map[pid].sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0));
         });
         return map;
-    }, [tasks]);
+    }, [ tasks ]);
 
     // Task cha đang active — dùng activeTaskId từ prop (trỏ đến kind=1)
     // hoặc fallback về task cha đầu tiên
-    const [activeParentId, setActiveParentId] = useState(() => activeTaskId ?? parentTasks[0]?.id ?? null);
+    const [ activeParentId, setActiveParentId ] = useState(() => activeTaskId ?? parentTasks[0]?.id ?? null);
 
     // Subtask đang active (kind=2)
-    const [activeSubId, setActiveSubId] = useState(() => {
+    const [ activeSubId, setActiveSubId ] = useState(() => {
         const firstParent = activeTaskId ?? parentTasks[0]?.id;
         if (firstParent == null) return null;
         const subs = subTaskMap[firstParent] ?? [];
@@ -284,18 +289,18 @@ function TaskPanel({ tasks = [], activeTaskId, onSelectTask }) {
             if (pid != null) setActiveParentId(pid);
             setActiveSubId(task.id);
         }
-    }, [activeTaskId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [ activeTaskId ]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Subtasks của task cha đang chọn
     const currentSubTasks = useMemo(
         () => (activeParentId != null ? (subTaskMap[activeParentId] ?? []) : []),
-        [activeParentId, subTaskMap],
+        [ activeParentId, subTaskMap ],
     );
 
     // Subtask đang hiển thị
     const activeSubTask = useMemo(
         () => currentSubTasks.find((s) => s.id === activeSubId) ?? currentSubTasks[0] ?? null,
-        [currentSubTasks, activeSubId],
+        [ currentSubTasks, activeSubId ],
     );
 
     // Click task cha trong sidebar

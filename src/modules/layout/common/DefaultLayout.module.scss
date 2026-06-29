@@ -1,6 +1,7 @@
 .masterLayout {
     background-color: var(--body-color);
-    min-width: 1500px;
+    min-width: 100%;
+    overflow-x: hidden;
 }
 .appContent {
     min-height: 95svh;

@@ -1,20 +1,23 @@
 import React from 'react';
-import PageNotAllowed from '@components/common/page/PageNotAllowed';
-import PageNotFound from '@components/common/page/PageNotFound';
-import BlogListContainer from '@modules/containers/blog';
-import BlogDetailContainer from '@modules/containers/blog/detail';
-import DashBoardPageContainer from '@modules/containers/dashboard';
-import JobsPageContainer from '@modules/containers/jobs';
-import LandingPageContainer from '@modules/containers/landing';
-import LoginPageContainer from '@modules/containers/login';
-import PolicyContainer from '@modules/containers/policy';
-import ProfilePageContainer from '@modules/containers/profile';
-import RegisterContainer from '@modules/containers/register/register';
-import SimulationCompletedContainer from '@modules/containers/simulation/SimulationCompletedContainer';
-import SimulationDetailContainer from '@modules/containers/simulation/SimulationDetailContainer';
-import SimulationListContainer from '@modules/containers/simulation/SimulationListContainer';
-import TaskDoingContainer from '@modules/containers/simulation/TaskDoingContainer';
 import PublicLayout from '@modules/layout/common/PublicLayout';
+
+const PageNotAllowed = React.lazy(() => import('@components/common/page/PageNotAllowed'));
+const PageNotFound = React.lazy(() => import('@components/common/page/PageNotFound'));
+const BlogListContainer = React.lazy(() => import('@modules/containers/blog'));
+const BlogDetailContainer = React.lazy(() => import('@modules/containers/blog/detail'));
+const DashBoardPageContainer = React.lazy(() => import('@modules/containers/dashboard'));
+const JobsPageContainer = React.lazy(() => import('@modules/containers/jobs'));
+const LandingPageContainer = React.lazy(() => import('@modules/containers/landing'));
+const LoginPageContainer = React.lazy(() => import('@modules/containers/login'));
+const PolicyContainer = React.lazy(() => import('@modules/containers/policy'));
+const ProfilePageContainer = React.lazy(() => import('@modules/containers/profile'));
+const RegisterContainer = React.lazy(() => import('@modules/containers/register/register'));
+const SimulationCompletedContainer = React.lazy(
+    () => import('@modules/containers/simulation/SimulationCompletedContainer'),
+);
+const SimulationDetailContainer = React.lazy(() => import('@modules/containers/simulation/SimulationDetailContainer'));
+const SimulationListContainer = React.lazy(() => import('@modules/containers/simulation/SimulationListContainer'));
+const TaskDoingContainer = React.lazy(() => import('@modules/containers/simulation/TaskDoingContainer'));
 
 /*
 	auth
@@ -71,7 +74,6 @@ const routes = {
         component: PolicyContainer,
         auth: null,
         title: 'Chính sách bảo mật',
-        layout: 'public',
     },
     registerPage: {
         path: '/register',

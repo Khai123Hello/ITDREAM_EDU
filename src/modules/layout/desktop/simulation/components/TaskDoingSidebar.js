@@ -13,7 +13,7 @@ export default function TaskDoingSidebar({
 }) {
     const navigate = useNavigate();
     const { id: simulationId } = useParams();
-    const [achievementsExpanded, setAchievementsExpanded] = useState(true);
+    const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
 
     const handleLogoClick = () => {
         if (simulationId) {

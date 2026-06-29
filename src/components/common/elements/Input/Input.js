@@ -37,7 +37,7 @@ function Input({
     ...props
 }) {
     const { styleProps, rest } = extractStyleProps(props);
-    const [_value, _onChange] = useUncontrolled({
+    const [ _value, _onChange ] = useUncontrolled({
         value: isNull(value) ? '' : value,
         onChange,
         defaultValue: '',
@@ -48,39 +48,7 @@ function Input({
 
     const _leftSection = withSearch ? <SearchIcon /> : leftSection;
 
-    useEffect(() => {
-        const handleTouchMove = (e) => {
-            if (finalInputRef.current) {
-                finalInputRef.current.blur();
-            }
-        };
-
-        const handleTouchStart = (e) => {
-            const touchStartY = e.touches[0].clientY;
-
-            const handleTouchMoveCheck = (moveEvent) => {
-                const touchMoveY = moveEvent.touches[0].clientY;
-                if (Math.abs(touchStartY - touchMoveY) > 10) {
-                    handleTouchMove();
-                }
-            };
-
-            document.addEventListener('touchmove', handleTouchMoveCheck, { passive: true });
-            document.addEventListener(
-                'touchend',
-                () => {
-                    document.removeEventListener('touchmove', handleTouchMoveCheck);
-                },
-                { once: true },
-            );
-        };
-
-        document.addEventListener('touchstart', handleTouchStart);
-
-        return () => {
-            document.removeEventListener('touchstart', handleTouchStart);
-        };
-    }, [finalInputRef]);
+    // Removed auto blur on touchmove for better Mobile UX
 
     return (
         <Box

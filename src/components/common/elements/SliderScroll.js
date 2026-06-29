@@ -5,11 +5,11 @@ import styles from './SliderScroll.module.scss';
 
 const SliderScroll = forwardRef(({ className, children, scrollToId, ...props }, ref) => {
     const sliderRef = useRef(null);
-    const [isDown, setIsDown] = useState(false);
-    const [startX, setStartX] = useState(0);
-    const [sliderWidth, setSliderWidth] = useState(null);
+    const [ isDown, setIsDown ] = useState(false);
+    const [ startX, setStartX ] = useState(0);
+    const [ sliderWidth, setSliderWidth ] = useState(null);
 
-    useImperativeHandle(ref, () => sliderRef.current, [sliderRef]);
+    useImperativeHandle(ref, () => sliderRef.current, [ sliderRef ]);
 
     const handleMouseDown = (e) => {
         setIsDown(true);
@@ -20,12 +20,16 @@ const SliderScroll = forwardRef(({ className, children, scrollToId, ...props }, 
 
     const handleMouseLeave = () => {
         setIsDown(false);
-        sliderRef.current.classList.remove(styles.active);
+        if (sliderRef.current) {
+            sliderRef.current.classList.remove(styles.active);
+        }
     };
 
     const handleMouseUp = () => {
         setIsDown(false);
-        sliderRef.current.classList.remove(styles.active);
+        if (sliderRef.current) {
+            sliderRef.current.classList.remove(styles.active);
+        }
     };
 
     const handleMouseMove = (e) => {
@@ -62,7 +66,7 @@ const SliderScroll = forwardRef(({ className, children, scrollToId, ...props }, 
                 saveScrollPosition();
             }
         }
-    }, [scrollToId, sliderWidth]);
+    }, [ scrollToId, sliderWidth ]);
 
     return (
         <div

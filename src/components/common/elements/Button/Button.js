@@ -8,7 +8,7 @@ const Loader = ({ width = '1.8rem', height = '1.8rem', style, props }) => (
         {...props}
         style={{ width, height, ...style }}
         xmlns="http://www.w3.org/2000/svg"
-        stroke="#fff"
+        stroke="currentColor"
         className="mantine-0"
         viewBox="0 0 38 38"
     >

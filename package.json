@@ -44,6 +44,7 @@
         "buffer": "^6.0.3",
         "classnames": "^2.3.2",
         "dayjs": "^1.11.7",
+        "dompurify": "^3.4.11",
         "embla-carousel-autoplay": "^8.3.0",
         "embla-carousel-react": "^8.3.0",
         "env-cmd": "^10.1.0",

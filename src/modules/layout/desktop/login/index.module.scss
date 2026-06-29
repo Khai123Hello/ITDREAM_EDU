@@ -31,7 +31,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 44px 48px;
+        padding: 48px;
 
         @media (max-width: 480px) {
             padding: 32px 24px;
@@ -42,7 +42,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 36px;
+        margin-bottom: 32px;
 
         .logoIcon {
             width: 30px;
@@ -117,13 +117,13 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 36px 28px;
-        gap: 18px;
+        padding: 32px;
+        gap: 16px;
         flex-shrink: 0;
 
         @media (max-width: 768px) {
             width: 100%;
-            padding: 36px 24px;
+            padding: 32px 24px;
         }
     }
 

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Form, useForm } from '@components/common/elements/Form';
 
 const useBasicForm = ({ onSubmit, setIsChangedFormValues, onResetForm, override, otherData } = {}) => {
-    const [form] = Form.useForm();
+    const [ form ] = Form.useForm();
     const getFieldValue = (fieldName) => {
         if (form) return form.getFieldValue(fieldName);
         return '';

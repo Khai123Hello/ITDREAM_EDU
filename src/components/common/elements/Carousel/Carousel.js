@@ -7,7 +7,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 
 import styles from './Carousel.module.scss';
-const [CarouselProvider, useCarouselRef] = createCtx('Carousel');
+const [ CarouselProvider, useCarouselRef ] = createCtx('Carousel');
 
 function Carousel({
     options,
@@ -31,9 +31,9 @@ function Carousel({
     ...props
 }) {
     const autoplayPlugin = useRef(autoplay && Autoplay({ delay: 10000, stopOnInteraction: false, ...autoplay }));
-    const [ref, api] = useEmblaCarousel(
+    const [ ref, api ] = useEmblaCarousel(
         { loop, active, slidesToScroll, breakpoints, dragFree, watchDrag, startIndex, inViewThreshold: 0.01, ...props },
-        [autoplayPlugin.current].filter(Boolean),
+        [ autoplayPlugin.current ].filter(Boolean),
     );
 
     const onInitCallback = useCallbackRef(onInit);
@@ -47,10 +47,10 @@ function Carousel({
 
         const withAutoplayReset =
             (fn) =>
-            (...args) => {
-                autoplay && autoplayPlugin?.current?.reset?.();
-                return fn(...args);
-            };
+                (...args) => {
+                    autoplay && autoplayPlugin?.current?.reset?.();
+                    return fn(...args);
+                };
 
         api.scrollTo = withAutoplayReset(api.scrollTo);
         api.scrollNext = withAutoplayReset(api.scrollNext);
@@ -71,7 +71,7 @@ function Carousel({
             onSettleCallback && api.off('settle', onSettleCallback);
             onResizeCallback && api.off('resize', onResizeCallback);
         };
-    }, [api, autoplayPlugin, autoplay]);
+    }, [ api, autoplayPlugin, autoplay ]);
 
     useEffect(() => {
         if (!api) return;
@@ -94,7 +94,7 @@ function Carousel({
         return () => {
             api.off('resize', handleDisableDrag);
         };
-    }, [api]);
+    }, [ api ]);
 
     return (
         <div

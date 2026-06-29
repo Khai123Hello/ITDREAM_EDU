@@ -2,48 +2,62 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { sendRequest } from '@services/api';
 
 const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, pathParams = {}, dataBody = {} } = {}) => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-    const initialized = useRef(false);
+    const [ loading, setLoading ] = useState(false);
+    const [ data, setData ] = useState(null);
+    const [ error, setError ] = useState(null);
+    const isMounted = useRef(true);
+    const abortControllerRef = useRef(null);
+
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
+    }, []);
 
     const execute = useCallback(
         async ({ onCompleted, onError, ...payload } = {}, cancelType) => {
-            setLoading(true);
-            setError(null);
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+            abortControllerRef.current = new AbortController();
+
+            if (isMounted.current) setLoading(true);
+            if (isMounted.current) setError(null);
+
             try {
                 const requestData = payload.dataBody !== undefined ? payload.dataBody : dataBody;
                 const { data, status } = await sendRequest(
                     apiConfig,
-                    { params, pathParams, data: requestData, ...payload },
+                    { params, pathParams, data: requestData, ...payload, signal: abortControllerRef.current.signal },
                     cancelType,
                 );
                 if (status !== 200) {
                     throw data;
                 }
-                !cancelType && setData(mappingData ? mappingData(data) : data);
+                if (isMounted.current && !cancelType) setData(mappingData ? mappingData(data) : data);
                 onCompleted && onCompleted(data);
                 return data;
             } catch (error) {
-                !cancelType && setError(error);
+                if (error.name === 'CanceledError' || error.message === 'canceled') return error;
+                if (isMounted.current && !cancelType) setError(error);
                 onError && onError(error);
                 return error;
             } finally {
-                !cancelType && setLoading(false);
+                if (isMounted.current && !cancelType) setLoading(false);
             }
         },
-        [apiConfig],
+        [ apiConfig ],
     );
 
     useEffect(() => {
-        if (!initialized.current) {
-            initialized.current = true;
-            // My actual effect logic...
-            if (immediate) {
-                execute();
-            }
+        if (immediate) {
+            execute();
         }
-    }, [execute, immediate]);
+    }, [ execute, immediate ]);
 
     return { loading, execute, data, error, setData };
 };

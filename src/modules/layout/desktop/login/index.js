@@ -85,7 +85,7 @@ function LoginPageDesktop({
     fieldName = 'email',
     fieldLabel = 'E-mail',
 }) {
-    const [otp, setOtpLocal] = useState('');
+    const [ otp, setOtpLocal ] = useState('');
     const translate = useTranslate();
 
     const loginGoogle = useGoogleLogin({
@@ -191,7 +191,20 @@ function LoginPageDesktop({
                             </Form>
 
                             <div className={styles.registerRow}>
-                                Chưa có tài khoản? <a onClick={handleRegisterPage}>Đăng ký ngay</a>
+                                Chưa có tài khoản?{' '}
+                                <a
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={handleRegisterPage}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleRegisterPage();
+                                        }
+                                    }}
+                                >
+                                    Đăng ký ngay
+                                </a>
                             </div>
                         </div>
 

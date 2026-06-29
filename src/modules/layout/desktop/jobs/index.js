@@ -27,61 +27,83 @@ const getJobTags = (job) => {
 
 const getAchievementIcon = (achievementName) => {
     switch (achievementName) {
-        case 'Đoạn trích sơ yếu lý lịch':
-            return (
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                    />
-                </svg>
-            );
-        case 'Mẹo phỏng vấn':
-            return (
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.82m2.56-5.84a14.982 14.982 0 00-6.16 12.12A14.98 14.98 0 0014.37 8.41m-2.56 5.96a14.926 14.926 0 00-5.84 2.56"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                    />
-                </svg>
-            );
-        case 'Giấy chứng nhận':
-            return (
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                    />
-                </svg>
-            );
-        case 'Kỹ năng':
-            return (
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                    />
-                </svg>
-            );
-        default:
-            return null;
+                    case 'Đoạn trích sơ yếu lý lịch':
+                        return (
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        );
+                    case 'Mẹo phỏng vấn':
+                        return (
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.82m2.56-5.84a14.982 14.982 0 00-6.16 12.12A14.98 14.98 0 0014.37 8.41m-2.56 5.96a14.926 14.926 0 00-5.84 2.56"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        );
+                    case 'Giấy chứng nhận':
+                        return (
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        );
+                    case 'Kỹ năng':
+                        return (
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        );
+                    default:
+                        return null;
     }
 };
 
 function JobsDesktop() {
-    const [selectedJobId, setSelectedJobId] = useState(null);
-    const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'recommended', 'saved', 'applied'
+    const [ selectedJobId, setSelectedJobId ] = useState(null);
+    const [ selectedTab, setSelectedTab ] = useState('all'); // 'all', 'recommended', 'saved', 'applied'
 
     // Dropdown filters
-    const [opportunityFilter, setOpportunityFilter] = useState('Tất cả');
-    const [countryFilter, setCountryFilter] = useState('Tất cả');
-    const [companyFilter, setCompanyFilter] = useState('Tất cả');
-    const [roleFilter, setRoleFilter] = useState('Tất cả');
-    const [fieldFilter, setFieldFilter] = useState('Tất cả');
+    const [ opportunityFilter, setOpportunityFilter ] = useState('Tất cả');
+    const [ countryFilter, setCountryFilter ] = useState('Tất cả');
+    const [ companyFilter, setCompanyFilter ] = useState('Tất cả');
+    const [ roleFilter, setRoleFilter ] = useState('Tất cả');
+    const [ fieldFilter, setFieldFilter ] = useState('Tất cả');
+
+    // Fetch all jobs once to populate filter choices dynamically
+    const { data: allJobsData } = useFetch(apiConfig.job.studentList, {
+        params: { page: 0, size: 1000, tab: 'all' },
+        mappingData: (res) => res.data?.content || [],
+        immediate: true,
+    });
+
+    const companies = useMemo(() => {
+        const list = (allJobsData || []).map((j) => j.company).filter(Boolean);
+        return [ 'Tất cả', ...new Set(list) ];
+    }, [ allJobsData ]);
+
+    const countries = useMemo(() => {
+        const list = (allJobsData || []).map((j) => j.country).filter(Boolean);
+        return [ 'Tất cả', ...new Set(list) ];
+    }, [ allJobsData ]);
+
+    const fields = useMemo(() => {
+        const list = (allJobsData || []).map((j) => j.field).filter(Boolean);
+        return [ 'Tất cả', ...new Set(list) ];
+    }, [ allJobsData ]);
 
     const handleSelectJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -106,7 +128,7 @@ function JobsDesktop() {
         if (fieldFilter !== 'Tất cả') params.field = fieldFilter;
 
         return params;
-    }, [selectedTab, opportunityFilter, roleFilter, countryFilter, companyFilter, fieldFilter]);
+    }, [ selectedTab, opportunityFilter, roleFilter, countryFilter, companyFilter, fieldFilter ]);
 
     // Main jobs list fetcher
     const {
@@ -135,13 +157,13 @@ function JobsDesktop() {
     // Load jobs on query parameters change
     useEffect(() => {
         fetchJobs();
-    }, [queryParams, fetchJobs]);
+    }, [ queryParams, fetchJobs ]);
 
     // Load counts on mount
     useEffect(() => {
         fetchSavedCount();
         fetchAppliedCount();
-    }, [fetchSavedCount, fetchAppliedCount]);
+    }, [ fetchSavedCount, fetchAppliedCount ]);
 
     // Active job details resolver
     const jobs = jobsResponse?.content || [];
@@ -149,14 +171,14 @@ function JobsDesktop() {
 
     const activeJob = useMemo(() => {
         return jobs.find((job) => job.id === selectedJobId) || null;
-    }, [jobs, selectedJobId]);
+    }, [ jobs, selectedJobId ]);
 
     // Reset selected job if it gets filtered out of the list
     useEffect(() => {
         if (selectedJobId && jobs.length > 0 && !jobs.some((j) => j.id === selectedJobId)) {
             setSelectedJobId(null);
         }
-    }, [jobs, selectedJobId]);
+    }, [ jobs, selectedJobId ]);
 
     // Toggle save job action
     const { execute: callToggleSave } = useFetch(apiConfig.job.toggleSave, {}, false);
@@ -311,9 +333,13 @@ function JobsDesktop() {
                             className={styles.filterSelect}
                         >
                             <option value="Tất cả">Quốc gia: Tất cả</option>
-                            <option value="Toàn cầu">Toàn cầu</option>
-                            <option value="Anh Quốc">Anh Quốc</option>
-                            <option value="Úc">Úc</option>
+                            {countries
+                                .filter((c) => c !== 'Tất cả')
+                                .map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 
@@ -324,10 +350,13 @@ function JobsDesktop() {
                             className={styles.filterSelect}
                         >
                             <option value="Tất cả">Công ty: Tất cả</option>
-                            <option value="Baker McKenzie.">Baker McKenzie.</option>
-                            <option value="SLAUGHTER AND MAY">SLAUGHTER AND MAY</option>
-                            <option value="KPMG">KPMG</option>
-                            <option value="WHITE & CASE">WHITE & CASE</option>
+                            {companies
+                                .filter((c) => c !== 'Tất cả')
+                                .map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 
@@ -350,8 +379,13 @@ function JobsDesktop() {
                             className={styles.filterSelect}
                         >
                             <option value="Tất cả">Lĩnh vực: Tất cả</option>
-                            <option value="Pháp luật">Pháp luật</option>
-                            <option value="Tư vấn">Tư vấn</option>
+                            {fields
+                                .filter((f) => f !== 'Tất cả')
+                                .map((f) => (
+                                    <option key={f} value={f}>
+                                        {f}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                 </div>

@@ -11,6 +11,7 @@ const LandingPageContainer = ({ title }) => {
             page: 0,
             size: 12,
             status: 1,
+            paged: true,
         },
         mappingData: (response) => response?.data?.content || [],
     });
@@ -28,8 +29,22 @@ const LandingPageContainer = ({ title }) => {
                 organization: item.educator?.organization || {},
                 category: item.category,
             })),
-        [data],
+        [ data ],
     );
+
+    const { data: organizationData } = useFetch(apiConfig.organization.guestList, {
+        immediate: true,
+        mappingData: (response) => response?.data?.content || [],
+    });
+
+    const { data: feedbacksData } = useFetch(apiConfig.feedback.clientList, {
+        immediate: true,
+        params: {
+            page: 0,
+            size: 6,
+        },
+        mappingData: (response) => response?.data?.content || [],
+    });
 
     const handleRetry = () => {
         execute();
@@ -43,6 +58,8 @@ const LandingPageContainer = ({ title }) => {
                         <LandingPageDesktop
                             {...props}
                             simulations={simulations}
+                            organizations={organizationData || []}
+                            feedbacks={feedbacksData || []}
                             loading={loading}
                             error={error}
                             onRetry={handleRetry}

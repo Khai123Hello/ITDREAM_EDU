@@ -12,47 +12,24 @@ const MOCK_ACHIEVEMENT = {
     description: 'Tham gia mô phỏng dự án để nhận chứng chỉ và làm đẹp hồ sơ của bạn.',
 };
 
-const MOCK_JOBS = [
-    {
-        id: 1,
-        title: 'Comcast Talent Network',
-        description: 'Nhận thông tin cơ hội việc làm và sự kiện tuyển dụng.',
-        company: 'COMCAST',
-        companyClass: 'companyComcast',
-    },
-    {
-        id: 2,
-        title: 'Siemens Mobility Careers',
-        description: 'Khám phá các vị trí đang tuyển dụng.',
-        company: 'SIEMENS',
-        companyClass: 'companySiemens',
-    },
-    {
-        id: 3,
-        title: 'Student Marketeer – Various Locations',
-        description: 'Khởi đầu sự nghiệp cùng Red Bull',
-        company: 'Red Bull',
-        companyClass: 'companyRedbull',
-        closeDate: '30/06/2026',
-    },
-];
-
 function DashboardDesktop({
     profile,
     enrolledSims = [],
     enrolledUrlBase = '',
     achievements = [],
     allSimulations = [],
+    organizations = [],
     loading,
 }) {
     const navigate = useNavigate();
     const name = profile?.fullName || profile?.account?.fullName || '';
+    const [ dismissedOrgs, setDismissedOrgs ] = useState([]);
 
-    const [previewModalVisible, setPreviewModalVisible] = useState(false);
-    const [previewLoading, setPreviewLoading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [currentDownloadUrl, setCurrentDownloadUrl] = useState(null);
-    const [currentFileName, setCurrentFileName] = useState('');
+    const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
+    const [ previewLoading, setPreviewLoading ] = useState(false);
+    const [ previewUrl, setPreviewUrl ] = useState(null);
+    const [ currentDownloadUrl, setCurrentDownloadUrl ] = useState(null);
+    const [ currentFileName, setCurrentFileName ] = useState('');
 
     const handlePreviewCertificate = async (e, downloadUrl, fileName) => {
         e.preventDefault();
@@ -95,7 +72,7 @@ function DashboardDesktop({
     const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
     const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
 
-    const completionStatus = [hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization];
+    const completionStatus = [ hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization ];
     const completedCount = completionStatus.filter(Boolean).length;
     const missingCount = 5 - completedCount;
     const isProfileComplete = completedCount === 5;
@@ -471,33 +448,51 @@ function DashboardDesktop({
                         )}
 
                         <div className={styles.sectionTitle}>
-                            <span className={styles.sectionIcon}>💼</span> Việc làm phù hợp
+                            <span className={styles.sectionIcon}>💼</span> Đối tác doanh nghiệp
                         </div>
 
-                        {MOCK_JOBS.map((job) => (
-                            <div key={job.id} className={styles.jobCard}>
-                                <div>
-                                    <h4>{job.title}</h4>
-                                    <p>{job.description}</p>
-                                    {job.closeDate && (
-                                        <div className={styles.closeDate}>🕐 Đóng vào {job.closeDate}</div>
-                                    )}
-                                    <div className={styles.cardActions}>
-                                        <button className={styles.btnDismiss}>Không quan tâm</button>
-                                        <button className={styles.linkBtn}>
-                                            Xem chi tiết <span className={styles.chevron}></span>
-                                        </button>
+                        {organizations
+                            .filter((org) => !dismissedOrgs.includes(org.id))
+                            .slice(0, 3)
+                            .map((org) => {
+                                const logoUrl = org.logoUrl
+                                    ? org.logoUrl.startsWith('http')
+                                        ? org.logoUrl
+                                        : `${enrolledUrlBase || ''}${org.logoUrl}`
+                                    : null;
+                                const orgName = org.shortName || org.name || 'Tổ chức';
+
+                                return (
+                                    <div key={org.id} className={styles.jobCard}>
+                                        <div>
+                                            <h4>Cơ hội việc làm tại {orgName}</h4>
+                                            <p>{org.description || `Tham gia mạng lưới nhân tài của ${orgName}.`}</p>
+                                            <div className={styles.cardActions}>
+                                                <button
+                                                    className={styles.btnDismiss}
+                                                    onClick={() => setDismissedOrgs([ ...dismissedOrgs, org.id ])}
+                                                >
+                                                    Không quan tâm
+                                                </button>
+                                                <button className={styles.linkBtn} onClick={() => navigate('/jobs')}>
+                                                    Xem chi tiết <span className={styles.chevron}></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className={styles.companyBadge} style={{ background: '#fff' }}>
+                                            {logoUrl ? (
+                                                <img
+                                                    src={logoUrl}
+                                                    alt={orgName}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                                />
+                                            ) : (
+                                                <div style={{ color: '#000', fontWeight: 'bold' }}>{orgName}</div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={`${styles.companyBadge} ${styles[job.companyClass]}`}>
-                                    {job.companyClass === 'companyRedbull' ? (
-                                        <div className={styles.redbullBadge}>Red Bull</div>
-                                    ) : (
-                                        job.company
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                                );
+                            })}
                     </div>
                 </div>
             </main>
