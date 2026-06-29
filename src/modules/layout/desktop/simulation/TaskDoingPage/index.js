@@ -161,6 +161,8 @@ function QuizBlock({
     questionId = null,
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const [ selected, setSelected ] = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
@@ -193,8 +195,10 @@ function QuizBlock({
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
     const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
+    const isExceeded = totalError > 0 && errorCount >= totalError;
+
     const handleSubmit = () => {
-        if (selected === null) return;
+        if (selected === null || isExceeded) return;
         setSubmitted(true);
         const selectedOption = (block.options || [])[selected];
         onQuizAnswerSubmit({
@@ -205,6 +209,7 @@ function QuizBlock({
     };
 
     const handleReset = () => {
+        if (isExceeded) return;
         setSelected(null);
         setSubmitted(false);
         setIsRetrying(true);
@@ -217,6 +222,18 @@ function QuizBlock({
                 <span className="tfo-block-quiz-icon">❓</span>
                 <span className="tfo-block-quiz-text">{block.question}</span>
             </div>
+
+            {/* Error Count / Attempt info */}
+            {totalError > 0 && (
+                <div className="tfo-quiz-error-count-info" style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}>
+                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong> / {totalError}
+                </div>
+            )}
+            {isExceeded && (
+                <div className="tfo-quiz-exceeded-warning" style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}>
+                    ⚠️ Bạn đã vượt quá số lần làm sai cho phép. Vui lòng bấm đặt lại nhiệm vụ để làm lại bài.
+                </div>
+            )}
 
             {/* Options */}
             <div className="tfo-block-quiz-options">
@@ -237,8 +254,8 @@ function QuizBlock({
                         <button
                             key={oi}
                             className={cls}
-                            disabled={effectiveSubmitted || hasCompleted}
-                            onClick={() => !(effectiveSubmitted || hasCompleted) && setSelected(oi)}
+                            disabled={effectiveSubmitted || hasCompleted || isExceeded}
+                            onClick={() => !(effectiveSubmitted || hasCompleted || isExceeded) && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
@@ -258,7 +275,7 @@ function QuizBlock({
                 {!effectiveSubmitted ? (
                     <button
                         className="tfo-quiz-submit-btn"
-                        disabled={selected === null || hasCompleted}
+                        disabled={selected === null || hasCompleted || isExceeded}
                         onClick={handleSubmit}
                     >
                         Kiểm tra đáp án
@@ -269,7 +286,7 @@ function QuizBlock({
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted} onClick={handleReset}>
+                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted || isExceeded} onClick={handleReset}>
                                 Làm lại
                             </button>
                         )}
@@ -290,6 +307,8 @@ function BlockItem({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     switch (block.type) {
                     case 'meta':
@@ -396,6 +415,8 @@ function BlockItem({
                                 questionId={questionId}
                                 onQuizAnswerSubmit={onQuizAnswerSubmit}
                                 hasCompleted={hasCompleted}
+                                errorCount={errorCount}
+                                totalError={totalError}
                             />
                         );
                     }
@@ -413,6 +434,8 @@ function BlocksContent({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const blocks = useMemo(() => {
         try {
@@ -434,6 +457,8 @@ function BlocksContent({
                     questionMap={questionMap}
                     onQuizAnswerSubmit={onQuizAnswerSubmit}
                     hasCompleted={hasCompleted}
+                    errorCount={errorCount}
+                    totalError={totalError}
                 />
             ))}
         </div>
@@ -524,6 +549,8 @@ function ContentRenderer({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
     onQuestionRendered = () => {},
 }) {
     return (
@@ -533,6 +560,8 @@ function ContentRenderer({
             questionMap={questionMap}
             onQuizAnswerSubmit={onQuizAnswerSubmit}
             hasCompleted={hasCompleted}
+            errorCount={errorCount}
+            totalError={totalError}
             onQuestionRendered={onQuestionRendered}
         />
     );
@@ -858,6 +887,7 @@ export default function TaskDoingPage({
     urlBase = '',
 
     // Progress
+    taskProgress = null,
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
     taskProgressMap = {},
     hasCompleted = false,
@@ -876,6 +906,7 @@ export default function TaskDoingPage({
     previousFile = null,
     previousText = '',
     onTextResponseSubmit = () => {},
+    onResetSubtask = () => {},
     quizSubmissionMap = {},
     questionMap = {},
     onQuizAnswerSubmit = () => {},
@@ -1005,6 +1036,9 @@ export default function TaskDoingPage({
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed' || hasCompleted;
 
+    const errorCount = taskProgress?.errorCount || 0;
+    const totalError = taskProgress?.task?.totalError || 0;
+
     return (
         <>
             <AppHeader />
@@ -1108,6 +1142,8 @@ export default function TaskDoingPage({
                                                         questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                         hasCompleted={hasCompleted}
+                                                        errorCount={errorCount}
+                                                        totalError={totalError}
                                                         onQuestionRendered={setInlineQuestionIds}
                                                     />
                                                 )}
@@ -1142,6 +1178,8 @@ export default function TaskDoingPage({
                                                                         questionId={questionId}
                                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                                         hasCompleted={hasCompleted}
+                                                                        errorCount={errorCount}
+                                                                        totalError={totalError}
                                                                     />
                                                                 );
                                                             })}
@@ -1192,6 +1230,35 @@ export default function TaskDoingPage({
                                                 )}
 
                                                 {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
+                                                {!isCompleted && (
+                                                    <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <button
+                                                            className="tfo-action-btn tfo-action-btn-secondary"
+                                                            onClick={onResetSubtask}
+                                                            style={{
+                                                                background: '#fff',
+                                                                border: '1px solid #d9d9d9',
+                                                                color: '#595959',
+                                                                padding: '6px 16px',
+                                                                borderRadius: '4px',
+                                                                cursor: 'pointer',
+                                                                fontSize: '14px',
+                                                                fontWeight: '500',
+                                                                transition: 'all 0.3s',
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.target.style.color = '#1890ff';
+                                                                e.target.style.borderColor = '#1890ff';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.target.style.color = '#595959';
+                                                                e.target.style.borderColor = '#d9d9d9';
+                                                            }}
+                                                        >
+                                                            🔄 Làm lại nhiệm vụ
+                                                        </button>
+                                                    </div>
+                                                )}
 
                                                 {/* File upload section */}
                                                 {requiresFileUpload && (
@@ -1216,7 +1283,7 @@ export default function TaskDoingPage({
                                                             placeholder="Nhập câu trả lời của bạn ở đây..."
                                                             value={textInput}
                                                             onChange={(e) => setTextInput(e.target.value)}
-                                                            disabled={isCompleted || Boolean(previousText)}
+                                                            disabled={isCompleted}
                                                             rows={6}
                                                         />
                                                         <div className="tfo-text-response-footer">
@@ -1225,7 +1292,6 @@ export default function TaskDoingPage({
                                                                 onClick={() => onTextResponseSubmit(textInput)}
                                                                 disabled={
                                                                     isCompleted ||
-                                                                    Boolean(previousText) ||
                                                                     !textInput.trim()
                                                                 }
                                                             >

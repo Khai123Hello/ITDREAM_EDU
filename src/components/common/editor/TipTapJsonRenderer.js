@@ -42,6 +42,8 @@ function InteractiveQuizBlock({
     questionId = null,
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const [ selected, setSelected ] = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
@@ -74,8 +76,10 @@ function InteractiveQuizBlock({
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
     const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
+    const isExceeded = totalError > 0 && errorCount >= totalError;
+
     const handleSubmit = () => {
-        if (selected === null) return;
+        if (selected === null || isExceeded) return;
         setSubmitted(true);
         const selectedOption = (block.options || [])[selected];
         onQuizAnswerSubmit({
@@ -86,6 +90,7 @@ function InteractiveQuizBlock({
     };
 
     const handleReset = () => {
+        if (isExceeded) return;
         setSelected(null);
         setSubmitted(false);
         setIsRetrying(true);
@@ -98,6 +103,18 @@ function InteractiveQuizBlock({
                 <span className="tfo-block-quiz-icon">❓</span>
                 <span className="tfo-block-quiz-text">{block.question}</span>
             </div>
+
+            {/* Error Count / Attempt info */}
+            {totalError > 0 && (
+                <div className="tfo-quiz-error-count-info" style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}>
+                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong> / {totalError}
+                </div>
+            )}
+            {isExceeded && (
+                <div className="tfo-quiz-exceeded-warning" style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}>
+                    ⚠️ Bạn đã vượt quá số lần làm sai cho phép. Vui lòng bấm đặt lại nhiệm vụ để làm lại bài.
+                </div>
+            )}
 
             {/* Options */}
             <div className="tfo-block-quiz-options">
@@ -112,8 +129,8 @@ function InteractiveQuizBlock({
                         <button
                             key={oi}
                             className={cls}
-                            disabled={effectiveSubmitted || hasCompleted}
-                            onClick={() => !(effectiveSubmitted || hasCompleted) && setSelected(oi)}
+                            disabled={effectiveSubmitted || hasCompleted || isExceeded}
+                            onClick={() => !(effectiveSubmitted || hasCompleted || isExceeded) && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
@@ -133,7 +150,7 @@ function InteractiveQuizBlock({
                 {!effectiveSubmitted ? (
                     <button
                         className="tfo-quiz-submit-btn"
-                        disabled={selected === null || hasCompleted}
+                        disabled={selected === null || hasCompleted || isExceeded}
                         onClick={handleSubmit}
                     >
                         Kiểm tra đáp án
@@ -144,7 +161,7 @@ function InteractiveQuizBlock({
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted} onClick={handleReset}>
+                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted || isExceeded} onClick={handleReset}>
                                 Làm lại
                             </button>
                         )}
@@ -302,6 +319,8 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                                     questionId={questionId}
                                     onQuizAnswerSubmit={onQuizAnswerSubmit}
                                     hasCompleted={hasCompleted}
+                                    errorCount={quizCtx?.errorCount}
+                                    totalError={quizCtx?.totalError}
                                 />
                             );
                         }
@@ -381,6 +400,8 @@ export default function TipTapJsonRenderer({
     onQuizAnswerSubmit,
     hasCompleted,
     onQuestionRendered,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const json = useMemo(() => {
         if (!content) return { type: 'doc', content: [] };
@@ -429,8 +450,10 @@ export default function TipTapJsonRenderer({
         return {
             quizSubmissionMap: quizSubmissionMap || {},
             questionMap: questionMap || {},
+            errorCount,
+            totalError,
         };
-    }, [ quizSubmissionMap, questionMap ]);
+    }, [ quizSubmissionMap, questionMap, errorCount, totalError ]);
 
     // Extract inline question IDs inside useMemo to avoid state setting during rendering
     const inlineQuestionIds = useMemo(() => {

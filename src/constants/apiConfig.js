@@ -241,7 +241,7 @@ const apiConfig = {
         },
         reset: {
             baseURL: `${apiUrl}v1/task_progress/reset`,
-            method: 'POST',
+            method: 'PUT',
             headers: baseHeader,
         },
         studentList: {

@@ -5,7 +5,7 @@ import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
 import useTaskHierarchy from '@hooks/useTaskHierarchy';
 import TaskDoingPage from '@modules/layout/desktop/simulation/TaskDoingPage';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 
 const isFilePath = (str = '') => {
     if (!str || typeof str !== 'string') return false;
@@ -231,6 +231,15 @@ function TaskDoingContainer() {
     // Complete task progress
     const { execute: completeTaskProgress } = useFetch(
         apiConfig.taskProgress.complete,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    // Reset task progress
+    const { execute: resetTaskProgress } = useFetch(
+        apiConfig.taskProgress.reset,
         {
             mappingData: (res) => res.data || {},
         },
@@ -1259,6 +1268,48 @@ function TaskDoingContainer() {
     );
 
     /**
+     * Đặt lại tiến độ nhiệm vụ con (Reset Subtask Progress)
+     */
+    const handleResetSubtask = useCallback(async () => {
+        if (!selectedSubtaskId) return;
+        try {
+            const res = await resetTaskProgress({
+                dataBody: {
+                    taskId: selectedSubtaskId,
+                },
+            });
+            const errorMsg = res?.response?.data?.message || res?.data?.message || res?.message;
+            const isError =
+                res?.result === false ||
+                res?.response?.data?.result === false ||
+                (res?.result !== true && res?.response?.data?.result !== true && !!errorMsg);
+
+            if (isError) {
+                message.error(errorMsg || 'Không thể đặt lại tiến độ nhiệm vụ.');
+                return;
+            }
+
+            message.success('Đặt lại tiến độ nhiệm vụ thành công!');
+            
+            // Refetch task list to update status in sidebar
+            fetchTaskList();
+            // Refetch enrollment progress
+            refetchProgress();
+            
+            // Refetch current progress details
+            if (currentSubtaskProgress?.taskProgressId) {
+                fetchProgressDetail({
+                    pathParams: { id: currentSubtaskProgress.taskProgressId },
+                });
+            }
+            // Clear local answers
+            setLocalQuizAnswers({});
+        } catch (err) {
+            message.error('Có lỗi xảy ra khi đặt lại tiến độ.');
+        }
+    }, [ selectedSubtaskId, resetTaskProgress, fetchTaskList, refetchProgress, currentSubtaskProgress, fetchProgressDetail ]);
+
+    /**
      * Nộp câu hỏi trắc nghiệm - chỉ nộp khi học viên đã bấm đúng đáp án (isCorrect = true)
      * Gắn với studentTaskProgressId và taskQuestionId của câu hỏi trắc nghiệm
      */
@@ -1290,13 +1341,34 @@ function TaskDoingContainer() {
                         isCorrect,
                     },
                 });
-                if (submitRes?.result === false) {
+                
+                const errorMsg = submitRes?.response?.data?.message || submitRes?.data?.message || submitRes?.message;
+                const errorCode = submitRes?.response?.data?.code || submitRes?.code || submitRes?.data?.code;
+                const isError =
+                    submitRes?.result === false ||
+                    submitRes?.response?.data?.result === false ||
+                    (submitRes?.result !== true && submitRes?.response?.data?.result !== true && !!errorMsg);
+
+                if (isError) {
                     setLocalQuizAnswers((prev) => {
                         const next = { ...prev };
                         delete next[normalizedQuestionId];
                         return next;
                     });
-                    message.error('Có lỗi xảy ra khi lưu đáp án!');
+                    
+                    if (errorCode === 'STUDENT_TASK-PROGRESS-ERROR-0004') {
+                        Modal.confirm({
+                            title: 'Đã vượt quá số lần làm sai',
+                            content: 'Bạn đã làm sai vượt quá số lần quy định cho nhiệm vụ này. Bạn có muốn đặt lại tiến trình để làm lại từ đầu không?',
+                            okText: 'Làm lại từ đầu',
+                            cancelText: 'Hủy',
+                            onOk: () => {
+                                handleResetSubtask();
+                            },
+                        });
+                    } else {
+                        message.error(errorMsg || 'Có lỗi xảy ra khi lưu đáp án!');
+                    }
                     return;
                 }
 
@@ -1318,7 +1390,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi lưu đáp án!');
             }
         },
-        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted ],
+        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted, handleResetSubtask ],
     );
 
     /**
@@ -1602,6 +1674,7 @@ function TaskDoingContainer() {
         previousText,
         onFileChange: handleFileUpload,
         onTextResponseSubmit: handleTextResponseSubmit,
+        onResetSubtask: handleResetSubtask,
         quizSubmissionMap,
         questionMap,
         onQuizAnswerSubmit: handleQuizAnswerSubmit,
