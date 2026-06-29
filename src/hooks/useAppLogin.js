@@ -84,14 +84,16 @@ const useAppLogin = (role = 'student') => {
                 dispatch(accountActions.getProfileSuccess(payload));
                 navigate('/dashboard');
             } else {
-                showErrorMessage(translate.formatMessage(message.loginFail));
+                const errorMsg = profileData?.message || translate.formatMessage(message.loginFail);
+                showErrorMessage(errorMsg);
                 removeCacheToken();
                 removeCacheUserKind();
                 removeCacheUserEmail();
             }
         } catch (error) {
             setLoadingProfileFetch(false);
-            showErrorMessage(translate.formatMessage(message.loginFail));
+            const errorMsg = error?.message || translate.formatMessage(message.loginFail);
+            showErrorMessage(errorMsg);
             removeCacheToken();
             removeCacheUserKind();
             removeCacheUserEmail();
@@ -109,7 +111,9 @@ const useAppLogin = (role = 'student') => {
             authorization: `Basic ${base64Credentials}`,
             onCompleted: (responseLogin) => handleLoginSuccess(responseLogin, values.email),
             onError: (error) => {
-                showErrorMessage(translate.formatMessage(message.loginFail));
+                const responseData = error?.response?.data;
+                const errorMsg = responseData?.message || translate.formatMessage(message.loginFail);
+                showErrorMessage(errorMsg);
                 console.error('Login error:', error);
             },
         });
@@ -124,7 +128,9 @@ const useAppLogin = (role = 'student') => {
             authorization: `Basic ${base64Credentials}`,
             onCompleted: (responseLogin) => handleLoginSuccess(responseLogin, ''),
             onError: (error) => {
-                showErrorMessage(translate.formatMessage(message.loginFail));
+                const responseData = error?.response?.data;
+                const errorMsg = responseData?.message || translate.formatMessage(message.loginFail);
+                showErrorMessage(errorMsg);
                 console.error('Google Login error:', error);
             },
         });

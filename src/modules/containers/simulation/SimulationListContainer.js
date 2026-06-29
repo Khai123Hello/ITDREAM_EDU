@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import apiConfig from '@constants/apiConfig';
 import { DEFAULT_PAGE_SIZE, MAX_SIMULATIONS_LOAD_LIMIT } from '@constants';
+import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import useQueryParams from '@hooks/useQueryParams';
 import AppFooter from '@modules/layout/common/AppFooter';

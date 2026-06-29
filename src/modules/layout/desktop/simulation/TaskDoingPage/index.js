@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Spin } from 'antd';
+import dayjs from 'dayjs';
 
 import CommentPanel from '../components/CommentPanel';
 import TaskDoingSidebar from '../components/TaskDoingSidebar';
@@ -9,6 +10,30 @@ import TaskDoingSidebar from '../components/TaskDoingSidebar';
 import './TaskDoingPage.scss';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
+
+const getInitials = (fullName) => {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+};
+
+const getAvatarColor = (name) => {
+    const colors = [
+        'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)',
+        'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+        'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+        'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    ];
+    let hash = 0;
+    const cleanName = name || '';
+    for (let i = 0; i < cleanName.length; i++) {
+        hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+};
 
 function detectContentType(content) {
     if (!content || typeof content !== 'string') return 'empty';
@@ -199,8 +224,14 @@ function QuizBlock({
                     const letter = String.fromCharCode(65 + oi);
                     let cls = 'tfo-quiz-option';
                     if (effectiveSelected === oi) cls += ' selected';
-                    if (effectiveSubmitted && oi === correct) cls += ' answer-correct';
-                    if (effectiveSubmitted && effectiveSelected === oi && oi !== correct) cls += ' answer-wrong';
+
+                    // Show correct answer highlighting only if the user actually chose the correct answer
+                    const showAsCorrect = effectiveSubmitted && oi === correct && isCorrect;
+                    // Show wrong answer highlighting if this was the selected option and it is wrong
+                    const showAsWrong = effectiveSubmitted && effectiveSelected === oi && oi !== correct;
+
+                    if (showAsCorrect) cls += ' answer-correct';
+                    if (showAsWrong) cls += ' answer-wrong';
 
                     return (
                         <button
@@ -211,10 +242,10 @@ function QuizBlock({
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
-                            {effectiveSubmitted && oi === correct && (
+                            {showAsCorrect && (
                                 <span className="tfo-quiz-option-badge correct">✓ Đúng</span>
                             )}
-                            {effectiveSubmitted && effectiveSelected === oi && oi !== correct && (
+                            {showAsWrong && (
                                 <span className="tfo-quiz-option-badge wrong">✗ Sai</span>
                             )}
                         </button>
@@ -828,6 +859,7 @@ export default function TaskDoingPage({
 
     // Progress
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
+    taskProgressMap = {},
     hasCompleted = false,
     isLastSubtask = false,
 
@@ -972,7 +1004,6 @@ export default function TaskDoingPage({
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed' || hasCompleted;
-    const isNavigationBlocked = !isCompleted;
 
     return (
         <>
@@ -996,7 +1027,8 @@ export default function TaskDoingPage({
                                 parentTasks={parentTasks}
                                 selectedParentTaskId={selectedParentTaskId}
                                 onSelectParentTask={onSelectParentTask}
-                                isNavigationBlocked={isNavigationBlocked}
+                                taskProgressMap={taskProgressMap}
+                                hasCompleted={hasCompleted}
                             />
 
                             <main className="tfo-pane">
@@ -1009,15 +1041,20 @@ export default function TaskDoingPage({
                                                 <div className="tfo-step-pagination">
                                                     {subtasks.map((st, index) => {
                                                         const isCurrent = st.id === selectedSubtaskId;
+                                                        const isUnlocked =
+                                                            hasCompleted ||
+                                                            isCurrent ||
+                                                            taskProgressMap[st.id]?.status === 'completed' ||
+                                                            taskProgressMap[st.id]?.status === 'in_progress';
                                                         return (
                                                             <button
                                                                 key={st.id}
                                                                 className={`tfo-step-btn${isCurrent ? ' active' : ''}`}
                                                                 onClick={() => {
-                                                                    if (isNavigationBlocked && !isCurrent) return;
+                                                                    if (!isUnlocked) return;
                                                                     onSelectSubtask(st.id);
                                                                 }}
-                                                                disabled={isNavigationBlocked && !isCurrent}
+                                                                disabled={!isUnlocked}
                                                             >
                                                                 {index + 1}
                                                             </button>
@@ -1113,24 +1150,43 @@ export default function TaskDoingPage({
 
                                                 {renderMedia()}
 
-                                                {/* Educator feedback for this subtask */}
+                                                {/* Educator reviews (CMS Style) */}
                                                 {currentSubtaskReviews && currentSubtaskReviews.length > 0 && (
-                                                    <div className="tfo-subtask-feedback-card">
-                                                        <div className="tfo-subtask-feedback-header">
-                                                            <span className="tfo-subtask-feedback-icon">💬</span>
-                                                            <span className="tfo-subtask-feedback-title">
-                                                                Nhận xét từ Giảng viên
-                                                            </span>
+                                                    <div className="tfo-subtask-reviews-section">
+                                                        <div className="tfo-subtask-reviews-header">
+                                                            Nhận xét từ Giảng viên ({currentSubtaskReviews.length})
                                                         </div>
-                                                        <div className="tfo-subtask-feedback-comments">
-                                                            {currentSubtaskReviews.map((review) => (
-                                                                <div
-                                                                    key={review.id}
-                                                                    className="tfo-subtask-feedback-comment-item"
-                                                                >
-                                                                    {review.content}
-                                                                </div>
-                                                            ))}
+                                                        <div className="tfo-subtask-reviews-list">
+                                                            {currentSubtaskReviews.map((review) => {
+                                                                const reviewerName = review.creator?.fullName || review.creator?.username || review.createdBy || 'Giảng viên';
+                                                                const reviewerAvatar = review.creator?.avatar ? (review.creator.avatar.startsWith('http') ? review.creator.avatar : `${urlBase}${review.creator.avatar}`) : null;
+                                                                const initials = getInitials(reviewerName);
+                                                                const avatarBg = getAvatarColor(reviewerName);
+                                                                
+                                                                return (
+                                                                    <div key={review.id} className="tfo-review-display saved-card">
+                                                                        <div className="tfo-review-display__header">
+                                                                            {reviewerAvatar ? (
+                                                                                <img src={reviewerAvatar} alt={reviewerName} className="tfo-review-display__avatar" />
+                                                                            ) : (
+                                                                                <div style={{ background: avatarBg }} className="tfo-review-display__avatar-initials">
+                                                                                    {initials}
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="tfo-review-display__meta">
+                                                                                <div className="tfo-review-display__name">{reviewerName}</div>
+                                                                                <div className="tfo-review-display__role">Giáo viên hướng dẫn</div>
+                                                                            </div>
+                                                                            <span className="tfo-review-display__date">
+                                                                                {review.createdDate ? dayjs(review.createdDate).format('DD/MM/YYYY') : '-'}
+                                                                            </span>
+                                                                        </div>
+                                                                        <blockquote className="tfo-review-display__quote">
+                                                                            {review.content}
+                                                                        </blockquote>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                     </div>
                                                 )}
@@ -1179,20 +1235,20 @@ export default function TaskDoingPage({
                                                     </div>
                                                 )}
                                             </div>
+                                            {showComments && (
+                                                <CommentPanel
+                                                    taskId={selectedSubtaskId}
+                                                    comments={comments}
+                                                    loading={commentsLoading}
+                                                    profile={profile}
+                                                    onClose={() => setShowComments(false)}
+                                                    onSendComment={onSendComment}
+                                                    onUpdateComment={onUpdateComment}
+                                                    onDeleteComment={onDeleteComment}
+                                                />
+                                            )}
                                         </div>
                                     </div>
-                                    {showComments && (
-                                        <CommentPanel
-                                            taskId={selectedSubtaskId}
-                                            comments={comments}
-                                            loading={commentsLoading}
-                                            profile={profile}
-                                            onClose={() => setShowComments(false)}
-                                            onSendComment={onSendComment}
-                                            onUpdateComment={onUpdateComment}
-                                            onDeleteComment={onDeleteComment}
-                                        />
-                                    )}
                                 </div>
                             </main>
                         </div>

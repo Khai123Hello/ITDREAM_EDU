@@ -258,7 +258,7 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                     case 'step':
                         return (
                             <div key={index} className="tfo-block-step">
-                                <div className="tfo-block-step-badge">{index + 1}</div>
+                                <div className="tfo-block-step-badge">{node.attrs?.stepNumber || (index + 1)}</div>
                                 <div className="tfo-block-step-content">
                                     {node.attrs?.label && <span className="tfo-block-step-label">{node.attrs.label}</span>}
                                     <div className="tfo-block-step-body">{children}</div>
@@ -392,23 +392,37 @@ export default function TipTapJsonRenderer({
                 try {
                     parsed = JSON.parse(trimmed);
                 } catch {
-                    return markdocToTipTapJson(content);
+                    parsed = markdocToTipTapJson(content);
                 }
             } else {
-                return markdocToTipTapJson(content);
+                parsed = markdocToTipTapJson(content);
             }
         }
 
+        let doc = { type: 'doc', content: [] };
         if (parsed && parsed.type === 'doc') {
-            return parsed;
-        }
-
-        if (Array.isArray(parsed)) {
+            doc = parsed;
+        } else if (Array.isArray(parsed)) {
             const markdocStr = blocksToMarkdoc(parsed);
-            return markdocToTipTapJson(markdocStr);
+            doc = markdocToTipTapJson(markdocStr);
+        } else {
+            return doc;
         }
 
-        return { type: 'doc', content: [] };
+        // Traverse AST to pre-calculate step numbers
+        let stepCounter = 1;
+        const walk = (nodes) => {
+            (nodes || []).forEach((n) => {
+                if (n.type === 'step') {
+                    if (!n.attrs) n.attrs = {};
+                    n.attrs.stepNumber = stepCounter++;
+                }
+                if (n.content) walk(n.content);
+            });
+        };
+        walk(doc.content);
+
+        return doc;
     }, [ content ]);
 
     const quizCtx = useMemo(() => {

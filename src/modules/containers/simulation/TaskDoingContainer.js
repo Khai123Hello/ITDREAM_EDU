@@ -407,11 +407,12 @@ function TaskDoingContainer() {
     // Load task progress & educator reviews on mount
     React.useEffect(() => {
         if (simulationEnrollmentId) {
+            console.log('TaskDoingContainer: Fetching progress and reviews for enrollment:', simulationEnrollmentId);
             refetchProgress({
-                params: { simulationEnrollmentId },
+                params: { simulationEnrollmentId, size: 1000 },
             });
             fetchReviews({
-                params: { simulationEnrollmentId },
+                params: { simulationEnrollmentId, size: 1000 },
             });
         }
     }, [ simulationEnrollmentId, refetchProgress, fetchReviews ]);
@@ -552,7 +553,10 @@ function TaskDoingContainer() {
             }
 
             const errorMsg = result?.response?.data?.message || result?.data?.message || result?.message;
-            const isError = result?.result === false || result?.response?.data?.result === false || errorMsg;
+            const isError =
+                result?.result === false ||
+                result?.response?.data?.result === false ||
+                (result?.result !== true && result?.response?.data?.result !== true && !!errorMsg);
             if (isError) {
                 return {
                     result: false,
@@ -938,8 +942,16 @@ function TaskDoingContainer() {
 
     // Filter educator reviews for the current subtask
     const currentSubtaskReviews = useMemo(() => {
-        if (!reviewData?.content || !currentSubtaskProgress?.taskProgressId) return [];
-        return reviewData.content.filter((r) => r.studentTaskProgressId === currentSubtaskProgress.taskProgressId);
+        if (!reviewData?.content || !currentSubtaskProgress?.taskProgressId) {
+            console.log('TaskDoingContainer: No reviews or no active taskProgressId. reviewData:', reviewData, 'currentSubtaskProgress:', currentSubtaskProgress);
+            return [];
+        }
+        const filtered = reviewData.content.filter((r) => {
+            const rProgressId = r.studentTaskProgressId || r.studentSubmission?.studentTaskProgress?.id;
+            return String(rProgressId) === String(currentSubtaskProgress.taskProgressId);
+        });
+        console.log('TaskDoingContainer: Current active subtask reviews:', filtered, 'Total reviews in enrollment:', reviewData.content.length, 'Active taskProgressId:', currentSubtaskProgress.taskProgressId);
+        return filtered;
     }, [ reviewData, currentSubtaskProgress?.taskProgressId ]);
 
     // Handle parent task selection
@@ -1573,6 +1585,7 @@ function TaskDoingContainer() {
         // Progress info
         taskProgress: currentSubtaskProgress,
         taskStatus: getTaskStatus(),
+        taskProgressMap: taskProgressMap,
         hasCompleted,
         isLastSubtask: isLastSubtaskOverall,
 

@@ -9,7 +9,8 @@ export default function TaskDoingSidebar({
     parentTasks = [],
     selectedParentTaskId = null,
     onSelectParentTask = () => {},
-    isNavigationBlocked = false,
+    taskProgressMap = {},
+    hasCompleted = false,
 }) {
     const navigate = useNavigate();
     const { id: simulationId } = useParams();
@@ -41,6 +42,11 @@ export default function TaskDoingSidebar({
                 {parentTasks.map((task, idx) => {
                     const isActive = selectedParentTaskId === task.id;
                     const isLast = idx === parentTasks.length - 1;
+                    const isUnlocked =
+                        hasCompleted ||
+                        isActive ||
+                        taskProgressMap[task.id]?.status === 'completed' ||
+                        taskProgressMap[task.id]?.status === 'in_progress';
 
                     return (
                         <div key={task.id || idx} className="tfo-task-list-row">
@@ -49,10 +55,10 @@ export default function TaskDoingSidebar({
                                 <button
                                     className={`tfo-task-circle${isActive ? ' active' : ''}`}
                                     onClick={() => {
-                                        if (isNavigationBlocked && !isActive) return;
+                                        if (!isUnlocked) return;
                                         onSelectParentTask(task.id);
                                     }}
-                                    disabled={isNavigationBlocked && !isActive}
+                                    disabled={!isUnlocked}
                                     aria-label={`Task ${idx + 1}`}
                                 >
                                     {idx + 1}
@@ -64,10 +70,10 @@ export default function TaskDoingSidebar({
                             <button
                                 className={`tfo-task-content-btn${isActive ? ' active' : ''}`}
                                 onClick={() => {
-                                    if (isNavigationBlocked && !isActive) return;
+                                    if (!isUnlocked) return;
                                     onSelectParentTask(task.id);
                                 }}
-                                disabled={isNavigationBlocked && !isActive}
+                                disabled={!isUnlocked}
                             >
                                 <div className={`tfo-task-title${isActive ? ' active' : ''}`}>
                                     {task.title || task.name}

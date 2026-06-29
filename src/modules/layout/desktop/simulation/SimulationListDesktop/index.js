@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchOutlined } from '@ant-design/icons';
-import { DEFAULT_PAGE_SIZE } from '@constants';
 import SimulationCard from '@components/common/elements/SimulationCard';
+import { DEFAULT_PAGE_SIZE } from '@constants';
 import { Empty, Input, Pagination, Spin } from 'antd';
 
 import styles from './index.module.scss';
@@ -24,21 +24,21 @@ const DURATION_OPTIONS = [
 const parseDurationInHours = (durationStr) => {
     if (!durationStr) return 0;
     const lower = durationStr.toLowerCase();
-    
+
     // Check if it contains minutes
     if (lower.includes('phút') || lower.includes('min')) {
         const mins = parseInt(lower.replace(/\D/g, ''), 10) || 0;
         return mins / 60;
     }
-    
+
     // Extract numbers
     const numbers = lower.match(/\d+(\.\d+)?/g);
     if (!numbers || numbers.length === 0) return 0;
-    
+
     if (numbers.length === 1) {
         return parseFloat(numbers[0]);
     }
-    
+
     // If range like "3-4 giờ", take average
     const start = parseFloat(numbers[0]);
     const end = parseFloat(numbers[1]);
@@ -75,7 +75,13 @@ const DropdownFilter = ({ label, value, options, onChange }) => {
                 <span className={styles.dropdownValue}>{displayLabel}</span>
                 <span className={`${styles.arrowIcon} ${isOpen ? styles.arrowOpen : ''}`}>
                     <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path
+                            d="M1 1L5 5L9 1"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
                     </svg>
                 </span>
             </button>
@@ -86,7 +92,7 @@ const DropdownFilter = ({ label, value, options, onChange }) => {
                             type="button"
                             key={opt.value}
                             className={`${styles.dropdownItemCustom} ${
-                                (opt.value === value || (value === undefined && opt.value === 'all'))
+                                opt.value === value || (value === undefined && opt.value === 'all')
                                     ? styles.dropdownItemActive
                                     : ''
                             }`}
@@ -118,7 +124,7 @@ function SimulationListDesktop({
 }) {
     const navigate = useNavigate();
     const [ searchValue, setSearchValue ] = useState(filters.title || '');
-    
+
     // Local filter states for horizontal filters
     const [ activeQuickFilter, setActiveQuickFilter ] = useState('all');
     const [ localDuration, setLocalDuration ] = useState('all');
@@ -177,7 +183,9 @@ function SimulationListDesktop({
     }, [ categories ]);
 
     const organizationOptions = useMemo(() => {
-        const list = Array.isArray(organizations) ? organizations.map((org) => ({ value: org.id, label: org.name })) : [];
+        const list = Array.isArray(organizations)
+            ? organizations.map((org) => ({ value: org.id, label: org.name }))
+            : [];
         return [ { value: 'all', label: 'Tất cả' }, ...list ];
     }, [ organizations ]);
 
@@ -416,4 +424,3 @@ function SimulationListDesktop({
 }
 
 export default SimulationListDesktop;
-
