@@ -85,7 +85,7 @@ function LoginPageDesktop({
     fieldName = 'email',
     fieldLabel = 'E-mail',
 }) {
-    const [ otp, setOtpLocal ] = useState('');
+    const [otp, setOtpLocal] = useState('');
     const translate = useTranslate();
 
     const loginGoogle = useGoogleLogin({
@@ -165,10 +165,7 @@ function LoginPageDesktop({
                                     disabled={loading}
                                 >
                                     {loading ? (
-                                        <>
-                                            <div className={styles.spinner} />
-                                            <span>Đang đăng nhập...</span>
-                                        </>
+                                        <span>Đang đăng nhập...</span>
                                     ) : (
                                         <>
                                             <TbLogin style={{ fontSize: '16px' }} />

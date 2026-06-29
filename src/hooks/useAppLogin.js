@@ -29,14 +29,14 @@ const useAppLogin = (role = 'student') => {
     const translate = useTranslate();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [ loadingProfileFetch, setLoadingProfileFetch ] = useState(false);
+    const [loadingProfileFetch, setLoadingProfileFetch] = useState(false);
 
     const base64Credentials = useMemo(() => {
         return typeof window !== 'undefined' && typeof window.btoa === 'function'
             ? window.btoa(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`)
             : typeof Buffer !== 'undefined'
-                ? Buffer.from(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`).toString('base64')
-                : '';
+              ? Buffer.from(`${appAccount.APP_USERNAME}:${appAccount.APP_PASSWORD}`).toString('base64')
+              : '';
     }, []);
 
     const { execute: executeLogin, loading: loadingLogin } = useFetch(apiConfig.account.loginOAuth);

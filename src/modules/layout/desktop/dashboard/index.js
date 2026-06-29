@@ -48,11 +48,11 @@ function DashboardDesktop({
     const navigate = useNavigate();
     const name = profile?.fullName || profile?.account?.fullName || '';
 
-    const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
-    const [ previewLoading, setPreviewLoading ] = useState(false);
-    const [ previewUrl, setPreviewUrl ] = useState(null);
-    const [ currentDownloadUrl, setCurrentDownloadUrl ] = useState(null);
-    const [ currentFileName, setCurrentFileName ] = useState('');
+    const [previewModalVisible, setPreviewModalVisible] = useState(false);
+    const [previewLoading, setPreviewLoading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [currentDownloadUrl, setCurrentDownloadUrl] = useState(null);
+    const [currentFileName, setCurrentFileName] = useState('');
 
     const handlePreviewCertificate = async (e, downloadUrl, fileName) => {
         e.preventDefault();
@@ -95,7 +95,7 @@ function DashboardDesktop({
     const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
     const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
 
-    const completionStatus = [ hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization ];
+    const completionStatus = [hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization];
     const completedCount = completionStatus.filter(Boolean).length;
     const missingCount = 5 - completedCount;
     const isProfileComplete = completedCount === 5;

@@ -13,18 +13,18 @@ function useDataList({ fetcher, filter, queryOptions, mappingData = (res) => res
                             size: 10,
                             ...filter,
                         },
-                        { clear: [ undefined, '', null, 0 ] },
+                        { clear: [undefined, '', null, 0] },
                     ),
                     signal: signal,
                 }),
                 300,
             ).then((res) => res.data),
-        [ filter ],
+        [filter],
     );
 
     const { data, isFetching, error, refetch } = useQuery({
         ...queryOptions,
-        queryKey: [ filter ],
+        queryKey: [filter],
         queryFn: fetchData,
         select: mappingData,
         placeholderData: keepPreviousData,

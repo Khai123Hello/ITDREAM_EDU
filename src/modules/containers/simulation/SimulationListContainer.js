@@ -12,13 +12,13 @@ import SimulationListDesktop from '@modules/layout/desktop/simulation/Simulation
  */
 function SimulationListContainer() {
     const { params, setQueryParams, deserializeParams } = useQueryParams();
-    const [ filters, setFilters ] = useState({
+    const [filters, setFilters] = useState({
         title: params.get('title') || '',
         level: params.get('level') ? parseInt(params.get('level'), 10) : undefined,
         categoryId: params.get('categoryId') ? parseInt(params.get('categoryId'), 10) : undefined,
         organizationId: params.get('organizationId') ? parseInt(params.get('organizationId'), 10) : undefined,
     });
-    const [ pagination, setPagination ] = useState({
+    const [pagination, setPagination] = useState({
         page: params.get('page') ? parseInt(params.get('page'), 10) : 0,
         size: params.get('size') ? parseInt(params.get('size'), 10) : 16,
     });
@@ -35,7 +35,7 @@ function SimulationListContainer() {
             ...(filters.categoryId !== undefined && { categoryId: filters.categoryId }),
             ...(filters.organizationId !== undefined && { organizationId: filters.organizationId }),
         }),
-        [ pagination, filters ],
+        [pagination, filters],
     );
 
     const {
@@ -74,7 +74,7 @@ function SimulationListContainer() {
                 size: String(pagination.size),
             });
         },
-        [ pagination.size, setQueryParams ],
+        [pagination.size, setQueryParams],
     );
 
     const handlePaginationChange = useCallback(
@@ -86,17 +86,17 @@ function SimulationListContainer() {
                 size: String(size),
             });
         },
-        [ params, setQueryParams ],
+        [params, setQueryParams],
     );
 
     const handleRetry = useCallback(() => {
         refetchSim();
-    }, [ refetchSim ]);
+    }, [refetchSim]);
 
     // Fetch simulation list on mount and when filters change
     React.useEffect(() => {
         refetchSim();
-    }, [ queryParams, refetchSim ]);
+    }, [queryParams, refetchSim]);
 
     return (
         <>

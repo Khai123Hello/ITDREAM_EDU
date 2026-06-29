@@ -12,10 +12,15 @@ export default function TaskDoingSidebar({
     isNavigationBlocked = false,
 }) {
     const navigate = useNavigate();
-    const [ achievementsExpanded, setAchievementsExpanded ] = useState(true);
+    const { id: simulationId } = useParams();
+    const [achievementsExpanded, setAchievementsExpanded] = useState(true);
 
     const handleLogoClick = () => {
-        navigate('/dashboard');
+        if (simulationId) {
+            navigate(`/simulations/${simulationId}`);
+        } else {
+            navigate('/dashboard');
+        }
     };
 
     return (

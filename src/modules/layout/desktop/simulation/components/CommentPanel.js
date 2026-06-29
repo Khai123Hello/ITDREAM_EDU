@@ -25,7 +25,7 @@ const parseDate = (dateStr) => {
         const parts = dateStr.split(' ');
         const datePart = parts[0];
         const timePart = parts[1] || '00:00:00';
-        const [ day, month, year ] = datePart.split('/');
+        const [day, month, year] = datePart.split('/');
         return new Date(`${year}-${month}-${day}T${timePart}`);
     }
     return new Date(dateStr);
@@ -59,17 +59,17 @@ export default function CommentPanel({
     onUpdateComment = () => {},
     onDeleteComment = () => {},
 }) {
-    const [ mainText, setMainText ] = useState('');
-    const [ replyingToId, setReplyingToId ] = useState(null);
-    const [ replyText, setReplyText ] = useState('');
-    const [ editingId, setEditingId ] = useState(null);
-    const [ editText, setEditText ] = useState('');
+    const [mainText, setMainText] = useState('');
+    const [replyingToId, setReplyingToId] = useState(null);
+    const [replyText, setReplyText] = useState('');
+    const [editingId, setEditingId] = useState(null);
+    const [editText, setEditText] = useState('');
     const listEndRef = useRef(null);
 
     // Filter root comments and replies
     const rootComments = useMemo(() => {
         return comments.filter((c) => !c.parentId || c.parentId === 0);
-    }, [ comments ]);
+    }, [comments]);
 
     const repliesMap = useMemo(() => {
         const map = {};
@@ -98,13 +98,13 @@ export default function CommentPanel({
         });
 
         return map;
-    }, [ comments ]);
+    }, [comments]);
 
     // Handle submit main comment
     const handleMainSubmit = (e) => {
         e.preventDefault();
         if (!mainText.trim()) return;
-        onSendComment(mainText.trim(), 0);
+        onSendComment(mainText.trim(), null);
         setMainText('');
     };
 
@@ -133,14 +133,14 @@ export default function CommentPanel({
         setReplyText('');
         setEditingId(null);
         setEditText('');
-    }, [ taskId ]);
+    }, [taskId]);
 
     // Scroll to bottom when comments count changes
     useEffect(() => {
         if (listEndRef.current) {
             listEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [ comments.length ]);
+    }, [comments.length]);
 
     // Render Avatar
     const renderAvatar = (user) => {
@@ -170,7 +170,10 @@ export default function CommentPanel({
         const isTeacher = !isStudent;
 
         return (
-            <div key={comment.id} className={`tfo-comment-card${isReply ? ' reply' : ''}${isTeacher ? ' teacher-comment' : ''}`}>
+            <div
+                key={comment.id}
+                className={`tfo-comment-card${isReply ? ' reply' : ''}${isTeacher ? ' teacher-comment' : ''}`}
+            >
                 <div className="tfo-comment-card-header">
                     {renderAvatar(comment.user)}
                     <div className="tfo-comment-user-info">

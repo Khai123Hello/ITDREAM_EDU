@@ -46,23 +46,23 @@ function RegisterDesktop({ form }) {
 
     const STORAGE_KEY = 'nail-fe-register-flow';
 
-    const [ step, setStep ] = useState(() => {
+    const [step, setStep] = useState(() => {
         const saved = getData(STORAGE_KEY);
         return saved?.step || 1;
     });
-    const [ idHash, setIdHash ] = useState(() => {
+    const [idHash, setIdHash] = useState(() => {
         const saved = getData(STORAGE_KEY);
         return saved?.idHash || '';
     });
-    const [ email, setEmail ] = useState(() => {
+    const [email, setEmail] = useState(() => {
         const saved = getData(STORAGE_KEY);
         return saved?.email || '';
     });
-    const [ otp, setOtp ] = useState([ '', '', '', '', '', '' ]);
-    const [ resendTimer, setResendTimer ] = useState(0);
-    const [ redirectTimer, setRedirectTimer ] = useState(0);
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [resendTimer, setResendTimer] = useState(0);
+    const [redirectTimer, setRedirectTimer] = useState(0);
 
-    const otpRefs = [ useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null) ];
+    const otpRefs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
 
     const { execute: executeRegister, loading: loadingRegister } = useFetch(apiConfig.student.register);
     const { execute: executeVerify, loading: loadingVerify } = useFetch(apiConfig.account.verify);
@@ -79,7 +79,7 @@ function RegisterDesktop({ form }) {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [ resendTimer ]);
+    }, [resendTimer]);
 
     // Countdown for login redirect
     useEffect(() => {
@@ -99,7 +99,7 @@ function RegisterDesktop({ form }) {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [ step, redirectTimer, navigate ]);
+    }, [step, redirectTimer, navigate]);
 
     // Persist registration flow state to sessionStorage
     useEffect(() => {
@@ -108,7 +108,7 @@ function RegisterDesktop({ form }) {
         } else {
             setData(STORAGE_KEY, { step, idHash, email });
         }
-    }, [ step, idHash, email, STORAGE_KEY ]);
+    }, [step, idHash, email, STORAGE_KEY]);
 
     // Auto-focus first input when entering step 2
     useEffect(() => {
@@ -119,7 +119,7 @@ function RegisterDesktop({ form }) {
                 }
             }, 100);
         }
-    }, [ step ]);
+    }, [step]);
 
     const handleRegisterSubmit = (values) => {
         const payload = {
@@ -204,7 +204,7 @@ function RegisterDesktop({ form }) {
                 if (returnedIdHash) {
                     setIdHash(returnedIdHash);
                     setResendTimer(60);
-                    setOtp([ '', '', '', '', '', '' ]);
+                    setOtp(['', '', '', '', '', '']);
                     setTimeout(() => {
                         if (otpRefs[0]?.current) {
                             otpRefs[0].current.focus();
@@ -224,7 +224,7 @@ function RegisterDesktop({ form }) {
 
     const handleOtpChange = (e, index) => {
         const val = e.target.value.replace(/\D/g, '');
-        const newOtp = [ ...otp ];
+        const newOtp = [...otp];
         newOtp[index] = val;
         setOtp(newOtp);
 

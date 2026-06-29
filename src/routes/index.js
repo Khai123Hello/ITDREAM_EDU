@@ -56,7 +56,7 @@ const routes = {
     jobsPage: {
         path: '/jobs',
         component: JobsPageContainer,
-        auth: null,
+        auth: true,
         title: 'Việc làm IT',
     },
     loginPage: {

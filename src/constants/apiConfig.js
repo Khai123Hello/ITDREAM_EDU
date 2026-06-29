@@ -562,6 +562,28 @@ const apiConfig = {
             headers: baseHeader,
         },
     },
+    job: {
+        studentList: {
+            baseURL: `${apiUrl}v1/job/student-list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        toggleSave: {
+            baseURL: `${apiUrl}v1/job/toggle-save`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        apply: {
+            baseURL: `${apiUrl}v1/job/apply`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        cancelApply: {
+            baseURL: `${apiUrl}v1/job/cancel-apply`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+    },
 };
 
 export default apiConfig;

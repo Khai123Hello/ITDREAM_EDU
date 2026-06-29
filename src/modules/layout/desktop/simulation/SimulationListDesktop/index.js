@@ -39,9 +39,9 @@ function SimulationListDesktop({
     onPaginationChange,
 }) {
     const navigate = useNavigate();
-    const [ searchValue, setSearchValue ] = useState(filters.title || '');
-    const [ activeQuick, setActiveQuick ] = useState('all');
-    const [ sortBy, setSortBy ] = useState('popular');
+    const [searchValue, setSearchValue] = useState(filters.title || '');
+    const [activeQuick, setActiveQuick] = useState('all');
+    const [sortBy, setSortBy] = useState('popular');
     const searchTimeout = React.useRef(null);
 
     const handleSearchChange = useCallback(
@@ -53,50 +53,50 @@ function SimulationListDesktop({
                 onFilterChange({ ...filters, title: value });
             }, 500);
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleSearchClick = useCallback(() => {
         if (searchTimeout.current) clearTimeout(searchTimeout.current);
         onFilterChange({ ...filters, title: searchValue });
-    }, [ filters, onFilterChange, searchValue ]);
+    }, [filters, onFilterChange, searchValue]);
 
     const handleLevelChange = useCallback(
         (value) => {
             onFilterChange({ ...filters, level: value });
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleCategoryChange = useCallback(
         (value) => {
             onFilterChange({ ...filters, categoryId: value });
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleOrganizationChange = useCallback(
         (value) => {
             onFilterChange({ ...filters, organizationId: value });
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleCardClick = useCallback(
         (id) => {
             navigate(`/simulations/${id}`);
         },
-        [ navigate ],
+        [navigate],
     );
 
     const categoryOptions = useMemo(
         () => (Array.isArray(categories) ? categories.map((cat) => ({ value: cat.id, label: cat.name })) : []),
-        [ categories ],
+        [categories],
     );
 
     const organizationOptions = useMemo(
         () => (Array.isArray(organizations) ? organizations.map((org) => ({ value: org.id, label: org.name })) : []),
-        [ organizations ],
+        [organizations],
     );
 
     const total = pagination.total || 0;
