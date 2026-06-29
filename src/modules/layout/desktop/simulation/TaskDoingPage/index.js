@@ -225,12 +225,19 @@ function QuizBlock({
 
             {/* Error Count / Attempt info */}
             {totalError > 0 && (
-                <div className="tfo-quiz-error-count-info" style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}>
-                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong> / {totalError}
+                <div
+                    className="tfo-quiz-error-count-info"
+                    style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}
+                >
+                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong>{' '}
+                    / {totalError}
                 </div>
             )}
             {isExceeded && (
-                <div className="tfo-quiz-exceeded-warning" style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}>
+                <div
+                    className="tfo-quiz-exceeded-warning"
+                    style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}
+                >
                     ⚠️ Bạn đã vượt quá số lần làm sai cho phép. Vui lòng bấm đặt lại nhiệm vụ để làm lại bài.
                 </div>
             )}
@@ -259,12 +266,8 @@ function QuizBlock({
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
-                            {showAsCorrect && (
-                                <span className="tfo-quiz-option-badge correct">✓ Đúng</span>
-                            )}
-                            {showAsWrong && (
-                                <span className="tfo-quiz-option-badge wrong">✗ Sai</span>
-                            )}
+                            {showAsCorrect && <span className="tfo-quiz-option-badge correct">✓ Đúng</span>}
+                            {showAsWrong && <span className="tfo-quiz-option-badge wrong">✗ Sai</span>}
                         </button>
                     );
                 })}
@@ -286,7 +289,11 @@ function QuizBlock({
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted || isExceeded} onClick={handleReset}>
+                            <button
+                                className="tfo-quiz-retry-btn"
+                                disabled={hasCompleted || isExceeded}
+                                onClick={handleReset}
+                            >
                                 Làm lại
                             </button>
                         )}
@@ -1196,27 +1203,53 @@ export default function TaskDoingPage({
                                                         </div>
                                                         <div className="tfo-subtask-reviews-list">
                                                             {currentSubtaskReviews.map((review) => {
-                                                                const reviewerName = review.creator?.fullName || review.creator?.username || review.createdBy || 'Giảng viên';
-                                                                const reviewerAvatar = review.creator?.avatar ? (review.creator.avatar.startsWith('http') ? review.creator.avatar : `${urlBase}${review.creator.avatar}`) : null;
+                                                                const reviewerName =
+                                                                    review.creator?.fullName ||
+                                                                    review.creator?.username ||
+                                                                    review.createdBy ||
+                                                                    'Giảng viên';
+                                                                const reviewerAvatar = review.creator?.avatar
+                                                                    ? review.creator.avatar.startsWith('http')
+                                                                        ? review.creator.avatar
+                                                                        : `${urlBase}${review.creator.avatar}`
+                                                                    : null;
                                                                 const initials = getInitials(reviewerName);
                                                                 const avatarBg = getAvatarColor(reviewerName);
-                                                                
+
                                                                 return (
-                                                                    <div key={review.id} className="tfo-review-display saved-card">
+                                                                    <div
+                                                                        key={review.id}
+                                                                        className="tfo-review-display saved-card"
+                                                                    >
                                                                         <div className="tfo-review-display__header">
                                                                             {reviewerAvatar ? (
-                                                                                <img src={reviewerAvatar} alt={reviewerName} className="tfo-review-display__avatar" />
+                                                                                <img
+                                                                                    src={reviewerAvatar}
+                                                                                    alt={reviewerName}
+                                                                                    className="tfo-review-display__avatar"
+                                                                                />
                                                                             ) : (
-                                                                                <div style={{ background: avatarBg }} className="tfo-review-display__avatar-initials">
+                                                                                <div
+                                                                                    style={{ background: avatarBg }}
+                                                                                    className="tfo-review-display__avatar-initials"
+                                                                                >
                                                                                     {initials}
                                                                                 </div>
                                                                             )}
                                                                             <div className="tfo-review-display__meta">
-                                                                                <div className="tfo-review-display__name">{reviewerName}</div>
-                                                                                <div className="tfo-review-display__role">Giáo viên hướng dẫn</div>
+                                                                                <div className="tfo-review-display__name">
+                                                                                    {reviewerName}
+                                                                                </div>
+                                                                                <div className="tfo-review-display__role">
+                                                                                    Giáo viên hướng dẫn
+                                                                                </div>
                                                                             </div>
                                                                             <span className="tfo-review-display__date">
-                                                                                {review.createdDate ? dayjs(review.createdDate).format('DD/MM/YYYY') : '-'}
+                                                                                {review.createdDate
+                                                                                    ? dayjs(review.createdDate).format(
+                                                                                        'DD/MM/YYYY',
+                                                                                    )
+                                                                                    : '-'}
                                                                             </span>
                                                                         </div>
                                                                         <blockquote className="tfo-review-display__quote">
@@ -1231,7 +1264,13 @@ export default function TaskDoingPage({
 
                                                 {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
                                                 {!isCompleted && (
-                                                    <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+                                                    <div
+                                                        style={{
+                                                            marginBottom: 16,
+                                                            display: 'flex',
+                                                            justifyContent: 'flex-end',
+                                                        }}
+                                                    >
                                                         <button
                                                             className="tfo-action-btn tfo-action-btn-secondary"
                                                             onClick={onResetSubtask}
@@ -1290,10 +1329,7 @@ export default function TaskDoingPage({
                                                             <button
                                                                 className="tfo-action-btn tfo-action-btn-primary tfo-text-submit-btn"
                                                                 onClick={() => onTextResponseSubmit(textInput)}
-                                                                disabled={
-                                                                    isCompleted ||
-                                                                    !textInput.trim()
-                                                                }
+                                                                disabled={isCompleted || !textInput.trim()}
                                                             >
                                                                 Nộp câu trả lời
                                                             </button>

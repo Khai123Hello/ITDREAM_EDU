@@ -106,12 +106,19 @@ function InteractiveQuizBlock({
 
             {/* Error Count / Attempt info */}
             {totalError > 0 && (
-                <div className="tfo-quiz-error-count-info" style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}>
-                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong> / {totalError}
+                <div
+                    className="tfo-quiz-error-count-info"
+                    style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}
+                >
+                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong>{' '}
+                    / {totalError}
                 </div>
             )}
             {isExceeded && (
-                <div className="tfo-quiz-exceeded-warning" style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}>
+                <div
+                    className="tfo-quiz-exceeded-warning"
+                    style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}
+                >
                     ⚠️ Bạn đã vượt quá số lần làm sai cho phép. Vui lòng bấm đặt lại nhiệm vụ để làm lại bài.
                 </div>
             )}
@@ -161,7 +168,11 @@ function InteractiveQuizBlock({
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted || isExceeded} onClick={handleReset}>
+                            <button
+                                className="tfo-quiz-retry-btn"
+                                disabled={hasCompleted || isExceeded}
+                                onClick={handleReset}
+                            >
                                 Làm lại
                             </button>
                         )}
@@ -275,7 +286,7 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                     case 'step':
                         return (
                             <div key={index} className="tfo-block-step">
-                                <div className="tfo-block-step-badge">{node.attrs?.stepNumber || (index + 1)}</div>
+                                <div className="tfo-block-step-badge">{node.attrs?.stepNumber || index + 1}</div>
                                 <div className="tfo-block-step-content">
                                     {node.attrs?.label && <span className="tfo-block-step-label">{node.attrs.label}</span>}
                                     <div className="tfo-block-step-body">{children}</div>

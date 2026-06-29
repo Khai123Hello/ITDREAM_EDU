@@ -952,14 +952,26 @@ function TaskDoingContainer() {
     // Filter educator reviews for the current subtask
     const currentSubtaskReviews = useMemo(() => {
         if (!reviewData?.content || !currentSubtaskProgress?.taskProgressId) {
-            console.log('TaskDoingContainer: No reviews or no active taskProgressId. reviewData:', reviewData, 'currentSubtaskProgress:', currentSubtaskProgress);
+            console.log(
+                'TaskDoingContainer: No reviews or no active taskProgressId. reviewData:',
+                reviewData,
+                'currentSubtaskProgress:',
+                currentSubtaskProgress,
+            );
             return [];
         }
         const filtered = reviewData.content.filter((r) => {
             const rProgressId = r.studentTaskProgressId || r.studentSubmission?.studentTaskProgress?.id;
             return String(rProgressId) === String(currentSubtaskProgress.taskProgressId);
         });
-        console.log('TaskDoingContainer: Current active subtask reviews:', filtered, 'Total reviews in enrollment:', reviewData.content.length, 'Active taskProgressId:', currentSubtaskProgress.taskProgressId);
+        console.log(
+            'TaskDoingContainer: Current active subtask reviews:',
+            filtered,
+            'Total reviews in enrollment:',
+            reviewData.content.length,
+            'Active taskProgressId:',
+            currentSubtaskProgress.taskProgressId,
+        );
         return filtered;
     }, [ reviewData, currentSubtaskProgress?.taskProgressId ]);
 
@@ -1290,12 +1302,12 @@ function TaskDoingContainer() {
             }
 
             message.success('Đặt lại tiến độ nhiệm vụ thành công!');
-            
+
             // Refetch task list to update status in sidebar
             fetchTaskList();
             // Refetch enrollment progress
             refetchProgress();
-            
+
             // Refetch current progress details
             if (currentSubtaskProgress?.taskProgressId) {
                 fetchProgressDetail({
@@ -1307,7 +1319,14 @@ function TaskDoingContainer() {
         } catch (err) {
             message.error('Có lỗi xảy ra khi đặt lại tiến độ.');
         }
-    }, [ selectedSubtaskId, resetTaskProgress, fetchTaskList, refetchProgress, currentSubtaskProgress, fetchProgressDetail ]);
+    }, [
+        selectedSubtaskId,
+        resetTaskProgress,
+        fetchTaskList,
+        refetchProgress,
+        currentSubtaskProgress,
+        fetchProgressDetail,
+    ]);
 
     /**
      * Nộp câu hỏi trắc nghiệm - chỉ nộp khi học viên đã bấm đúng đáp án (isCorrect = true)
@@ -1341,7 +1360,7 @@ function TaskDoingContainer() {
                         isCorrect,
                     },
                 });
-                
+
                 const errorMsg = submitRes?.response?.data?.message || submitRes?.data?.message || submitRes?.message;
                 const errorCode = submitRes?.response?.data?.code || submitRes?.code || submitRes?.data?.code;
                 const isError =
@@ -1355,11 +1374,12 @@ function TaskDoingContainer() {
                         delete next[normalizedQuestionId];
                         return next;
                     });
-                    
+
                     if (errorCode === 'STUDENT_TASK-PROGRESS-ERROR-0004') {
                         Modal.confirm({
                             title: 'Đã vượt quá số lần làm sai',
-                            content: 'Bạn đã làm sai vượt quá số lần quy định cho nhiệm vụ này. Bạn có muốn đặt lại tiến trình để làm lại từ đầu không?',
+                            content:
+                                'Bạn đã làm sai vượt quá số lần quy định cho nhiệm vụ này. Bạn có muốn đặt lại tiến trình để làm lại từ đầu không?',
                             okText: 'Làm lại từ đầu',
                             cancelText: 'Hủy',
                             onOk: () => {

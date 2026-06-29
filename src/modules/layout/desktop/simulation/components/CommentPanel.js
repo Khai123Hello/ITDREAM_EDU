@@ -400,7 +400,12 @@ export default function CommentPanel({
                     }}
                     rows={1}
                 />
-                <button type="submit" className="tfo-comments-send-btn" disabled={!mainText.trim()} title="Gửi bình luận">
+                <button
+                    type="submit"
+                    className="tfo-comments-send-btn"
+                    disabled={!mainText.trim()}
+                    title="Gửi bình luận"
+                >
                     <FiSend size={16} />
                 </button>
             </form>
