@@ -975,6 +975,57 @@ function TaskDoingContainer() {
         return filtered;
     }, [ reviewData, currentSubtaskProgress?.taskProgressId ]);
 
+    // Review Detail Modal States & Callbacks
+    const [ selectedReviewDetail, setSelectedReviewDetail ] = useState(null);
+    const [ reviewDetailModalOpen, setReviewDetailModalOpen ] = useState(false);
+    const [ reviewDetailLoading, setReviewDetailLoading ] = useState(false);
+
+    const { execute: fetchReviewDetail } = useFetch(
+        apiConfig.reviewSubmission.studentGet,
+        {
+            params: {},
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    const handleViewReviewDetail = useCallback(
+        async (reviewId) => {
+            setReviewDetailModalOpen(true);
+            setReviewDetailLoading(true);
+            try {
+                const res = await fetchReviewDetail({
+                    pathParams: { id: reviewId },
+                });
+                const detail = res?.data || res;
+                setSelectedReviewDetail(detail);
+            } catch (err) {
+                message.error('Không thể tải chi tiết nhận xét.');
+            } finally {
+                setReviewDetailLoading(false);
+            }
+        },
+        [ fetchReviewDetail ],
+    );
+
+    const handleCloseReviewDetail = useCallback(() => {
+        setReviewDetailModalOpen(false);
+        setSelectedReviewDetail(null);
+    }, []);
+
+    // Fetch subtask reviews when the task is completed or progress status changes
+    React.useEffect(() => {
+        const isTaskCompleted = getTaskStatus() === 'completed' || hasCompleted;
+        if (currentSubtaskProgress?.taskProgressId && isTaskCompleted) {
+            fetchReviews({
+                params: {
+                    studentTaskProgressId: currentSubtaskProgress.taskProgressId,
+                    size: 1000,
+                },
+            });
+        }
+    }, [ currentSubtaskProgress?.taskProgressId, currentSubtaskProgress?.status, hasCompleted, fetchReviews ]);
+
     // Handle parent task selection
     const handleSelectParentTask = useCallback((parentTaskId) => {
         setSelectedParentTaskId(parentTaskId);
@@ -1283,7 +1334,7 @@ function TaskDoingContainer() {
      * Đặt lại tiến độ nhiệm vụ con (Reset Subtask Progress)
      */
     const handleResetSubtask = useCallback(async () => {
-        if (!selectedSubtaskId) return;
+        if (!selectedSubtaskId) return false;
         try {
             const res = await resetTaskProgress({
                 dataBody: {
@@ -1298,7 +1349,7 @@ function TaskDoingContainer() {
 
             if (isError) {
                 message.error(errorMsg || 'Không thể đặt lại tiến độ nhiệm vụ.');
-                return;
+                return false;
             }
 
             message.success('Đặt lại tiến độ nhiệm vụ thành công!');
@@ -1307,6 +1358,10 @@ function TaskDoingContainer() {
             fetchTaskList();
             // Refetch enrollment progress
             refetchProgress();
+            // Refetch checkEnrollment to update progress percentage / completion status (hasCompleted)
+            checkEnrollment({
+                params: {},
+            });
 
             // Refetch current progress details
             if (currentSubtaskProgress?.taskProgressId) {
@@ -1316,14 +1371,17 @@ function TaskDoingContainer() {
             }
             // Clear local answers
             setLocalQuizAnswers({});
+            return true;
         } catch (err) {
             message.error('Có lỗi xảy ra khi đặt lại tiến độ.');
+            return false;
         }
     }, [
         selectedSubtaskId,
         resetTaskProgress,
         fetchTaskList,
         refetchProgress,
+        checkEnrollment,
         currentSubtaskProgress,
         fetchProgressDetail,
     ]);
@@ -1382,8 +1440,11 @@ function TaskDoingContainer() {
                                 'Bạn đã làm sai vượt quá số lần quy định cho nhiệm vụ này. Bạn có muốn đặt lại tiến trình để làm lại từ đầu không?',
                             okText: 'Làm lại từ đầu',
                             cancelText: 'Hủy',
-                            onOk: () => {
-                                handleResetSubtask();
+                            onOk: async () => {
+                                const success = await handleResetSubtask();
+                                if (success) {
+                                    window.location.reload();
+                                }
                             },
                         });
                     } else {
@@ -1705,6 +1766,11 @@ function TaskDoingContainer() {
 
         // Educator feedback / reviews
         currentSubtaskReviews,
+        onViewReviewDetail: handleViewReviewDetail,
+        reviewDetailLoading,
+        selectedReviewDetail,
+        reviewDetailModalOpen,
+        onCloseReviewDetail: handleCloseReviewDetail,
 
         // Certificate and congrats
         isGeneratingCert,

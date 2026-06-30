@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
-import { Spin } from 'antd';
+import { Modal, Spin } from 'antd';
 import dayjs from 'dayjs';
 
 import CommentPanel from '../components/CommentPanel';
@@ -921,6 +921,11 @@ export default function TaskDoingPage({
 
     // Educator reviews
     currentSubtaskReviews = [],
+    onViewReviewDetail = () => {},
+    reviewDetailLoading = false,
+    selectedReviewDetail = null,
+    reviewDetailModalOpen = false,
+    onCloseReviewDetail = () => {},
 
     // Certificate and congrats
     isGeneratingCert = false,
@@ -1045,6 +1050,7 @@ export default function TaskDoingPage({
 
     const errorCount = taskProgress?.errorCount || 0;
     const totalError = taskProgress?.task?.totalError || 0;
+    const isExceeded = totalError > 0 && errorCount >= totalError;
 
     return (
         <>
@@ -1196,18 +1202,20 @@ export default function TaskDoingPage({
                                                 {renderMedia()}
 
                                                 {/* Educator reviews (CMS Style) */}
-                                                {currentSubtaskReviews && currentSubtaskReviews.length > 0 && (
+                                                {isCompleted &&
+                                                    currentSubtaskReviews &&
+                                                    currentSubtaskReviews.length > 0 && (
                                                     <div className="tfo-subtask-reviews-section">
                                                         <div className="tfo-subtask-reviews-header">
-                                                            Nhận xét từ Giảng viên ({currentSubtaskReviews.length})
+                                                                Nhận xét từ Giảng viên ({currentSubtaskReviews.length})
                                                         </div>
                                                         <div className="tfo-subtask-reviews-list">
                                                             {currentSubtaskReviews.map((review) => {
                                                                 const reviewerName =
-                                                                    review.creator?.fullName ||
-                                                                    review.creator?.username ||
-                                                                    review.createdBy ||
-                                                                    'Giảng viên';
+                                                                        review.creator?.fullName ||
+                                                                        review.creator?.username ||
+                                                                        review.createdBy ||
+                                                                        'Giảng viên';
                                                                 const reviewerAvatar = review.creator?.avatar
                                                                     ? review.creator.avatar.startsWith('http')
                                                                         ? review.creator.avatar
@@ -1220,6 +1228,11 @@ export default function TaskDoingPage({
                                                                     <div
                                                                         key={review.id}
                                                                         className="tfo-review-display saved-card"
+                                                                        onClick={() =>
+                                                                            onViewReviewDetail &&
+                                                                                onViewReviewDetail(review.id)
+                                                                        }
+                                                                        style={{ cursor: 'pointer' }}
                                                                     >
                                                                         <div className="tfo-review-display__header">
                                                                             {reviewerAvatar ? (
@@ -1241,14 +1254,14 @@ export default function TaskDoingPage({
                                                                                     {reviewerName}
                                                                                 </div>
                                                                                 <div className="tfo-review-display__role">
-                                                                                    Giáo viên hướng dẫn
+                                                                                        Giáo viên hướng dẫn
                                                                                 </div>
                                                                             </div>
                                                                             <span className="tfo-review-display__date">
                                                                                 {review.createdDate
-                                                                                    ? dayjs(review.createdDate).format(
-                                                                                        'DD/MM/YYYY',
-                                                                                    )
+                                                                                    ? dayjs(
+                                                                                        review.createdDate,
+                                                                                    ).format('DD/MM/YYYY')
                                                                                     : '-'}
                                                                             </span>
                                                                         </div>
@@ -1261,9 +1274,12 @@ export default function TaskDoingPage({
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
-                                                {!isCompleted && (
+                                                {/* Nút Làm lại - hiển thị khi chưa hoàn thành nhiệm vụ và đã vượt quá số lần làm sai (isExceeded) */}
+                                                {!isCompleted &&
+                                                    isExceeded &&
+                                                    (requiresFileUpload ||
+                                                        requiresTextResponse ||
+                                                        quizBlocks.length > 0) && (
                                                     <div
                                                         style={{
                                                             marginBottom: 16,
@@ -1272,29 +1288,25 @@ export default function TaskDoingPage({
                                                         }}
                                                     >
                                                         <button
-                                                            className="tfo-action-btn tfo-action-btn-secondary"
+                                                            className="tfo-reset-subtask-btn"
                                                             onClick={onResetSubtask}
-                                                            style={{
-                                                                background: '#fff',
-                                                                border: '1px solid #d9d9d9',
-                                                                color: '#595959',
-                                                                padding: '6px 16px',
-                                                                borderRadius: '4px',
-                                                                cursor: 'pointer',
-                                                                fontSize: '14px',
-                                                                fontWeight: '500',
-                                                                transition: 'all 0.3s',
-                                                            }}
-                                                            onMouseOver={(e) => {
-                                                                e.target.style.color = '#1890ff';
-                                                                e.target.style.borderColor = '#1890ff';
-                                                            }}
-                                                            onMouseOut={(e) => {
-                                                                e.target.style.color = '#595959';
-                                                                e.target.style.borderColor = '#d9d9d9';
-                                                            }}
                                                         >
-                                                            🔄 Làm lại nhiệm vụ
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                strokeWidth="2.5"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                className="tfo-reset-icon"
+                                                            >
+                                                                <polyline points="23 4 23 10 17 10" />
+                                                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                                                            </svg>
+                                                                Làm lại nhiệm vụ
                                                         </button>
                                                     </div>
                                                 )}
@@ -1365,6 +1377,130 @@ export default function TaskDoingPage({
                     />
                 </div>
             </div>
+
+            {/* Modal chi tiết nhận xét */}
+            <Modal
+                title={
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, fontWeight: 600 }}>
+                        <span>📋 Chi tiết nhận xét từ Giảng viên</span>
+                    </div>
+                }
+                open={reviewDetailModalOpen}
+                onCancel={onCloseReviewDetail}
+                footer={null}
+                width={650}
+                centered
+                destroyOnClose
+            >
+                {reviewDetailLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px 0' }}>
+                        <Spin size="large" />
+                    </div>
+                ) : selectedReviewDetail ? (
+                    <div style={{ padding: '10px 0' }}>
+                        {/* Educator Info */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                            <div
+                                style={{
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: '50%',
+                                    background: getAvatarColor(
+                                        selectedReviewDetail.creator?.fullName ||
+                                            selectedReviewDetail.creator?.username ||
+                                            selectedReviewDetail.createdBy ||
+                                            'Giảng viên',
+                                    ),
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#fff',
+                                    fontWeight: 'bold',
+                                    fontSize: 16,
+                                }}
+                            >
+                                {getInitials(
+                                    selectedReviewDetail.creator?.fullName ||
+                                        selectedReviewDetail.creator?.username ||
+                                        selectedReviewDetail.createdBy ||
+                                        'Giảng viên',
+                                )}
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: 600, fontSize: 15, color: '#1e293b' }}>
+                                    {selectedReviewDetail.creator?.fullName ||
+                                        selectedReviewDetail.creator?.username ||
+                                        selectedReviewDetail.createdBy ||
+                                        'Giảng viên'}
+                                </div>
+                                <div style={{ fontSize: 12, color: '#64748b' }}>Giáo viên hướng dẫn</div>
+                            </div>
+                            <div style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>
+                                {selectedReviewDetail.createdDate
+                                    ? dayjs(selectedReviewDetail.createdDate).format('DD/MM/YYYY HH:mm')
+                                    : '-'}
+                            </div>
+                        </div>
+
+                        {/* Student's Submission Answer */}
+                        {selectedReviewDetail.studentSubmission && (
+                            <div
+                                style={{
+                                    backgroundColor: '#f8fafc',
+                                    borderLeft: '4px solid #3b82f6',
+                                    padding: '12px 16px',
+                                    borderRadius: '0 8px 8px 0',
+                                    marginBottom: 20,
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        fontSize: 12,
+                                        fontWeight: 700,
+                                        color: '#475569',
+                                        textTransform: 'uppercase',
+                                        marginBottom: 6,
+                                    }}
+                                >
+                                    Bài làm của bạn:
+                                </div>
+                                <div style={{ fontSize: 14, color: '#334155', whiteSpace: 'pre-wrap' }}>
+                                    {selectedReviewDetail.studentSubmission.answer || '(Không có nội dung trả lời)'}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Review Content */}
+                        <div
+                            style={{
+                                backgroundColor: '#f0fdf4',
+                                borderLeft: '4px solid #22c55e',
+                                padding: '16px',
+                                borderRadius: '0 8px 8px 0',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    color: '#166534',
+                                    textTransform: 'uppercase',
+                                    marginBottom: 6,
+                                }}
+                            >
+                                Nhận xét chi tiết:
+                            </div>
+                            <div style={{ fontSize: 14, color: '#14532d', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                                {selectedReviewDetail.content || 'Giảng viên không để lại nhận xét chi tiết nào.'}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#94a3b8' }}>
+                        Không thể tải thông tin nhận xét.
+                    </div>
+                )}
+            </Modal>
 
             {/* Loading overlay for certificate generation */}
             {isGeneratingCert && (

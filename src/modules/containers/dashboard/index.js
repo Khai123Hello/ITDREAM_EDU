@@ -34,6 +34,15 @@ function DashboardPageContainer() {
         mappingData: (res) => res.data?.content || res.data || [],
     });
 
+    const { data: categoriesRes, loading: categoriesLoading } = useFetch(apiConfig.category.autoComplete, {
+        immediate: true,
+        params: { kind: 1 },
+        mappingData: (res) => {
+            const data = res?.data;
+            return Array.isArray(data) ? data : data?.content || [];
+        },
+    });
+
     return (
         <>
             <AppHeader />
@@ -44,7 +53,8 @@ function DashboardPageContainer() {
                 achievements={achievementRes?.data?.content || []}
                 allSimulations={allSimsRes?.content || []}
                 organizations={organizationList || []}
-                loading={simLoading || achLoading || allSimsLoading || orgLoading}
+                categories={categoriesRes || []}
+                loading={simLoading || achLoading || allSimsLoading || orgLoading || categoriesLoading}
             />
             <AppFooter />
         </>
