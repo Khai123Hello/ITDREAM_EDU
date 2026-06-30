@@ -20,6 +20,8 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   color: $text-dark;
   background: $white;
   margin-bottom: 30px;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 // =============================================
@@ -86,6 +88,11 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   color: $navy;
   margin: 0 0 20px;
   letter-spacing: -1.5px;
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+    letter-spacing: -0.8px;
+  }
 }
 
 .lp-hero__subtitle {
@@ -122,6 +129,13 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
 // =============================================
 .lp-section {
   padding: 64px 80px;
+
+  @media (max-width: 1024px) {
+    padding: 48px 40px;
+  }
+  @media (max-width: 768px) {
+    padding: 36px 20px;
+  }
 }
 
 .lp-section__title {
@@ -365,6 +379,13 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 36px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lp-step {
@@ -460,6 +481,13 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lp-employer-card {
@@ -502,6 +530,13 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   margin-bottom: 36px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lp-testimonial {
@@ -552,11 +587,25 @@ $font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   justify-content: space-between;
   padding: 72px 100px;
   gap: 48px;
+
+  @media (max-width: 1024px) {
+    padding: 48px 40px;
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+  @media (max-width: 768px) {
+    padding: 36px 20px;
+  }
 }
 
 .lp-cta__content {
   flex: 1;
   max-width: 540px;
+
+  @media (max-width: 1024px) {
+    max-width: 100%;
+  }
 }
 
 .lp-cta__title {

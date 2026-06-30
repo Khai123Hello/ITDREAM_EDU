@@ -40,28 +40,54 @@ const GoogleIcon = () => (
     </svg>
 );
 
-const getCategoryInfo = (title, index) => {
+const getCategoryInfo = (category, title, index) => {
+    const categoryName = category?.name || '';
+    const lowerName = categoryName.toLowerCase();
     const lowerTitle = (title || '').toLowerCase();
+
+    let icon = <TbCode />;
+    let label = categoryName;
+
     if (
+        lowerName.includes('data') ||
+        lowerName.includes('analyst') ||
+        lowerName.includes('analytics') ||
         lowerTitle.includes('data') ||
         lowerTitle.includes('analyst') ||
-        lowerTitle.includes('analytics') ||
-        lowerTitle.includes('chart')
+        lowerTitle.includes('analytics')
     ) {
-        return { label: 'Data Analyst', icon: <TbChartDots /> };
-    }
-    if (
+        icon = <TbChartDots />;
+        if (!label) label = 'Data Analyst';
+    } else if (
+        lowerName.includes('security') ||
+        lowerName.includes('pentest') ||
+        lowerName.includes('audit') ||
+        lowerName.includes('shield') ||
+        lowerName.includes('hack') ||
         lowerTitle.includes('security') ||
         lowerTitle.includes('pentest') ||
         lowerTitle.includes('audit') ||
         lowerTitle.includes('shield') ||
         lowerTitle.includes('hack')
     ) {
-        return { label: 'Security', icon: <TbShieldLock /> };
+        icon = <TbShieldLock />;
+        if (!label) label = 'Security';
     }
-    if (index === 1) return { label: 'Data Analyst', icon: <TbChartDots /> };
-    if (index === 2) return { label: 'Security', icon: <TbShieldLock /> };
-    return { label: 'Developer', icon: <TbCode /> };
+
+    if (!label) {
+        if (index === 1) {
+            label = 'Data Analyst';
+            icon = <TbChartDots />;
+        } else if (index === 2) {
+            label = 'Security';
+            icon = <TbShieldLock />;
+        } else {
+            label = 'Developer';
+            icon = <TbCode />;
+        }
+    }
+
+    return { label, icon };
 };
 
 const formatParticipant = (num) => {
@@ -165,10 +191,7 @@ function LoginPageDesktop({
                                     disabled={loading}
                                 >
                                     {loading ? (
-                                        <>
-                                            <div className={styles.spinner} />
-                                            <span>Đang đăng nhập...</span>
-                                        </>
+                                        <span>Đang đăng nhập...</span>
                                     ) : (
                                         <>
                                             <TbLogin style={{ fontSize: '16px' }} />
@@ -194,7 +217,20 @@ function LoginPageDesktop({
                             </Form>
 
                             <div className={styles.registerRow}>
-                                Chưa có tài khoản? <a onClick={handleRegisterPage}>Đăng ký ngay</a>
+                                Chưa có tài khoản?{' '}
+                                <a
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={handleRegisterPage}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleRegisterPage();
+                                        }
+                                    }}
+                                >
+                                    Đăng ký ngay
+                                </a>
                             </div>
                         </div>
 
@@ -215,7 +251,7 @@ function LoginPageDesktop({
 
                         {displaySimulations.length > 0 ? (
                             displaySimulations.slice(0, 3).map((item, index) => {
-                                const cat = getCategoryInfo(item.title, index);
+                                const cat = getCategoryInfo(item.category, item.title, index);
                                 const orgName = item.educator?.organization?.name;
                                 const titleText = orgName ? `${item.title} — ${orgName}` : item.title;
                                 return (

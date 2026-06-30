@@ -180,11 +180,17 @@ const useSaveBase = ({
         const responseData = response?.data;
 
         if (responseData?.data && Array.isArray(responseData.data) && responseData.data.length > 0) {
-            responseData.data.forEach((item) => {
-                if (item.message) {
-                    showErrorMessage(item.message, translate);
-                }
-            });
+            // Check if errors are field-specific (have a 'field' property)
+            const hasFieldErrors = responseData.data.some((item) => item.field || item.fieldName);
+
+            // Only blast toasts if they are generic system errors without a specific field
+            if (!hasFieldErrors) {
+                responseData.data.forEach((item) => {
+                    if (item.message) {
+                        showErrorMessage(item.message, translate);
+                    }
+                });
+            }
             return;
         }
 

@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, LoadingOutlined } from '@ant-design/icons';
+import apiConfig from '@constants/apiConfig';
+import useFetch from '@hooks/useFetch';
+import { accountActions } from '@store/actions';
 import { getDownloadUrl } from '@utils';
 import { Button, Modal, Spin } from 'antd';
+import { toast } from 'sonner';
 
 import styles from './index.module.scss';
 
@@ -12,47 +17,199 @@ const MOCK_ACHIEVEMENT = {
     description: 'Tham gia mô phỏng dự án để nhận chứng chỉ và làm đẹp hồ sơ của bạn.',
 };
 
-const MOCK_JOBS = [
-    {
-        id: 1,
-        title: 'Comcast Talent Network',
-        description: 'Nhận thông tin cơ hội việc làm và sự kiện tuyển dụng.',
-        company: 'COMCAST',
-        companyClass: 'companyComcast',
-    },
-    {
-        id: 2,
-        title: 'Siemens Mobility Careers',
-        description: 'Khám phá các vị trí đang tuyển dụng.',
-        company: 'SIEMENS',
-        companyClass: 'companySiemens',
-    },
-    {
-        id: 3,
-        title: 'Student Marketeer – Various Locations',
-        description: 'Khởi đầu sự nghiệp cùng Red Bull',
-        company: 'Red Bull',
-        companyClass: 'companyRedbull',
-        closeDate: '30/06/2026',
-    },
-];
-
 function DashboardDesktop({
     profile,
     enrolledSims = [],
     enrolledUrlBase = '',
     achievements = [],
     allSimulations = [],
+    organizations = [],
+    categories = [],
     loading,
 }) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const name = profile?.fullName || profile?.account?.fullName || '';
+    const [ dismissedOrgs, setDismissedOrgs ] = useState([]);
+    const [ dismissedCardKeys, setDismissedCardKeys ] = useState([]);
+    const [ dismissedRecSimIds, setDismissedRecSimIds ] = useState([]);
+
+    const [ selectedSpecs, setSelectedSpecs ] = useState([]);
+    const [ selectedOrgs, setSelectedOrgs ] = useState([]);
+
+    const { execute: executeUpdateProfile, loading: updatingPreferences } = useFetch(apiConfig.student.clientUpdate);
 
     const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
     const [ previewLoading, setPreviewLoading ] = useState(false);
     const [ previewUrl, setPreviewUrl ] = useState(null);
     const [ currentDownloadUrl, setCurrentDownloadUrl ] = useState(null);
     const [ currentFileName, setCurrentFileName ] = useState('');
+
+    const toggleSpec = (id) => {
+        if (selectedSpecs.includes(id)) {
+            setSelectedSpecs(selectedSpecs.filter((s) => s !== id));
+        } else {
+            setSelectedSpecs([ ...selectedSpecs, id ]);
+        }
+    };
+
+    const toggleOrg = (id) => {
+        if (selectedOrgs.includes(id)) {
+            setSelectedOrgs(selectedOrgs.filter((o) => o !== id));
+        } else {
+            setSelectedOrgs([ ...selectedOrgs, id ]);
+        }
+    };
+
+    const handleSavePreferences = () => {
+        if (selectedSpecs.length === 0 && selectedOrgs.length === 0) {
+            toast.error('Vui lòng chọn ít nhất một chuyên ngành hoặc tổ chức yêu thích.');
+            return;
+        }
+
+        const payloadPreferences = [];
+        selectedSpecs.forEach((specId) => {
+            payloadPreferences.push({ specializationId: specId });
+        });
+        selectedOrgs.forEach((orgId) => {
+            payloadPreferences.push({ organizationId: orgId });
+        });
+
+        executeUpdateProfile({
+            data: {
+                avatarPath: profile?.avatar || profile?.avatarPath || '',
+                fullname: name || profile?.fullName || profile?.account?.fullName || '',
+                phone: profile?.phone || profile?.account?.phone || '',
+                birthday: profile?.birthday || profile?.account?.birthday || null,
+                username: profile?.username || profile?.account?.username || '',
+                preferences: payloadPreferences,
+            },
+            onCompleted: () => {
+                toast.success('Lưu sở thích thành công!');
+                dispatch(accountActions.getProfile());
+            },
+            onError: () => {
+                toast.error('Có lỗi xảy ra khi lưu sở thích. Vui lòng thử lại.');
+            },
+        });
+    };
+
+    const userPrefs = profile?.preferences || [];
+    const hasPhoneVal = profile?.phone || profile?.account?.phone;
+    const showPreferenceSetup = userPrefs.length === 0 && !!hasPhoneVal;
+
+    const categoriesList = Array.isArray(categories) ? categories : categories?.content || [];
+    const organizationsList = Array.isArray(organizations) ? organizations : organizations?.content || [];
+
+    if (showPreferenceSetup) {
+        return (
+            <div className={styles.container}>
+                <main className={styles.main}>
+                    <div className={styles.prefContainer}>
+                        <div className={styles.prefHeader}>
+                            <span className={styles.prefHeaderIcon}>🎯</span>
+                            <h2>Cá nhân hóa trải nghiệm học tập của bạn</h2>
+                            <p>
+                                Để gợi ý các bài mô phỏng dự án phù hợp nhất với định hướng và mục tiêu nghề nghiệp, vui
+                                lòng lựa chọn chuyên ngành và tổ chức bạn quan tâm.
+                            </p>
+                        </div>
+
+                        <div className={styles.prefSection}>
+                            <h3>1. Chuyên ngành bạn quan tâm</h3>
+                            <p className={styles.prefSectionDesc}>
+                                Chọn một hoặc nhiều chuyên ngành để chúng tôi gợi ý lộ trình phù hợp.
+                            </p>
+                            <div className={styles.prefPillGrid}>
+                                {categoriesList.map((cat) => {
+                                    const isSelected = selectedSpecs.includes(cat.id);
+                                    return (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            className={`${styles.prefPill} ${isSelected ? styles.prefPillSelected : ''}`}
+                                            onClick={() => toggleSpec(cat.id)}
+                                        >
+                                            {cat.name}
+                                            {isSelected && <span className={styles.pillCheck}> ✓</span>}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className={styles.prefSection}>
+                            <h3>2. Tổ chức bạn muốn học hỏi</h3>
+                            <p className={styles.prefSectionDesc}>
+                                Chọn các tổ chức đối tác mà bạn quan tâm đến cơ hội thực tập và làm việc.
+                            </p>
+                            <div className={styles.orgSelectionGrid}>
+                                {organizationsList.map((org) => {
+                                    const isSelected = selectedOrgs.includes(org.id);
+                                    const logoUrl = org.logoUrl
+                                        ? org.logoUrl.startsWith('http')
+                                            ? org.logoUrl
+                                            : `${enrolledUrlBase || ''}${org.logoUrl}`
+                                        : null;
+                                    const orgName = org.shortName || org.name || 'Tổ chức';
+
+                                    return (
+                                        <div
+                                            key={org.id}
+                                            className={`${styles.orgSelectCard} ${isSelected ? styles.orgSelectCardSelected : ''}`}
+                                            onClick={() => toggleOrg(org.id)}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyDown={(e) => e.key === 'Enter' && toggleOrg(org.id)}
+                                        >
+                                            <div className={styles.orgSelectLogo}>
+                                                {logoUrl ? (
+                                                    <img src={logoUrl} alt={orgName} />
+                                                ) : (
+                                                    <div className={styles.orgSelectLogoText}>
+                                                        {orgName.charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className={styles.orgSelectInfo}>
+                                                <h4>{orgName}</h4>
+                                                <p>{org.description || 'Đối tác tổ chức đáng tin cậy.'}</p>
+                                            </div>
+                                            <div className={styles.orgSelectCheckbox}>
+                                                <div
+                                                    className={`${styles.customCheckbox} ${isSelected ? styles.customCheckboxChecked : ''}`}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className={styles.prefActions}>
+                            <button
+                                type="button"
+                                className={styles.btnSubmitPref}
+                                disabled={updatingPreferences}
+                                onClick={handleSavePreferences}
+                            >
+                                {updatingPreferences ? (
+                                    <>
+                                        <Spin
+                                            indicator={<LoadingOutlined style={{ fontSize: 16, color: '#fff' }} spin />}
+                                        />{' '}
+                                        Đang lưu...
+                                    </>
+                                ) : (
+                                    'Lưu sở thích & Bắt đầu học'
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     const handlePreviewCertificate = async (e, downloadUrl, fileName) => {
         e.preventDefault();
@@ -89,16 +246,22 @@ function DashboardDesktop({
 
     const hasFullName = !!(profile?.fullName || profile?.account?.fullName);
     const hasEmail = !!(profile?.email || profile?.account?.email);
-    const hasPhone = !!(profile?.phone || profile?.account?.phone);
 
     const preferences = profile?.preferences || [];
     const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
     const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
 
-    const completionStatus = [ hasFullName, hasEmail, hasPhone, hasSpecialization, hasOrganization ];
+    const completionStatus = [ hasFullName, hasEmail, hasSpecialization, hasOrganization ];
+    const hasPhone = profile?.phone || profile?.account?.phone;
+    if (hasPhone) {
+        completionStatus.push(true);
+    }
+
     const completedCount = completionStatus.filter(Boolean).length;
-    const missingCount = 5 - completedCount;
-    const isProfileComplete = completedCount === 5;
+    const totalRequired = completionStatus.length;
+    const completenessPercentage = Math.round((completedCount / totalRequired) * 100);
+    const missingCount = totalRequired - completedCount;
+    const isProfileComplete = completedCount === totalRequired;
 
     // Filter enrolled simulations in progress (progress < 100)
     const activeEnrolledSims = enrolledSims.filter((item) => item.progress < 100);
@@ -123,6 +286,8 @@ function DashboardDesktop({
         recommendedSims = recommendedSims.slice(0, 3);
     }
 
+    const filteredRecommendedSims = recommendedSims.filter((sim) => !dismissedRecSimIds.includes(sim.id));
+
     // Level label helper
     const getLevelLabel = (level) => {
         const config = {
@@ -140,9 +305,10 @@ function DashboardDesktop({
     if (!isProfileComplete) {
         const badgeDots = completionStatus.map((completed) => (completed ? 'completed' : 'empty'));
         dynamicCards.push({
+            key: 'profile',
             badgeDots,
             title: 'Hồ sơ của bạn chưa hoàn thiện',
-            description: `Bạn cần cập nhật thêm ${missingCount} thông tin để hoàn thiện hồ sơ.`,
+            description: `Cần cập nhật thêm ${missingCount} thông tin để hoàn thiện hồ sơ học tập.`,
             link: '/profile',
             linkText: 'Cập nhật hồ sơ',
         });
@@ -153,6 +319,7 @@ function DashboardDesktop({
         const sim = item.simulation || {};
         const org = sim.educator?.organization || {};
         dynamicCards.push({
+            key: `resume_${item.id}`,
             resume: true,
             company: org.shortName || org.name || 'Tổ chức',
             role: sim.title || 'Bài mô phỏng',
@@ -170,6 +337,7 @@ function DashboardDesktop({
     recommendedSims.slice(0, 2).forEach((sim) => {
         const org = sim.educator?.organization || {};
         dynamicCards.push({
+            key: `rec_${sim.id}`,
             recommended: true,
             company: org.shortName || org.name || 'Tổ chức',
             role: sim.title,
@@ -179,14 +347,75 @@ function DashboardDesktop({
         });
     });
 
+    const filteredDynamicCards = dynamicCards.filter((card) => !dismissedCardKeys.includes(card.key));
+
+    const handleDismissCard = (key) => {
+        setDismissedCardKeys([ ...dismissedCardKeys, key ]);
+    };
+
     return (
         <div className={styles.container}>
             <main className={styles.main}>
-                <h1 className={styles.greeting}>Xin chào{name ? `, ${name}!` : '!'}</h1>
+                <div className={styles.welcomeBanner}>
+                    <div className={styles.welcomeInfo}>
+                        <h1 className={styles.greeting}>Xin chào{name ? `, ${name}!` : '!'}</h1>
+                        <p className={styles.welcomeSubtitle}>
+                            Chào mừng bạn quay trở lại. Hãy cùng tiếp tục nâng cao chuyên môn và cơ hội nghề nghiệp của
+                            mình nhé!
+                        </p>
+                    </div>
+                </div>
 
-                {dynamicCards.length > 0 && (
+                {/* Stats Grid */}
+                <div className={styles.statsGrid}>
+                    <div className={styles.statsCard}>
+                        <div className={`${styles.statsIcon} ${styles.iconLearning}`}>📚</div>
+                        <div className={styles.statsContent}>
+                            <span className={styles.statsNumber}>{activeEnrolledSims.length}</span>
+                            <span className={styles.statsLabel}>Bài mô phỏng đang học</span>
+                        </div>
+                    </div>
+                    <div className={styles.statsCard}>
+                        <div className={`${styles.statsIcon} ${styles.iconCompleted}`}>🏆</div>
+                        <div className={styles.statsContent}>
+                            <span className={styles.statsNumber}>{achievements.length}</span>
+                            <span className={styles.statsLabel}>Chứng chỉ đạt được</span>
+                        </div>
+                    </div>
+                    <div className={styles.statsCard}>
+                        <div className={`${styles.statsIcon} ${styles.iconOrgs}`}>💼</div>
+                        <div className={styles.statsContent}>
+                            <span className={styles.statsNumber}>
+                                {organizations.filter((org) => !dismissedOrgs.includes(org.id)).length}
+                            </span>
+                            <span className={styles.statsLabel}>Đối tác & Tổ chức</span>
+                        </div>
+                    </div>
+                    <div className={`${styles.statsCard} ${styles.statsCardProfile}`}>
+                        <div className={`${styles.statsIcon} ${styles.iconProfile}`}>👤</div>
+                        <div className={styles.statsContent} style={{ width: '100%' }}>
+                            <div className={styles.profileHeaderRow}>
+                                <span className={styles.statsLabel}>Hồ sơ cá nhân</span>
+                                <span className={styles.profilePercentage}>{completenessPercentage}%</span>
+                            </div>
+                            <div className={styles.progressBarBgMini}>
+                                <div
+                                    className={styles.progressBarFillMini}
+                                    style={{ width: `${completenessPercentage}%` }}
+                                />
+                            </div>
+                            {!isProfileComplete && (
+                                <button className={styles.btnUpdateProfile} onClick={() => navigate('/profile')}>
+                                    Cập nhật ngay <span className={styles.chevronMini}></span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {filteredDynamicCards.length > 0 && (
                     <div className={styles.topCards}>
-                        {dynamicCards.map((card, idx) => (
+                        {filteredDynamicCards.map((card, idx) => (
                             <div key={idx} className={styles.topCard}>
                                 {card.badgeDots && (
                                     <div className={styles.badgeRow}>
@@ -203,16 +432,18 @@ function DashboardDesktop({
                                         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
                                         </svg>
-                                        Gợi ý cho bạn!
+                                        Gợi ý học tập
                                     </div>
                                 )}
-                                {card.resume && <div className={styles.recommendedBadge}>Tiếp tục bài mô phỏng</div>}
+                                {card.resume && <div className={styles.recommendedBadge}>Tiếp tục học phần</div>}
                                 <div className={styles.companyName}>{card.company}</div>
                                 <div className={styles.roleText}>{card.role}</div>
                                 {card.title && <h4 className={styles.topCardTitle}>{card.title}</h4>}
                                 {card.description && <p className={styles.topCardDesc}>{card.description}</p>}
                                 <div className={styles.cardActions}>
-                                    <button className={styles.btnDismiss}>Bỏ qua</button>
+                                    <button className={styles.btnDismiss} onClick={() => handleDismissCard(card.key)}>
+                                        Bỏ qua
+                                    </button>
                                     {card.link ? (
                                         <a
                                             className={styles.linkBtn}
@@ -245,7 +476,7 @@ function DashboardDesktop({
                 <div className={styles.twoCol}>
                     <div>
                         <div className={styles.sectionTitle}>
-                            <span className={styles.sectionIcon}>🚀</span> Bài mô phỏng còn cần tiếp tục
+                            <span className={styles.sectionIcon}>🚀</span> Bài mô phỏng cần tiếp tục
                         </div>
 
                         {loading ? (
@@ -275,7 +506,7 @@ function DashboardDesktop({
                                         tabIndex={0}
                                         onKeyDown={(e) => e.key === 'Enter' && handleCardClick(sim.id)}
                                     >
-                                        <div>
+                                        <div style={{ flex: 1 }}>
                                             <div className={styles.simCardBody}>
                                                 <h4>{sim.title || 'Chưa có tiêu đề'}</h4>
                                                 <p>{sim.notice || 'Không có mô tả'}</p>
@@ -332,10 +563,10 @@ function DashboardDesktop({
 
                         {loading ? (
                             <div className={styles.loadingBox}>Đang tải...</div>
-                        ) : recommendedSims.length === 0 ? (
+                        ) : filteredRecommendedSims.length === 0 ? (
                             <div className={styles.emptyBox}>Chưa có bài mô phỏng gợi ý phù hợp.</div>
                         ) : (
-                            recommendedSims.map((sim) => {
+                            filteredRecommendedSims.map((sim) => {
                                 const org = sim.educator?.organization || {};
                                 const orgName = org.shortName || org.name || '';
                                 const orgInitial = orgName ? orgName.charAt(0).toUpperCase() : '?';
@@ -385,7 +616,14 @@ function DashboardDesktop({
                                                 {durationText && <span>🕐 {durationText}</span>}
                                             </div>
                                             <div className={styles.cardActions}>
-                                                <button className={styles.btnDismiss}>Bỏ qua</button>
+                                                <button
+                                                    className={styles.btnDismiss}
+                                                    onClick={() =>
+                                                        setDismissedRecSimIds([ ...dismissedRecSimIds, sim.id ])
+                                                    }
+                                                >
+                                                    Bỏ qua
+                                                </button>
                                                 <button
                                                     className={styles.linkBtn}
                                                     onClick={() => navigate(`/simulations/${sim.id}`)}
@@ -425,7 +663,7 @@ function DashboardDesktop({
                                 return (
                                     <div key={ach.id} className={styles.achievementCard} style={{ marginBottom: 24 }}>
                                         <div className={styles.trophyIcon}>🎯</div>
-                                        <div>
+                                        <div style={{ flex: 1 }}>
                                             <h4>{sim.title || 'Thành tích'}</h4>
                                             <div className={styles.achievementMeta}>
                                                 <p className={styles.achievementDesc}>Chứng chỉ đã hoàn thành</p>
@@ -452,7 +690,7 @@ function DashboardDesktop({
                         ) : (
                             <div className={styles.achievementCard} style={{ marginBottom: 24 }}>
                                 <div className={styles.trophyIcon}>{MOCK_ACHIEVEMENT.icon}</div>
-                                <div>
+                                <div style={{ flex: 1 }}>
                                     <h4>{MOCK_ACHIEVEMENT.title}</h4>
                                     <p className={styles.achievementDesc}>{MOCK_ACHIEVEMENT.description}</p>
                                     <a
@@ -471,33 +709,51 @@ function DashboardDesktop({
                         )}
 
                         <div className={styles.sectionTitle}>
-                            <span className={styles.sectionIcon}>💼</span> Việc làm phù hợp
+                            <span className={styles.sectionIcon}>💼</span> Đối tác & Tổ chức
                         </div>
 
-                        {MOCK_JOBS.map((job) => (
-                            <div key={job.id} className={styles.jobCard}>
-                                <div>
-                                    <h4>{job.title}</h4>
-                                    <p>{job.description}</p>
-                                    {job.closeDate && (
-                                        <div className={styles.closeDate}>🕐 Đóng vào {job.closeDate}</div>
-                                    )}
-                                    <div className={styles.cardActions}>
-                                        <button className={styles.btnDismiss}>Không quan tâm</button>
-                                        <button className={styles.linkBtn}>
-                                            Xem chi tiết <span className={styles.chevron}></span>
-                                        </button>
+                        {organizations
+                            .filter((org) => !dismissedOrgs.includes(org.id))
+                            .slice(0, 3)
+                            .map((org) => {
+                                const logoUrl = org.logoUrl
+                                    ? org.logoUrl.startsWith('http')
+                                        ? org.logoUrl
+                                        : `${enrolledUrlBase || ''}${org.logoUrl}`
+                                    : null;
+                                const orgName = org.shortName || org.name || 'Tổ chức';
+
+                                return (
+                                    <div key={org.id} className={styles.jobCard}>
+                                        <div style={{ flex: 1 }}>
+                                            <h4>Cơ hội việc làm tại {orgName}</h4>
+                                            <p>{org.description || `Tham gia mạng lưới nhân tài của ${orgName}.`}</p>
+                                            <div className={styles.cardActions}>
+                                                <button
+                                                    className={styles.btnDismiss}
+                                                    onClick={() => setDismissedOrgs([ ...dismissedOrgs, org.id ])}
+                                                >
+                                                    Không quan tâm
+                                                </button>
+                                                <button className={styles.linkBtn} onClick={() => navigate('/jobs')}>
+                                                    Xem chi tiết <span className={styles.chevron}></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className={styles.companyBadge} style={{ background: '#fff' }}>
+                                            {logoUrl ? (
+                                                <img
+                                                    src={logoUrl}
+                                                    alt={orgName}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                                />
+                                            ) : (
+                                                <div style={{ color: '#000', fontWeight: 'bold' }}>{orgName}</div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className={`${styles.companyBadge} ${styles[job.companyClass]}`}>
-                                    {job.companyClass === 'companyRedbull' ? (
-                                        <div className={styles.redbullBadge}>Red Bull</div>
-                                    ) : (
-                                        job.company
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                                );
+                            })}
                     </div>
                 </div>
             </main>

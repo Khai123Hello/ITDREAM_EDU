@@ -2,10 +2,9 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimulationCard from '@components/common/elements/SimulationCard';
 import SliderScroll from '@components/common/elements/SliderScroll';
+import useAuth from '@hooks/useAuth';
 
 import styles from './index.module.scss';
-
-const companies = [ 'FPT Software', 'VNG Corporation', 'Tiki', 'Grab Vietnam', 'Momo' ];
 
 const levelText = {
     1: 'Cơ bản',
@@ -20,39 +19,20 @@ const steps = [
     { num: 4, text: 'Kết nối trực tiếp với nhà tuyển dụng và cơ hội việc làm IT.' },
 ];
 
-const employers = [
-    'FPT Software',
-    'VNG Corporation',
-    'Tiki',
-    'Grab Vietnam',
-    'Momo',
-    'Viettel Digital',
-    'KMS Technology',
-    'NashTech',
-];
-
-const testimonials = [
-    {
-        name: 'Nguyễn Minh Khoa',
-        landed: 'Được nhận vào làm tại FPT Software',
-        text: 'ITDream đã giúp tôi hiểu được công việc thực tế của một lập trình viên trước khi ra trường. Nhờ các bài mô phỏng, tôi tự tin hơn rất nhiều trong buổi phỏng vấn và được nhận việc ngay sau khi tốt nghiệp.',
-    },
-    {
-        name: 'Trần Thị Lan Anh',
-        landed: 'Được nhận vào làm tại Tiki',
-        text: 'Tôi không ngờ một nền tảng miễn phí lại có chất lượng cao như vậy. Dự án Data Analysis tại ITDream hoàn toàn giống với công việc thực tế tôi đang làm tại Tiki. Đây là trải nghiệm không thể bỏ qua!',
-    },
-    {
-        name: 'Lê Hoàng Phúc',
-        landed: 'Được nhận vào làm tại Grab Vietnam',
-        text: 'Bài mô phỏng Backend Engineering của ITDream rất thực tế và thử thách. Nó giúp tôi xây dựng được portfolio ấn tượng và chứng minh năng lực với nhà tuyển dụng một cách thuyết phục.',
-    },
-];
-
-function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
+function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = [], loading, error, onRetry }) {
     const navigate = useNavigate();
     const sliderRef = useRef(null);
+    const stepsRef = useRef(null);
+    const { isAuthenticated } = useAuth();
     const [ activeIndex, setActiveIndex ] = useState(0);
+
+    const handleStartClick = () => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        } else {
+            navigate('/register');
+        }
+    };
 
     const cards = useMemo(() => simulations || [], [ simulations ]);
     const totalCards = cards.length + 1;
@@ -153,15 +133,18 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
                     Trải nghiệm thực tế tại các công ty công nghệ hàng đầu Việt Nam với hàng trăm bài mô phỏng miễn phí
                     — không cần kinh nghiệm để bắt đầu.
                 </p>
-                <button className={`${styles['lp-btn']} ${styles['lp-btn--primary']} ${styles['lp-btn--lg']}`}>
+                <button
+                    className={`${styles['lp-btn']} ${styles['lp-btn--primary']} ${styles['lp-btn--lg']}`}
+                    onClick={handleStartClick}
+                >
                     Bắt Đầu Ngay →
                 </button>
 
-                <p className={styles['lp-hero__featuring']}>Bài mô phỏng từ các công ty công nghệ hàng đầu</p>
+                <p className={styles['lp-hero__featuring']}>Bài mô phỏng từ các tổ chức liên quan</p>
                 <div className={styles['lp-hero__logos']}>
-                    {companies.map((c) => (
-                        <span key={c} className={styles['lp-logo-pill']}>
-                            {c}
+                    {organizations.slice(0, 5).map((org) => (
+                        <span key={org.id} className={styles['lp-logo-pill']}>
+                            {org.name || org.shortName}
                         </span>
                     ))}
                 </div>
@@ -213,7 +196,7 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
             </section>
 
             {/* CÁCH THỨC HOẠT ĐỘNG */}
-            <section className={`${styles['lp-section']} ${styles['lp-how']}`}>
+            <section ref={stepsRef} className={`${styles['lp-section']} ${styles['lp-how']}`}>
                 <h2 className={styles['lp-section__title']}>
                     ITDream — Cầu nối từ sinh viên đến kỹ sư IT chuyên nghiệp
                 </h2>
@@ -229,63 +212,40 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
                         </div>
                     ))}
                 </div>
-                <button className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`}>
+                <button
+                    className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`}
+                    onClick={() => stepsRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                >
                     ITDream Hoạt Động Như Thế Nào →
                 </button>
             </section>
 
-            {/* THỐNG KÊ */}
-            <section className={styles['lp-stats']}>
-                <div className={styles['lp-stats__left']}>
-                    <p className={styles['lp-stats__highlight']}>Tăng 4x cơ hội</p>
-                    <p className={styles['lp-stats__sub']}>được nhận việc khi có dự án thực tế trong hồ sơ</p>
-                    <h3 className={styles['lp-stats__big']}>
-                        Hơn 200 bài mô phỏng
-                        <br />
-                        và 80+ doanh nghiệp IT
-                    </h3>
-                    <p className={styles['lp-stats__sub']}>trên đa dạng lĩnh vực công nghệ</p>
-                    <h3 className={styles['lp-stats__big']}>500K+ sinh viên</h3>
-                    <p className={styles['lp-stats__sub']}>đã đăng ký ITDream</p>
-                    <button className={`${styles['lp-btn']} ${styles['lp-btn--outline']} ${styles['lp-btn--white']}`}>
-                        Tìm Dự Án Phù Hợp →
-                    </button>
-                </div>
-                <div className={styles['lp-stats__photo']} />
-            </section>
-
-            {/* NHÀ TUYỂN DỤNG */}
-            <section className={styles['lp-section']}>
-                <h2 className={styles['lp-section__title']}>
-                    Các doanh nghiệp IT tuyển dụng vượt ra ngoài hồ sơ truyền thống
-                </h2>
-                <div className={styles['lp-employers']}>
-                    {employers.map((e) => (
-                        <div key={e} className={styles['lp-employer-card']}>
-                            <p className={styles['lp-employer-card__name']}>{e}</p>
-                            <a href="#" className={styles['lp-employer-card__link']}>
-                                XEM DỰ ÁN
-                            </a>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
             {/* ĐÁNH GIÁ */}
-            <section className={`${styles['lp-section']} ${styles['lp-testimonials-section']}`}>
-                <h2 className={styles['lp-section__title']}>Nghe từ chính các sinh viên đã thành công.</h2>
-                <div className={styles['lp-testimonials']}>
-                    {testimonials.map((t) => (
-                        <div key={t.name} className={styles['lp-testimonial']}>
-                            <div className={styles['lp-testimonial__avatar']} />
-                            <p className={styles['lp-testimonial__text']}>{t.text}</p>
-                            <p className={styles['lp-testimonial__name']}>{t.name}</p>
-                            <p className={styles['lp-testimonial__landed']}>{t.landed}</p>
-                        </div>
-                    ))}
-                </div>
-                <button className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`}>Tìm Bài Mô Phỏng →</button>
-            </section>
+            {feedbacks.length > 0 && (
+                <section className={`${styles['lp-section']} ${styles['lp-testimonials-section']}`}>
+                    <h2 className={styles['lp-section__title']}>Nghe từ chính các sinh viên đã thành công.</h2>
+                    <div className={styles['lp-testimonials']}>
+                        {feedbacks.map((f) => (
+                            <div key={f.id} className={styles['lp-testimonial']}>
+                                <div className={styles['lp-testimonial__avatar']} />
+                                <p className={styles['lp-testimonial__text']}>{f.content}</p>
+                                <p className={styles['lp-testimonial__name']}>
+                                    {f.student?.fullName || f.student?.account?.fullName || 'Học viên'}
+                                </p>
+                                <p className={styles['lp-testimonial__landed']}>
+                                    {f.simulation?.title ? `Hoàn thành bài mô phỏng: ${f.simulation.title}` : ''}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                    <button
+                        className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`}
+                        onClick={() => navigate('/simulations')}
+                    >
+                        Tìm Bài Mô Phỏng →
+                    </button>
+                </section>
+            )}
 
             {/* KÊU GỌI HÀNH ĐỘNG */}
             <section className={styles['lp-cta']}>
@@ -296,7 +256,9 @@ function LandingPageDesktop({ simulations = [], loading, error, onRetry }) {
                     <p className={styles['lp-cta__sub']}>
                         ITDream ở đây để biến kỹ năng, sự nỗ lực và đam mê của bạn thành cơ hội việc làm thực tế.
                     </p>
-                    <button className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`}>Đăng Ký Miễn Phí →</button>
+                    <button className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`} onClick={handleStartClick}>
+                        Đăng Ký Miễn Phí →
+                    </button>
                 </div>
                 <div className={styles['lp-cta__graphic']}>
                     <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">

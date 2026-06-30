@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunknail_fe=self.webpackChunknail_fe||[]).push([[682],{2682:(e,l,a)=>{a.r(l),a.d(l,{default:()=>t});var n=a(9950);const t=()=>n.createElement("div",null,"Page not allowed")}}]);

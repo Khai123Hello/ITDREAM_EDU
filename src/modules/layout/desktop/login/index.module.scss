@@ -5,18 +5,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 24px 16px;
+    padding: 40px 16px;
     font-family: 'Be Vietnam Pro', 'SF-Pro', sans-serif;
+    background: radial-gradient(circle at 10% 20%, #f0fdf4 0%, #f8fafc 100%); /* Premium modern background */
 
     .card {
-        background: #fff;
-        border: 1px solid #e2f0e2;
-        border-radius: 16px;
+        background: #ffffff;
+        border: none; /* Borderless modern design */
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(15, 40, 16, 0.04);
+        box-shadow: 0 20px 50px rgba(15, 40, 16, 0.06), 0 4px 12px rgba(0, 0, 0, 0.01);
         width: 100%;
-        max-width: 820px;
-        min-height: 560px;
+        max-width: 860px;
+        min-height: 580px;
         display: flex;
 
         @media (max-width: 768px) {
@@ -31,10 +32,10 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 44px 48px;
+        padding: 48px;
 
         @media (max-width: 480px) {
-            padding: 32px 24px;
+            padding: 36px 24px;
         }
     }
 
@@ -42,39 +43,40 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 36px;
+        margin-bottom: 28px;
 
         .logoIcon {
-            width: 30px;
-            height: 30px;
-            background: #f5c518;
-            border-radius: 7px;
+            width: 32px;
+            height: 32px;
+            background: #16a34a; /* Green theme icon */
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #1a2e1a;
-            font-size: 15px;
-            box-shadow: 0 2px 6px rgba(245, 197, 24, 0.25);
+            color: #ffffff;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
         }
 
         .logoName {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 800;
-            color: #0f2810;
+            color: #0f172a;
+            letter-spacing: -0.5px;
         }
     }
 
     .greetingHi {
-        font-size: 22px;
+        font-size: 24px;
         font-weight: 800;
-        color: #0f2810;
+        color: #0f172a;
         margin-bottom: 6px;
         letter-spacing: -0.5px;
     }
 
     .greetingSub {
-        font-size: 13px;
-        color: #4b6e52;
+        font-size: 13.5px;
+        color: #64748b;
         line-height: 1.6;
         margin-bottom: 28px;
     }
@@ -91,6 +93,17 @@
         :global(.rc-field-form-item) {
             margin-bottom: 0;
         }
+
+        :global(.ant-input-affix-wrapper), :global(.ant-input) {
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            border-color: #e2e8f0 !important;
+
+            &:focus, &:hover {
+                border-color: #16a34a !important;
+                box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.08) !important;
+            }
+        }
     }
 
     .forgotPassword {
@@ -102,24 +115,38 @@
         margin-top: -4px;
         margin-bottom: 24px;
         text-decoration: none;
+        transition: color 0.15s ease;
 
         &:hover {
             text-decoration: underline;
-            color: #0f2810;
+            color: #15803d;
         }
     }
 
     // Right Column (Career Tags)
     .right {
-        width: 320px;
-        background: #0f2810;
+        width: 340px;
+        background: linear-gradient(135deg, #091e0a 0%, #162f17 100%); /* Deep luxurious gradient */
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 36px 28px;
-        gap: 18px;
+        padding: 40px 32px;
+        gap: 16px;
         flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+
+        &::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at 100% 0%, rgba(34, 197, 94, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
 
         @media (max-width: 768px) {
             width: 100%;
@@ -133,78 +160,90 @@
         gap: 8px;
 
         .rightLogoIcon {
-            width: 26px;
-            height: 26px;
-            background: #f5c518;
-            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 7px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #1a2e1a;
-            font-size: 13px;
+            color: #4ade80;
+            font-size: 14px;
+            backdrop-filter: blur(4px);
         }
 
         .rightLogoName {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 800;
-            color: #fff;
+            color: #ffffff;
+            letter-spacing: -0.3px;
         }
     }
 
     .rightDesc {
         font-size: 12px;
-        color: #8fad8f;
+        color: #a7f3d0;
         line-height: 1.6;
         text-align: center;
+        opacity: 0.85;
     }
 
     .rightDivider {
-        height: 0.5px;
-        background: #2d5a2d;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.08);
         width: 100%;
     }
 
     .rightTag {
-        background: #1a3f1a;
-        border: 1px solid #2d5a2d;
-        border-radius: 8px;
-        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.03); /* Glassmorphism simulation tag */
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 12px 16px;
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 4px;
+        transition: all 0.25s ease;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(74, 222, 128, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
 
         .tl {
             font-size: 10px;
             font-weight: 700;
-            letter-spacing: .05em;
+            letter-spacing: .08em;
             text-transform: uppercase;
             color: #4ade80;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             
             svg {
-                font-size: 12px;
+                font-size: 13px;
             }
         }
 
         .tv {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            color: #dcfce7;
+            color: #ffffff;
+            line-height: 1.4;
         }
 
         .ts {
             font-size: 11px;
-            color: #8fad8f;
+            color: #94a3b8;
             margin-top: 2px;
         }
     }
 
     .rightInfoBlock {
-        background: #1a3f1a;
-        border: 1px solid #2d5a2d;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 12px;
         padding: 16px;
         width: 100%;
@@ -215,7 +254,7 @@
     }
 
     .rightInfoTitle {
-        font-size: 13px;
+        font-size: 13.5px;
         font-weight: 700;
         color: #4ade80;
         text-align: left;
@@ -224,28 +263,30 @@
     .rightInfoText {
         font-size: 12px;
         line-height: 1.6;
-        color: #dcfce7;
+        color: #e2e8f0;
         text-align: left;
+        opacity: 0.9;
     }
 
     .rightMotto {
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 11.5px;
+        font-weight: 700;
         color: #4ade80;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
         text-align: center;
         margin-top: 8px;
+        opacity: 0.9;
     }
 
     // Buttons
     .btnMain {
         width: 100%;
         height: 46px;
-        border-radius: 10px;
-        background: #22c55e;
+        border-radius: 8px;
+        background: #16a34a;
         border: none;
-        color: #fff;
+        color: #ffffff;
         font-size: 14px;
         font-weight: 700;
         cursor: pointer;
@@ -253,11 +294,13 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: background .15s;
-        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
 
         &:hover:not(:disabled) {
-            background: #16a34a;
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(22, 163, 74, 0.25);
         }
 
         &:disabled {
@@ -272,7 +315,7 @@
         align-items: center;
         gap: 12px;
         margin: 18px 0;
-        color: #8fad8f;
+        color: #94a3b8;
         font-size: 12px;
         font-weight: 600;
 
@@ -281,43 +324,45 @@
             content: '';
             flex: 1;
             height: 1px;
-            background: #e2f0e2;
+            background: #f1f5f9;
         }
     }
 
     .googleButton {
         width: 100%;
         height: 46px;
-        border-radius: 10px;
-        border: 1px solid #dbe7dc;
-        background: #fff;
-        color: #243b27;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        color: #334155;
         font-size: 14px;
         font-weight: 700;
-        box-shadow: 0 2px 8px rgba(15, 40, 16, 0.04);
-        transition:
-            border-color .15s,
-            background .15s,
-            box-shadow .15s,
-            transform .15s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
 
         &:hover:not(:disabled) {
-            border-color: #b8d7bb;
-            background: #f8fcf8;
-            box-shadow: 0 6px 16px rgba(15, 40, 16, 0.08);
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         &:focus-visible {
-            outline: 3px solid rgba(66, 133, 244, 0.18);
+            outline: 3px solid rgba(22, 163, 74, 0.18);
             outline-offset: 2px;
         }
 
         &:disabled {
-            color: #8fad8f;
-            background: #f4f7f4;
+            color: #94a3b8;
+            background: #f8fafc;
             cursor: not-allowed;
             box-shadow: none;
+            border-color: #e2e8f0;
         }
     }
 

@@ -104,7 +104,7 @@ export default function CommentPanel({
     const handleMainSubmit = (e) => {
         e.preventDefault();
         if (!mainText.trim()) return;
-        onSendComment(mainText.trim(), 0);
+        onSendComment(mainText.trim(), null);
         setMainText('');
     };
 
@@ -161,16 +161,52 @@ export default function CommentPanel({
 
     const currentUsername = profile?.username || '';
 
+    // Helper to get kind badge style and label based on user.kind
+    const getUserKindBadge = (kind) => {
+        switch (Number(kind)) {
+                        case 1: // Admin
+                            return {
+                                label: 'Quản trị viên',
+                                bgColor: '#fee2e2', // light red
+                                color: '#991b1b',
+                            };
+                        case 2: // Educator
+                            return {
+                                label: 'Giảng viên',
+                                bgColor: '#dbeafe', // light blue
+                                color: '#1e40af',
+                            };
+                        case 4: // Company
+                            return {
+                                label: 'Doanh nghiệp',
+                                bgColor: '#fef3c7', // light yellow
+                                color: '#92400e',
+                            };
+                        case 3: // Student
+                            return {
+                                label: 'Học viên',
+                                bgColor: '#f0fdf4', // light green
+                                color: '#166534',
+                            };
+                        default:
+                            return null;
+        }
+    };
+
     // Render individual comment card (either root or reply)
     const renderCommentCard = (comment, isReply = false) => {
         const isSelf = comment.user?.username === currentUsername;
         const isEditing = editingId === comment.id;
         const isReplying = replyingToId === comment.id;
-        const isStudent = comment.user?.username === profile?.username;
-        const isTeacher = !isStudent;
+        const isTeacher = comment.user?.kind !== 3; // Educator, Admin, or Company is Teacher
+        const badge = getUserKindBadge(comment.user?.kind);
+
+        let cardClass = `tfo-comment-card`;
+        if (isReply) cardClass += ' reply';
+        if (isTeacher) cardClass += ' teacher-comment';
 
         return (
-            <div key={comment.id} className={`tfo-comment-card${isReply ? ' reply' : ''}${isTeacher ? ' teacher-comment' : ''}`}>
+            <div key={comment.id} className={cardClass}>
                 <div className="tfo-comment-card-header">
                     {renderAvatar(comment.user)}
                     <div className="tfo-comment-user-info">
@@ -178,22 +214,15 @@ export default function CommentPanel({
                             <span className="tfo-comment-fullname">
                                 {comment.user?.fullName || comment.user?.username || 'Học viên'}
                             </span>
-                            {isTeacher && (
+                            {badge && (
                                 <span
+                                    className="tfo-comment-badge"
                                     style={{
-                                        fontSize: '9px',
-                                        fontWeight: 700,
-                                        backgroundColor: '#dbeafe',
-                                        color: '#1d4ed8',
-                                        padding: '2px 6px',
-                                        borderRadius: '10px',
-                                        lineHeight: '1.2',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.3px',
-                                        display: 'inline-block',
+                                        backgroundColor: badge.bgColor,
+                                        color: badge.color,
                                     }}
                                 >
-                                    Giáo viên
+                                    {badge.label}
                                 </span>
                             )}
                         </div>
@@ -313,7 +342,7 @@ export default function CommentPanel({
         <div className="tfo-comments-panel">
             {/* Panel Header */}
             <div className="tfo-comments-panel-header">
-                <h3 className="tfo-comments-panel-title">Bình luận ({comments.length})</h3>
+                <h3 className="tfo-comments-panel-title">Thảo luận nhiệm vụ ({comments.length})</h3>
                 <button className="tfo-comments-close-btn" onClick={onClose} title="Đóng bình luận">
                     <FiX size={20} />
                 </button>
@@ -327,7 +356,7 @@ export default function CommentPanel({
                     </div>
                 ) : comments.length === 0 ? (
                     <div className="tfo-comments-empty">
-                        <p>Chưa có bình luận nào. Hãy bắt đầu cuộc trò chuyện!</p>
+                        <p>Chưa có bình luận nào. Hãy bắt đầu cuộc thảo luận!</p>
                     </div>
                 ) : (
                     <div className="tfo-comments-scrollable">
@@ -357,11 +386,11 @@ export default function CommentPanel({
                 )}
             </div>
 
-            {/* Main input at bottom */}
+            {/* Compose Form at the bottom (Horizontal layout) */}
             <form onSubmit={handleMainSubmit} className="tfo-comments-panel-footer">
                 <textarea
                     className="tfo-comments-main-textarea"
-                    placeholder="Viết bình luận của bạn... (Ctrl + Enter để gửi)"
+                    placeholder="Viết bình luận... (Ctrl + Enter để gửi)"
                     value={mainText}
                     onChange={(e) => setMainText(e.target.value)}
                     onKeyDown={(e) => {
@@ -369,7 +398,7 @@ export default function CommentPanel({
                             handleMainSubmit(e);
                         }
                     }}
-                    rows={2}
+                    rows={1}
                 />
                 <button
                     type="submit"

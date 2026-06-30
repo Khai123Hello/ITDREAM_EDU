@@ -93,13 +93,14 @@ export const DATE_YEAR_FORMAT = 'DD/MM/YYYY';
 export const DATE_YEAR_FORMAT_TIME = 'DD/MM/YYYY HH:mm';
 export const DATE_YEAR = 'MMM DD YYYY';
 export const LIMIT_IMAGE_SIZE = 512000;
+export const DEFAULT_PAGE_SIZE = 16;
+export const MAX_SIMULATIONS_LOAD_LIMIT = 9999;
 
 export const STATUS_PENDING = 0;
 export const STATUS_ACTIVE = 1;
 export const STATUS_LOCK = -1;
 export const STATUS_DELETE = -2;
 
-export const DEFAULT_PAGE_SIZE = 10;
 export const DEFAULT_TABLE_ITEM_SIZE = 20;
 export const DEFAULT_TABLE_ITEM_MOBILE_SIZE = 10;
 export const DEFAULT_TABLE_PAGE_START = 0;

@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef,useState } from 'react';
-import { blocksToMarkdoc,markdocToTipTapJson } from '@utils/markdocBlockConverter';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { blocksToMarkdoc, markdocToTipTapJson } from '@utils/markdocBlockConverter';
 
 const MARKS = {
     bold: (ch) => <strong key="b">{ch}</strong>,
@@ -42,6 +42,8 @@ function InteractiveQuizBlock({
     questionId = null,
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const [ selected, setSelected ] = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
@@ -74,8 +76,10 @@ function InteractiveQuizBlock({
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
     const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
+    const isExceeded = totalError > 0 && errorCount >= totalError;
+
     const handleSubmit = () => {
-        if (selected === null) return;
+        if (selected === null || isExceeded) return;
         setSubmitted(true);
         const selectedOption = (block.options || [])[selected];
         onQuizAnswerSubmit({
@@ -86,6 +90,7 @@ function InteractiveQuizBlock({
     };
 
     const handleReset = () => {
+        if (isExceeded) return;
         setSelected(null);
         setSubmitted(false);
         setIsRetrying(true);
@@ -98,6 +103,25 @@ function InteractiveQuizBlock({
                 <span className="tfo-block-quiz-icon">❓</span>
                 <span className="tfo-block-quiz-text">{block.question}</span>
             </div>
+
+            {/* Error Count / Attempt info */}
+            {totalError > 0 && (
+                <div
+                    className="tfo-quiz-error-count-info"
+                    style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}
+                >
+                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong>{' '}
+                    / {totalError}
+                </div>
+            )}
+            {isExceeded && (
+                <div
+                    className="tfo-quiz-exceeded-warning"
+                    style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}
+                >
+                    ⚠️ Bạn đã vượt quá số lần làm sai cho phép. Vui lòng bấm đặt lại nhiệm vụ để làm lại bài.
+                </div>
+            )}
 
             {/* Options */}
             <div className="tfo-block-quiz-options">
@@ -112,8 +136,8 @@ function InteractiveQuizBlock({
                         <button
                             key={oi}
                             className={cls}
-                            disabled={effectiveSubmitted || hasCompleted}
-                            onClick={() => !(effectiveSubmitted || hasCompleted) && setSelected(oi)}
+                            disabled={effectiveSubmitted || hasCompleted || isExceeded}
+                            onClick={() => !(effectiveSubmitted || hasCompleted || isExceeded) && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
@@ -133,7 +157,7 @@ function InteractiveQuizBlock({
                 {!effectiveSubmitted ? (
                     <button
                         className="tfo-quiz-submit-btn"
-                        disabled={selected === null || hasCompleted}
+                        disabled={selected === null || hasCompleted || isExceeded}
                         onClick={handleSubmit}
                     >
                         Kiểm tra đáp án
@@ -144,7 +168,11 @@ function InteractiveQuizBlock({
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted} onClick={handleReset}>
+                            <button
+                                className="tfo-quiz-retry-btn"
+                                disabled={hasCompleted || isExceeded}
+                                onClick={handleReset}
+                            >
                                 Làm lại
                             </button>
                         )}
@@ -181,8 +209,17 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
 
                     case 'heading': {
                         const level = node.attrs?.level || 1;
+                        const text = node.content?.map((c) => c.text || '').join('') || '';
+                        const id = text
+                            .toLowerCase()
+                            .trim()
+                            .replace(/[^a-z0-9\u00C0-\u017F]+/g, '-');
                         const Tag = `h${level}`;
-                        return <Tag key={index}>{children}</Tag>;
+                        return (
+                            <Tag key={index} id={id}>
+                                {children}
+                            </Tag>
+                        );
                     }
 
                     case 'bulletList':
@@ -249,7 +286,7 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                     case 'step':
                         return (
                             <div key={index} className="tfo-block-step">
-                                <div className="tfo-block-step-badge">{index + 1}</div>
+                                <div className="tfo-block-step-badge">{node.attrs?.stepNumber || index + 1}</div>
                                 <div className="tfo-block-step-content">
                                     {node.attrs?.label && <span className="tfo-block-step-label">{node.attrs.label}</span>}
                                     <div className="tfo-block-step-body">{children}</div>
@@ -276,9 +313,7 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                         }));
                         const questionKey = (node.attrs?.question || '').trim();
                         const dataQId = node.attrs?.dataQuestionCode || '';
-                        const questionId = dataQId
-                            ? quizCtx?.questionMap?.[dataQId]
-                            : quizCtx?.questionMap?.[questionKey];
+                        const questionId = dataQId ? quizCtx?.questionMap?.[dataQId] : quizCtx?.questionMap?.[questionKey];
                         const studentAnswer = quizCtx?.quizSubmissionMap?.[questionId];
 
                         if (onQuizAnswerSubmit) {
@@ -295,6 +330,8 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                                     questionId={questionId}
                                     onQuizAnswerSubmit={onQuizAnswerSubmit}
                                     hasCompleted={hasCompleted}
+                                    errorCount={quizCtx?.errorCount}
+                                    totalError={quizCtx?.totalError}
                                 />
                             );
                         }
@@ -312,7 +349,7 @@ function renderNode(node, index, quizCtx, onQuizAnswerSubmit, hasCompleted) {
                             const correct = opt.answer === true;
                             const letter = String.fromCharCode(65 + i);
                             const text = opt.option;
-                            const isSelected = studentAnswer && (studentAnswer.answer === text);
+                            const isSelected = studentAnswer && studentAnswer.answer === text;
                             let optClass = 'tfo-quiz-option';
                             if (quizCtx?.quizSubmissionMap) {
                                 if (isSelected) optClass += ' selected';
@@ -374,10 +411,12 @@ export default function TipTapJsonRenderer({
     onQuizAnswerSubmit,
     hasCompleted,
     onQuestionRendered,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const json = useMemo(() => {
         if (!content) return { type: 'doc', content: [] };
-        
+
         let parsed = content;
         if (typeof content === 'string') {
             const trimmed = content.trim();
@@ -385,31 +424,47 @@ export default function TipTapJsonRenderer({
                 try {
                     parsed = JSON.parse(trimmed);
                 } catch {
-                    return markdocToTipTapJson(content);
+                    parsed = markdocToTipTapJson(content);
                 }
             } else {
-                return markdocToTipTapJson(content);
+                parsed = markdocToTipTapJson(content);
             }
         }
-        
+
+        let doc = { type: 'doc', content: [] };
         if (parsed && parsed.type === 'doc') {
-            return parsed;
-        }
-        
-        if (Array.isArray(parsed)) {
+            doc = parsed;
+        } else if (Array.isArray(parsed)) {
             const markdocStr = blocksToMarkdoc(parsed);
-            return markdocToTipTapJson(markdocStr);
+            doc = markdocToTipTapJson(markdocStr);
+        } else {
+            return doc;
         }
-        
-        return { type: 'doc', content: [] };
+
+        // Traverse AST to pre-calculate step numbers
+        let stepCounter = 1;
+        const walk = (nodes) => {
+            (nodes || []).forEach((n) => {
+                if (n.type === 'step') {
+                    if (!n.attrs) n.attrs = {};
+                    n.attrs.stepNumber = stepCounter++;
+                }
+                if (n.content) walk(n.content);
+            });
+        };
+        walk(doc.content);
+
+        return doc;
     }, [ content ]);
 
     const quizCtx = useMemo(() => {
         return {
             quizSubmissionMap: quizSubmissionMap || {},
             questionMap: questionMap || {},
+            errorCount,
+            totalError,
         };
-    }, [ quizSubmissionMap, questionMap ]);
+    }, [ quizSubmissionMap, questionMap, errorCount, totalError ]);
 
     // Extract inline question IDs inside useMemo to avoid state setting during rendering
     const inlineQuestionIds = useMemo(() => {
@@ -419,9 +474,7 @@ export default function TipTapJsonRenderer({
                 if (n.type === 'quiz') {
                     const questionKey = (n.attrs?.question || '').trim();
                     const dataQId = n.attrs?.dataQuestionCode || '';
-                    const questionId = dataQId
-                        ? quizCtx?.questionMap?.[dataQId]
-                        : quizCtx?.questionMap?.[questionKey];
+                    const questionId = dataQId ? quizCtx?.questionMap?.[dataQId] : quizCtx?.questionMap?.[questionKey];
                     if (questionId) {
                         ids.add(String(questionId));
                     }
@@ -441,9 +494,7 @@ export default function TipTapJsonRenderer({
     }, [ inlineQuestionIds, onQuestionRendered ]);
 
     const rendered = useMemo(() => {
-        return (json.content || []).map((node, i) =>
-            renderNode(node, i, quizCtx, onQuizAnswerSubmit, hasCompleted),
-        );
+        return (json.content || []).map((node, i) => renderNode(node, i, quizCtx, onQuizAnswerSubmit, hasCompleted));
     }, [ json, quizCtx, onQuizAnswerSubmit, hasCompleted ]);
 
     if (!content) {

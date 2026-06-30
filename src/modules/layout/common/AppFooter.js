@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import styles from './AppFooter.module.scss';
 
@@ -16,48 +17,48 @@ const AppFooter = () => {
             <div className={styles['lp-footer__col']}>
                 <p className={styles['lp-footer__heading']}>Dành Cho Sinh Viên</p>
 
-                <a href="#">Xem Dự Án</a>
-                <a href="#">Tìm Việc Làm IT</a>
-                <a href="#">Lập Trình Web</a>
-                <a href="#">Data & AI</a>
-                <a href="#">Mobile Development</a>
-                <a href="#">DevOps & Cloud</a>
-                <a href="#">Cybersecurity</a>
-                <a href="#">Blog Công Nghệ</a>
+                <Link to="/simulations">Xem Dự Án</Link>
+                <Link to="/jobs">Tìm Việc Làm IT</Link>
+                <Link to="/simulations">Lập Trình Web</Link>
+                <Link to="/simulations">Data & AI</Link>
+                <Link to="/simulations">Mobile Development</Link>
+                <Link to="/simulations">DevOps & Cloud</Link>
+                <Link to="/simulations">Cybersecurity</Link>
+                <Link to="/blog">Blog Công Nghệ</Link>
             </div>
 
             <div className={styles['lp-footer__col']}>
                 <p className={styles['lp-footer__heading']}>Dành Cho Doanh Nghiệp</p>
 
-                <a href="#">Đăng Nhập</a>
-                <a href="#">Tài Nguyên Tuyển Dụng</a>
-                <a href="#">Đăng Ký Demo</a>
+                <Link to="/login">Đăng Nhập</Link>
+                <Link to="/login">Tài Nguyên Tuyển Dụng</Link>
+                <Link to="/login">Đăng Ký Demo</Link>
             </div>
 
             <div className={styles['lp-footer__col']}>
                 <p className={styles['lp-footer__heading']}>Dành Cho Giảng Viên</p>
 
-                <a href="#">Đăng Nhập</a>
-                <a href="#">Tài Nguyên Giảng Dạy</a>
-                <a href="#">Đăng Ký Hợp Tác</a>
+                <Link to="/login">Đăng Nhập</Link>
+                <Link to="/login">Tài Nguyên Giảng Dạy</Link>
+                <Link to="/login">Đăng Ký Hợp Tác</Link>
             </div>
 
             <div className={styles['lp-footer__col']}>
                 <p className={styles['lp-footer__heading']}>Về ITDream</p>
 
-                <a href="#">Câu Chuyện Của Chúng Tôi</a>
-                <a href="#">Tuyển Dụng</a>
-                <a href="#">Câu Hỏi Thường Gặp</a>
+                <Link to="/">Câu Chuyện Của Chúng Tôi</Link>
+                <Link to="/">Tuyển Dụng</Link>
+                <Link to="/">Câu Hỏi Thường Gặp</Link>
             </div>
 
             <div className={styles['lp-footer__col']}>
                 <p className={styles['lp-footer__heading']}>Hỗ Trợ</p>
 
-                <a href="#">Trung Tâm Trợ Giúp</a>
-                <a href="#">Chính Sách Bảo Mật</a>
-                <a href="#">Điều Khoản Sử Dụng</a>
-                <a href="#">Liên Hệ</a>
-                <a href="#">Sơ Đồ Trang</a>
+                <Link to="/">Trung Tâm Trợ Giúp</Link>
+                <Link to="/policy">Chính Sách Bảo Mật</Link>
+                <Link to="/policy">Điều Khoản Sử Dụng</Link>
+                <Link to="/">Liên Hệ</Link>
+                <Link to="/">Sơ Đồ Trang</Link>
             </div>
         </footer>
     );

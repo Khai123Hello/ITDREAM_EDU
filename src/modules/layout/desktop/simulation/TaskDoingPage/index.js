@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
-import { Spin } from 'antd';
+import { Modal, Spin } from 'antd';
+import dayjs from 'dayjs';
 
 import CommentPanel from '../components/CommentPanel';
 import TaskDoingSidebar from '../components/TaskDoingSidebar';
@@ -9,6 +10,30 @@ import TaskDoingSidebar from '../components/TaskDoingSidebar';
 import './TaskDoingPage.scss';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
+
+const getInitials = (fullName) => {
+    if (!fullName) return '?';
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+};
+
+const getAvatarColor = (name) => {
+    const colors = [
+        'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)',
+        'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+        'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+        'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+    ];
+    let hash = 0;
+    const cleanName = name || '';
+    for (let i = 0; i < cleanName.length; i++) {
+        hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+};
 
 function detectContentType(content) {
     if (!content || typeof content !== 'string') return 'empty';
@@ -136,6 +161,8 @@ function QuizBlock({
     questionId = null,
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const [ selected, setSelected ] = useState(null);
     const [ submitted, setSubmitted ] = useState(false);
@@ -168,8 +195,10 @@ function QuizBlock({
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
     const isCorrect = effectiveSubmitted && effectiveSelected === correct;
 
+    const isExceeded = totalError > 0 && errorCount >= totalError;
+
     const handleSubmit = () => {
-        if (selected === null) return;
+        if (selected === null || isExceeded) return;
         setSubmitted(true);
         const selectedOption = (block.options || [])[selected];
         onQuizAnswerSubmit({
@@ -180,6 +209,7 @@ function QuizBlock({
     };
 
     const handleReset = () => {
+        if (isExceeded) return;
         setSelected(null);
         setSubmitted(false);
         setIsRetrying(true);
@@ -193,30 +223,51 @@ function QuizBlock({
                 <span className="tfo-block-quiz-text">{block.question}</span>
             </div>
 
+            {/* Error Count / Attempt info */}
+            {totalError > 0 && (
+                <div
+                    className="tfo-quiz-error-count-info"
+                    style={{ padding: '0 16px', marginBottom: 8, fontSize: 13, color: '#666' }}
+                >
+                    Số lần làm sai: <strong style={{ color: isExceeded ? '#ff4d4f' : '#1890ff' }}>{errorCount}</strong>{' '}
+                    / {totalError}
+                </div>
+            )}
+            {isExceeded && (
+                <div
+                    className="tfo-quiz-exceeded-warning"
+                    style={{ padding: '0 16px', marginBottom: 12, fontSize: 13, color: '#ff4d4f', fontWeight: '500' }}
+                >
+                    ⚠️ Bạn đã vượt quá số lần làm sai cho phép. Vui lòng bấm đặt lại nhiệm vụ để làm lại bài.
+                </div>
+            )}
+
             {/* Options */}
             <div className="tfo-block-quiz-options">
                 {(block.options || []).map((opt, oi) => {
                     const letter = String.fromCharCode(65 + oi);
                     let cls = 'tfo-quiz-option';
                     if (effectiveSelected === oi) cls += ' selected';
-                    if (effectiveSubmitted && oi === correct) cls += ' answer-correct';
-                    if (effectiveSubmitted && effectiveSelected === oi && oi !== correct) cls += ' answer-wrong';
+
+                    // Show correct answer highlighting only if the user actually chose the correct answer
+                    const showAsCorrect = effectiveSubmitted && oi === correct && isCorrect;
+                    // Show wrong answer highlighting if this was the selected option and it is wrong
+                    const showAsWrong = effectiveSubmitted && effectiveSelected === oi && oi !== correct;
+
+                    if (showAsCorrect) cls += ' answer-correct';
+                    if (showAsWrong) cls += ' answer-wrong';
 
                     return (
                         <button
                             key={oi}
                             className={cls}
-                            disabled={effectiveSubmitted || hasCompleted}
-                            onClick={() => !(effectiveSubmitted || hasCompleted) && setSelected(oi)}
+                            disabled={effectiveSubmitted || hasCompleted || isExceeded}
+                            onClick={() => !(effectiveSubmitted || hasCompleted || isExceeded) && setSelected(oi)}
                         >
                             <span className="tfo-quiz-option-letter">{letter}.</span>
                             <span className="tfo-quiz-option-text">{opt.option}</span>
-                            {effectiveSubmitted && oi === correct && (
-                                <span className="tfo-quiz-option-badge correct">✓ Đúng</span>
-                            )}
-                            {effectiveSubmitted && effectiveSelected === oi && oi !== correct && (
-                                <span className="tfo-quiz-option-badge wrong">✗ Sai</span>
-                            )}
+                            {showAsCorrect && <span className="tfo-quiz-option-badge correct">✓ Đúng</span>}
+                            {showAsWrong && <span className="tfo-quiz-option-badge wrong">✗ Sai</span>}
                         </button>
                     );
                 })}
@@ -227,7 +278,7 @@ function QuizBlock({
                 {!effectiveSubmitted ? (
                     <button
                         className="tfo-quiz-submit-btn"
-                        disabled={selected === null || hasCompleted}
+                        disabled={selected === null || hasCompleted || isExceeded}
                         onClick={handleSubmit}
                     >
                         Kiểm tra đáp án
@@ -238,7 +289,11 @@ function QuizBlock({
                             {isCorrect ? '🎉 Chính xác!' : '😅 Chưa đúng, hãy thử lại!'}
                         </span>
                         {!isCorrect && (
-                            <button className="tfo-quiz-retry-btn" disabled={hasCompleted} onClick={handleReset}>
+                            <button
+                                className="tfo-quiz-retry-btn"
+                                disabled={hasCompleted || isExceeded}
+                                onClick={handleReset}
+                            >
                                 Làm lại
                             </button>
                         )}
@@ -259,6 +314,8 @@ function BlockItem({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     switch (block.type) {
                     case 'meta':
@@ -365,6 +422,8 @@ function BlockItem({
                                 questionId={questionId}
                                 onQuizAnswerSubmit={onQuizAnswerSubmit}
                                 hasCompleted={hasCompleted}
+                                errorCount={errorCount}
+                                totalError={totalError}
                             />
                         );
                     }
@@ -382,6 +441,8 @@ function BlocksContent({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
 }) {
     const blocks = useMemo(() => {
         try {
@@ -403,6 +464,8 @@ function BlocksContent({
                     questionMap={questionMap}
                     onQuizAnswerSubmit={onQuizAnswerSubmit}
                     hasCompleted={hasCompleted}
+                    errorCount={errorCount}
+                    totalError={totalError}
                 />
             ))}
         </div>
@@ -493,6 +556,8 @@ function ContentRenderer({
     questionMap = {},
     onQuizAnswerSubmit = () => {},
     hasCompleted = false,
+    errorCount = 0,
+    totalError = 0,
     onQuestionRendered = () => {},
 }) {
     return (
@@ -502,6 +567,8 @@ function ContentRenderer({
             questionMap={questionMap}
             onQuizAnswerSubmit={onQuizAnswerSubmit}
             hasCompleted={hasCompleted}
+            errorCount={errorCount}
+            totalError={totalError}
             onQuestionRendered={onQuestionRendered}
         />
     );
@@ -827,7 +894,9 @@ export default function TaskDoingPage({
     urlBase = '',
 
     // Progress
+    taskProgress = null,
     taskStatus = 'not_started', // 'not_started' | 'in_progress' | 'completed'
+    taskProgressMap = {},
     hasCompleted = false,
     isLastSubtask = false,
 
@@ -844,6 +913,7 @@ export default function TaskDoingPage({
     previousFile = null,
     previousText = '',
     onTextResponseSubmit = () => {},
+    onResetSubtask = () => {},
     quizSubmissionMap = {},
     questionMap = {},
     onQuizAnswerSubmit = () => {},
@@ -851,6 +921,11 @@ export default function TaskDoingPage({
 
     // Educator reviews
     currentSubtaskReviews = [],
+    onViewReviewDetail = () => {},
+    reviewDetailLoading = false,
+    selectedReviewDetail = null,
+    reviewDetailModalOpen = false,
+    onCloseReviewDetail = () => {},
 
     // Certificate and congrats
     isGeneratingCert = false,
@@ -972,7 +1047,10 @@ export default function TaskDoingPage({
 
     // Kiểm tra xem Task Con hiện tại đã được hoàn thành chưa
     const isCompleted = taskStatus === 'completed' || hasCompleted;
-    const isNavigationBlocked = !isCompleted;
+
+    const errorCount = taskProgress?.errorCount || 0;
+    const totalError = taskProgress?.task?.totalError || 0;
+    const isExceeded = totalError > 0 && errorCount >= totalError;
 
     return (
         <>
@@ -996,7 +1074,8 @@ export default function TaskDoingPage({
                                 parentTasks={parentTasks}
                                 selectedParentTaskId={selectedParentTaskId}
                                 onSelectParentTask={onSelectParentTask}
-                                isNavigationBlocked={isNavigationBlocked}
+                                taskProgressMap={taskProgressMap}
+                                hasCompleted={hasCompleted}
                             />
 
                             <main className="tfo-pane">
@@ -1009,15 +1088,20 @@ export default function TaskDoingPage({
                                                 <div className="tfo-step-pagination">
                                                     {subtasks.map((st, index) => {
                                                         const isCurrent = st.id === selectedSubtaskId;
+                                                        const isUnlocked =
+                                                            hasCompleted ||
+                                                            isCurrent ||
+                                                            taskProgressMap[st.id]?.status === 'completed' ||
+                                                            taskProgressMap[st.id]?.status === 'in_progress';
                                                         return (
                                                             <button
                                                                 key={st.id}
                                                                 className={`tfo-step-btn${isCurrent ? ' active' : ''}`}
                                                                 onClick={() => {
-                                                                    if (isNavigationBlocked && !isCurrent) return;
+                                                                    if (!isUnlocked) return;
                                                                     onSelectSubtask(st.id);
                                                                 }}
-                                                                disabled={isNavigationBlocked && !isCurrent}
+                                                                disabled={!isUnlocked}
                                                             >
                                                                 {index + 1}
                                                             </button>
@@ -1071,6 +1155,8 @@ export default function TaskDoingPage({
                                                         questionMap={questionMap}
                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                         hasCompleted={hasCompleted}
+                                                        errorCount={errorCount}
+                                                        totalError={totalError}
                                                         onQuestionRendered={setInlineQuestionIds}
                                                     />
                                                 )}
@@ -1105,6 +1191,8 @@ export default function TaskDoingPage({
                                                                         questionId={questionId}
                                                                         onQuizAnswerSubmit={onQuizAnswerSubmit}
                                                                         hasCompleted={hasCompleted}
+                                                                        errorCount={errorCount}
+                                                                        totalError={totalError}
                                                                     />
                                                                 );
                                                             })}
@@ -1113,24 +1201,115 @@ export default function TaskDoingPage({
 
                                                 {renderMedia()}
 
-                                                {/* Educator feedback for this subtask */}
-                                                {currentSubtaskReviews && currentSubtaskReviews.length > 0 && (
-                                                    <div className="tfo-subtask-feedback-card">
-                                                        <div className="tfo-subtask-feedback-header">
-                                                            <span className="tfo-subtask-feedback-icon">💬</span>
-                                                            <span className="tfo-subtask-feedback-title">Nhận xét từ Giảng viên</span>
+                                                {/* Educator reviews (CMS Style) */}
+                                                {isCompleted &&
+                                                    currentSubtaskReviews &&
+                                                    currentSubtaskReviews.length > 0 && (
+                                                    <div className="tfo-subtask-reviews-section">
+                                                        <div className="tfo-subtask-reviews-header">
+                                                                Nhận xét từ Giảng viên ({currentSubtaskReviews.length})
                                                         </div>
-                                                        <div className="tfo-subtask-feedback-comments">
-                                                            {currentSubtaskReviews.map((review) => (
-                                                                <div key={review.id} className="tfo-subtask-feedback-comment-item">
-                                                                    {review.content}
-                                                                </div>
-                                                            ))}
+                                                        <div className="tfo-subtask-reviews-list">
+                                                            {currentSubtaskReviews.map((review) => {
+                                                                const reviewerName =
+                                                                        review.creator?.fullName ||
+                                                                        review.creator?.username ||
+                                                                        review.createdBy ||
+                                                                        'Giảng viên';
+                                                                const reviewerAvatar = review.creator?.avatar
+                                                                    ? review.creator.avatar.startsWith('http')
+                                                                        ? review.creator.avatar
+                                                                        : `${urlBase}${review.creator.avatar}`
+                                                                    : null;
+                                                                const initials = getInitials(reviewerName);
+                                                                const avatarBg = getAvatarColor(reviewerName);
+
+                                                                return (
+                                                                    <div
+                                                                        key={review.id}
+                                                                        className="tfo-review-display saved-card"
+                                                                        onClick={() =>
+                                                                            onViewReviewDetail &&
+                                                                                onViewReviewDetail(review.id)
+                                                                        }
+                                                                        style={{ cursor: 'pointer' }}
+                                                                    >
+                                                                        <div className="tfo-review-display__header">
+                                                                            {reviewerAvatar ? (
+                                                                                <img
+                                                                                    src={reviewerAvatar}
+                                                                                    alt={reviewerName}
+                                                                                    className="tfo-review-display__avatar"
+                                                                                />
+                                                                            ) : (
+                                                                                <div
+                                                                                    style={{ background: avatarBg }}
+                                                                                    className="tfo-review-display__avatar-initials"
+                                                                                >
+                                                                                    {initials}
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="tfo-review-display__meta">
+                                                                                <div className="tfo-review-display__name">
+                                                                                    {reviewerName}
+                                                                                </div>
+                                                                                <div className="tfo-review-display__role">
+                                                                                        Giáo viên hướng dẫn
+                                                                                </div>
+                                                                            </div>
+                                                                            <span className="tfo-review-display__date">
+                                                                                {review.createdDate
+                                                                                    ? dayjs(
+                                                                                        review.createdDate,
+                                                                                    ).format('DD/MM/YYYY')
+                                                                                    : '-'}
+                                                                            </span>
+                                                                        </div>
+                                                                        <blockquote className="tfo-review-display__quote">
+                                                                            {review.content}
+                                                                        </blockquote>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                {/* Nút Làm lại - hiển thị khi task đã hoàn thành hoặc đã có bài nộp */}
+                                                {/* Nút Làm lại - hiển thị khi chưa hoàn thành nhiệm vụ và đã vượt quá số lần làm sai (isExceeded) */}
+                                                {!isCompleted &&
+                                                    isExceeded &&
+                                                    (requiresFileUpload ||
+                                                        requiresTextResponse ||
+                                                        quizBlocks.length > 0) && (
+                                                    <div
+                                                        style={{
+                                                            marginBottom: 16,
+                                                            display: 'flex',
+                                                            justifyContent: 'flex-end',
+                                                        }}
+                                                    >
+                                                        <button
+                                                            className="tfo-reset-subtask-btn"
+                                                            onClick={onResetSubtask}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                strokeWidth="2.5"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                className="tfo-reset-icon"
+                                                            >
+                                                                <polyline points="23 4 23 10 17 10" />
+                                                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                                                            </svg>
+                                                                Làm lại nhiệm vụ
+                                                        </button>
+                                                    </div>
+                                                )}
 
                                                 {/* File upload section */}
                                                 {requiresFileUpload && (
@@ -1155,18 +1334,14 @@ export default function TaskDoingPage({
                                                             placeholder="Nhập câu trả lời của bạn ở đây..."
                                                             value={textInput}
                                                             onChange={(e) => setTextInput(e.target.value)}
-                                                            disabled={isCompleted || Boolean(previousText)}
+                                                            disabled={isCompleted}
                                                             rows={6}
                                                         />
                                                         <div className="tfo-text-response-footer">
                                                             <button
                                                                 className="tfo-action-btn tfo-action-btn-primary tfo-text-submit-btn"
                                                                 onClick={() => onTextResponseSubmit(textInput)}
-                                                                disabled={
-                                                                    isCompleted ||
-                                                                    Boolean(previousText) ||
-                                                                    !textInput.trim()
-                                                                }
+                                                                disabled={isCompleted || !textInput.trim()}
                                                             >
                                                                 Nộp câu trả lời
                                                             </button>
@@ -1174,20 +1349,20 @@ export default function TaskDoingPage({
                                                     </div>
                                                 )}
                                             </div>
+                                            {showComments && (
+                                                <CommentPanel
+                                                    taskId={selectedSubtaskId}
+                                                    comments={comments}
+                                                    loading={commentsLoading}
+                                                    profile={profile}
+                                                    onClose={() => setShowComments(false)}
+                                                    onSendComment={onSendComment}
+                                                    onUpdateComment={onUpdateComment}
+                                                    onDeleteComment={onDeleteComment}
+                                                />
+                                            )}
                                         </div>
                                     </div>
-                                    {showComments && (
-                                        <CommentPanel
-                                            taskId={selectedSubtaskId}
-                                            comments={comments}
-                                            loading={commentsLoading}
-                                            profile={profile}
-                                            onClose={() => setShowComments(false)}
-                                            onSendComment={onSendComment}
-                                            onUpdateComment={onUpdateComment}
-                                            onDeleteComment={onDeleteComment}
-                                        />
-                                    )}
                                 </div>
                             </main>
                         </div>
@@ -1202,6 +1377,130 @@ export default function TaskDoingPage({
                     />
                 </div>
             </div>
+
+            {/* Modal chi tiết nhận xét */}
+            <Modal
+                title={
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 18, fontWeight: 600 }}>
+                        <span>📋 Chi tiết nhận xét từ Giảng viên</span>
+                    </div>
+                }
+                open={reviewDetailModalOpen}
+                onCancel={onCloseReviewDetail}
+                footer={null}
+                width={650}
+                centered
+                destroyOnClose
+            >
+                {reviewDetailLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px 0' }}>
+                        <Spin size="large" />
+                    </div>
+                ) : selectedReviewDetail ? (
+                    <div style={{ padding: '10px 0' }}>
+                        {/* Educator Info */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                            <div
+                                style={{
+                                    width: 44,
+                                    height: 44,
+                                    borderRadius: '50%',
+                                    background: getAvatarColor(
+                                        selectedReviewDetail.creator?.fullName ||
+                                            selectedReviewDetail.creator?.username ||
+                                            selectedReviewDetail.createdBy ||
+                                            'Giảng viên',
+                                    ),
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#fff',
+                                    fontWeight: 'bold',
+                                    fontSize: 16,
+                                }}
+                            >
+                                {getInitials(
+                                    selectedReviewDetail.creator?.fullName ||
+                                        selectedReviewDetail.creator?.username ||
+                                        selectedReviewDetail.createdBy ||
+                                        'Giảng viên',
+                                )}
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: 600, fontSize: 15, color: '#1e293b' }}>
+                                    {selectedReviewDetail.creator?.fullName ||
+                                        selectedReviewDetail.creator?.username ||
+                                        selectedReviewDetail.createdBy ||
+                                        'Giảng viên'}
+                                </div>
+                                <div style={{ fontSize: 12, color: '#64748b' }}>Giáo viên hướng dẫn</div>
+                            </div>
+                            <div style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>
+                                {selectedReviewDetail.createdDate
+                                    ? dayjs(selectedReviewDetail.createdDate).format('DD/MM/YYYY HH:mm')
+                                    : '-'}
+                            </div>
+                        </div>
+
+                        {/* Student's Submission Answer */}
+                        {selectedReviewDetail.studentSubmission && (
+                            <div
+                                style={{
+                                    backgroundColor: '#f8fafc',
+                                    borderLeft: '4px solid #3b82f6',
+                                    padding: '12px 16px',
+                                    borderRadius: '0 8px 8px 0',
+                                    marginBottom: 20,
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        fontSize: 12,
+                                        fontWeight: 700,
+                                        color: '#475569',
+                                        textTransform: 'uppercase',
+                                        marginBottom: 6,
+                                    }}
+                                >
+                                    Bài làm của bạn:
+                                </div>
+                                <div style={{ fontSize: 14, color: '#334155', whiteSpace: 'pre-wrap' }}>
+                                    {selectedReviewDetail.studentSubmission.answer || '(Không có nội dung trả lời)'}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Review Content */}
+                        <div
+                            style={{
+                                backgroundColor: '#f0fdf4',
+                                borderLeft: '4px solid #22c55e',
+                                padding: '16px',
+                                borderRadius: '0 8px 8px 0',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    color: '#166534',
+                                    textTransform: 'uppercase',
+                                    marginBottom: 6,
+                                }}
+                            >
+                                Nhận xét chi tiết:
+                            </div>
+                            <div style={{ fontSize: 14, color: '#14532d', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                                {selectedReviewDetail.content || 'Giảng viên không để lại nhận xét chi tiết nào.'}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#94a3b8' }}>
+                        Không thể tải thông tin nhận xét.
+                    </div>
+                )}
+            </Modal>
 
             {/* Loading overlay for certificate generation */}
             {isGeneratingCert && (

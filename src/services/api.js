@@ -13,7 +13,9 @@ import {
 } from './userService';
 
 // Handle refresh token
-const axiosInstance = axios.create();
+const axiosInstance = axios.create({
+    timeout: 10000,
+});
 let isRefreshing = false;
 let subscribers = [];
 
@@ -33,12 +35,13 @@ axiosInstance.interceptors.response.use(
         if (originalConfig.url !== apiConfig.account.login.baseURL && err.response) {
             // Access Token was expired
             if (err.response?.status === 403) {
-                // removeCacheToken();
+                removeCacheToken();
+                window.location.href = '/not-allowed';
             }
             if (err.response?.status === 401 && !originalConfig._retry) {
                 const handleExpireAll = () => {
-                    // removeCacheToken();
-                    // window.location.reload();
+                    removeCacheToken();
+                    window.location.href = '/login';
                 };
 
                 if (!getCacheRefreshToken()) {
@@ -135,6 +138,7 @@ const sendRequest = (options, payload, cancelToken) => {
         params,
         data,
         cancelToken,
+        signal: payload?.signal || options?.signal,
         responseType,
     });
 };

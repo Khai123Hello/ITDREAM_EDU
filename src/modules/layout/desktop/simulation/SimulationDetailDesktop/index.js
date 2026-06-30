@@ -6,6 +6,7 @@ import AppFooter from '@modules/layout/common/AppFooter';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
 import dayjs from 'dayjs';
+import DOMPurify from 'dompurify';
 
 import TaskPanel from '../components/TaskPanel';
 
@@ -427,7 +428,9 @@ function SimulationDetailDesktop({
                                     {overviewData.introduction && (
                                         <div
                                             className={styles.bodyText}
-                                            dangerouslySetInnerHTML={{ __html: overviewData.introduction }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: DOMPurify.sanitize(overviewData.introduction),
+                                            }}
                                         />
                                     )}
 
@@ -457,7 +460,9 @@ function SimulationDetailDesktop({
                                     <section className={styles.section}>
                                         <div
                                             className={styles.bodyText}
-                                            dangerouslySetInnerHTML={{ __html: overviewData.content }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: DOMPurify.sanitize(overviewData.content),
+                                            }}
                                         />
                                     </section>
                                 )}
@@ -733,7 +738,7 @@ function SimulationDetailDesktop({
                 {/* ══ BOTTOM CTA ══ */}
                 <div className={styles.bottomCta}>
                     <span>Chưa tìm thấy bài mô phỏng phù hợp?</span>
-                    <a href="/" className={styles.bottomCtaLink}>
+                    <a href="/simulations" className={styles.bottomCtaLink}>
                         Xem các bài khác →
                     </a>
                 </div>

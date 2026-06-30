@@ -20,12 +20,16 @@ const SliderScroll = forwardRef(({ className, children, scrollToId, ...props }, 
 
     const handleMouseLeave = () => {
         setIsDown(false);
-        sliderRef.current.classList.remove(styles.active);
+        if (sliderRef.current) {
+            sliderRef.current.classList.remove(styles.active);
+        }
     };
 
     const handleMouseUp = () => {
         setIsDown(false);
-        sliderRef.current.classList.remove(styles.active);
+        if (sliderRef.current) {
+            sliderRef.current.classList.remove(styles.active);
+        }
     };
 
     const handleMouseMove = (e) => {

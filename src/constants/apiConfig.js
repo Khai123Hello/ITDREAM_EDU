@@ -241,7 +241,7 @@ const apiConfig = {
         },
         reset: {
             baseURL: `${apiUrl}v1/task_progress/reset`,
-            method: 'POST',
+            method: 'PUT',
             headers: baseHeader,
         },
         studentList: {
@@ -275,6 +275,11 @@ const apiConfig = {
         },
     },
     organization: {
+        guestList: {
+            baseURL: `${apiUrl}v1/organization/guest_list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
         list: {
             baseURL: `${apiUrl}v1/organization/list`,
             method: 'GET',
@@ -559,6 +564,28 @@ const apiConfig = {
         studentGet: {
             baseURL: `${apiUrl}v1/review_submission/student_get/:id`,
             method: 'GET',
+            headers: baseHeader,
+        },
+    },
+    job: {
+        studentList: {
+            baseURL: `${apiUrl}v1/job/student-list`,
+            method: 'GET',
+            headers: baseHeader,
+        },
+        toggleSave: {
+            baseURL: `${apiUrl}v1/job/toggle-save`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        apply: {
+            baseURL: `${apiUrl}v1/job/apply`,
+            method: 'POST',
+            headers: baseHeader,
+        },
+        cancelApply: {
+            baseURL: `${apiUrl}v1/job/cancel-apply`,
+            method: 'POST',
             headers: baseHeader,
         },
     },

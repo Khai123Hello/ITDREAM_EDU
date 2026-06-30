@@ -5,7 +5,7 @@ import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
 import useTaskHierarchy from '@hooks/useTaskHierarchy';
 import TaskDoingPage from '@modules/layout/desktop/simulation/TaskDoingPage';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 
 const isFilePath = (str = '') => {
     if (!str || typeof str !== 'string') return false;
@@ -237,6 +237,15 @@ function TaskDoingContainer() {
         false,
     );
 
+    // Reset task progress
+    const { execute: resetTaskProgress } = useFetch(
+        apiConfig.taskProgress.reset,
+        {
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
     // Fetch selected subtask detail
     const {
         data: subtaskDetail,
@@ -313,10 +322,7 @@ function TaskDoingContainer() {
     );
 
     // Fetch educator reviews
-    const {
-        data: reviewData,
-        execute: fetchReviews,
-    } = useFetch(
+    const { data: reviewData, execute: fetchReviews } = useFetch(
         apiConfig.reviewSubmission.studentList,
         {
             params: {},
@@ -335,7 +341,11 @@ function TaskDoingContainer() {
     } = useFetch(
         apiConfig.comment.userList,
         {
-            params: { taskId: selectedSubtaskId || '', simulationEnrollmentId: simulationEnrollmentId || '', size: 1000 },
+            params: {
+                taskId: selectedSubtaskId || '',
+                simulationEnrollmentId: simulationEnrollmentId || '',
+                size: 1000,
+            },
             mappingData: (res) => res.data || {},
         },
         false,
@@ -406,11 +416,12 @@ function TaskDoingContainer() {
     // Load task progress & educator reviews on mount
     React.useEffect(() => {
         if (simulationEnrollmentId) {
+            console.log('TaskDoingContainer: Fetching progress and reviews for enrollment:', simulationEnrollmentId);
             refetchProgress({
-                params: { simulationEnrollmentId },
+                params: { simulationEnrollmentId, size: 1000 },
             });
             fetchReviews({
-                params: { simulationEnrollmentId },
+                params: { simulationEnrollmentId, size: 1000 },
             });
         }
     }, [ simulationEnrollmentId, refetchProgress, fetchReviews ]);
@@ -551,7 +562,10 @@ function TaskDoingContainer() {
             }
 
             const errorMsg = result?.response?.data?.message || result?.data?.message || result?.message;
-            const isError = result?.result === false || result?.response?.data?.result === false || errorMsg;
+            const isError =
+                result?.result === false ||
+                result?.response?.data?.result === false ||
+                (result?.result !== true && result?.response?.data?.result !== true && !!errorMsg);
             if (isError) {
                 return {
                     result: false,
@@ -727,7 +741,9 @@ function TaskDoingContainer() {
                     try {
                         const res = await ensureTaskProgress(selectedParentTaskId);
                         if (res && res.result === false) {
-                            message.error(res.message || 'Không thể tạo tiến độ cho nhiệm vụ cha này. Vui lòng thử lại.');
+                            message.error(
+                                res.message || 'Không thể tạo tiến độ cho nhiệm vụ cha này. Vui lòng thử lại.',
+                            );
                         } else {
                             progressChanged = true;
                         }
@@ -843,7 +859,7 @@ function TaskDoingContainer() {
     }, [ selectedSubtaskId, simulationEnrollmentId, fetchComments ]);
 
     const handleCreateComment = useCallback(
-        async (content, parentId = 0) => {
+        async (content, parentId = null) => {
             if (!selectedSubtaskId || !simulationEnrollmentId) {
                 message.error('Không tìm thấy nhiệm vụ hoặc thông tin đăng ký hiện tại');
                 return;
@@ -852,7 +868,7 @@ function TaskDoingContainer() {
                 const res = await createCommentApi({
                     dataBody: {
                         content,
-                        parentId: parentId === 0 ? null : parentId,
+                        parentId,
                         taskId: selectedSubtaskId,
                         simulationEnrollmentId,
                     },
@@ -863,7 +879,9 @@ function TaskDoingContainer() {
                         params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
                     });
                 } else {
-                    message.error(res?.response?.data?.message || res?.message || 'Không thể đăng bình luận. Vui lòng thử lại.');
+                    message.error(
+                        res?.response?.data?.message || res?.message || 'Không thể đăng bình luận. Vui lòng thử lại.',
+                    );
                 }
             } catch {
                 message.error('Có lỗi xảy ra khi đăng bình luận.');
@@ -888,7 +906,11 @@ function TaskDoingContainer() {
                         params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
                     });
                 } else {
-                    message.error(res?.response?.data?.message || res?.message || 'Không thể cập nhật bình luận. Vui lòng thử lại.');
+                    message.error(
+                        res?.response?.data?.message ||
+                            res?.message ||
+                            'Không thể cập nhật bình luận. Vui lòng thử lại.',
+                    );
                 }
             } catch {
                 message.error('Có lỗi xảy ra khi cập nhật bình luận.');
@@ -910,7 +932,9 @@ function TaskDoingContainer() {
                         params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
                     });
                 } else {
-                    message.error(res?.response?.data?.message || res?.message || 'Không thể xóa bình luận. Vui lòng thử lại.');
+                    message.error(
+                        res?.response?.data?.message || res?.message || 'Không thể xóa bình luận. Vui lòng thử lại.',
+                    );
                 }
             } catch {
                 message.error('Có lỗi xảy ra khi xóa bình luận.');
@@ -927,11 +951,80 @@ function TaskDoingContainer() {
 
     // Filter educator reviews for the current subtask
     const currentSubtaskReviews = useMemo(() => {
-        if (!reviewData?.content || !currentSubtaskProgress?.taskProgressId) return [];
-        return reviewData.content.filter(
-            (r) => r.studentTaskProgressId === currentSubtaskProgress.taskProgressId,
+        if (!reviewData?.content || !currentSubtaskProgress?.taskProgressId) {
+            console.log(
+                'TaskDoingContainer: No reviews or no active taskProgressId. reviewData:',
+                reviewData,
+                'currentSubtaskProgress:',
+                currentSubtaskProgress,
+            );
+            return [];
+        }
+        const filtered = reviewData.content.filter((r) => {
+            const rProgressId = r.studentTaskProgressId || r.studentSubmission?.studentTaskProgress?.id;
+            return String(rProgressId) === String(currentSubtaskProgress.taskProgressId);
+        });
+        console.log(
+            'TaskDoingContainer: Current active subtask reviews:',
+            filtered,
+            'Total reviews in enrollment:',
+            reviewData.content.length,
+            'Active taskProgressId:',
+            currentSubtaskProgress.taskProgressId,
         );
+        return filtered;
     }, [ reviewData, currentSubtaskProgress?.taskProgressId ]);
+
+    // Review Detail Modal States & Callbacks
+    const [ selectedReviewDetail, setSelectedReviewDetail ] = useState(null);
+    const [ reviewDetailModalOpen, setReviewDetailModalOpen ] = useState(false);
+    const [ reviewDetailLoading, setReviewDetailLoading ] = useState(false);
+
+    const { execute: fetchReviewDetail } = useFetch(
+        apiConfig.reviewSubmission.studentGet,
+        {
+            params: {},
+            mappingData: (res) => res.data || {},
+        },
+        false,
+    );
+
+    const handleViewReviewDetail = useCallback(
+        async (reviewId) => {
+            setReviewDetailModalOpen(true);
+            setReviewDetailLoading(true);
+            try {
+                const res = await fetchReviewDetail({
+                    pathParams: { id: reviewId },
+                });
+                const detail = res?.data || res;
+                setSelectedReviewDetail(detail);
+            } catch (err) {
+                message.error('Không thể tải chi tiết nhận xét.');
+            } finally {
+                setReviewDetailLoading(false);
+            }
+        },
+        [ fetchReviewDetail ],
+    );
+
+    const handleCloseReviewDetail = useCallback(() => {
+        setReviewDetailModalOpen(false);
+        setSelectedReviewDetail(null);
+    }, []);
+
+    // Fetch subtask reviews when the task is completed or progress status changes
+    React.useEffect(() => {
+        const isTaskCompleted = getTaskStatus() === 'completed' || hasCompleted;
+        if (currentSubtaskProgress?.taskProgressId && isTaskCompleted) {
+            fetchReviews({
+                params: {
+                    studentTaskProgressId: currentSubtaskProgress.taskProgressId,
+                    size: 1000,
+                },
+            });
+        }
+    }, [ currentSubtaskProgress?.taskProgressId, currentSubtaskProgress?.status, hasCompleted, fetchReviews ]);
 
     // Handle parent task selection
     const handleSelectParentTask = useCallback((parentTaskId) => {
@@ -1238,6 +1331,62 @@ function TaskDoingContainer() {
     );
 
     /**
+     * Đặt lại tiến độ nhiệm vụ con (Reset Subtask Progress)
+     */
+    const handleResetSubtask = useCallback(async () => {
+        if (!selectedSubtaskId) return false;
+        try {
+            const res = await resetTaskProgress({
+                dataBody: {
+                    taskId: selectedSubtaskId,
+                },
+            });
+            const errorMsg = res?.response?.data?.message || res?.data?.message || res?.message;
+            const isError =
+                res?.result === false ||
+                res?.response?.data?.result === false ||
+                (res?.result !== true && res?.response?.data?.result !== true && !!errorMsg);
+
+            if (isError) {
+                message.error(errorMsg || 'Không thể đặt lại tiến độ nhiệm vụ.');
+                return false;
+            }
+
+            message.success('Đặt lại tiến độ nhiệm vụ thành công!');
+
+            // Refetch task list to update status in sidebar
+            fetchTaskList();
+            // Refetch enrollment progress
+            refetchProgress();
+            // Refetch checkEnrollment to update progress percentage / completion status (hasCompleted)
+            checkEnrollment({
+                params: {},
+            });
+
+            // Refetch current progress details
+            if (currentSubtaskProgress?.taskProgressId) {
+                fetchProgressDetail({
+                    pathParams: { id: currentSubtaskProgress.taskProgressId },
+                });
+            }
+            // Clear local answers
+            setLocalQuizAnswers({});
+            return true;
+        } catch (err) {
+            message.error('Có lỗi xảy ra khi đặt lại tiến độ.');
+            return false;
+        }
+    }, [
+        selectedSubtaskId,
+        resetTaskProgress,
+        fetchTaskList,
+        refetchProgress,
+        checkEnrollment,
+        currentSubtaskProgress,
+        fetchProgressDetail,
+    ]);
+
+    /**
      * Nộp câu hỏi trắc nghiệm - chỉ nộp khi học viên đã bấm đúng đáp án (isCorrect = true)
      * Gắn với studentTaskProgressId và taskQuestionId của câu hỏi trắc nghiệm
      */
@@ -1269,13 +1418,38 @@ function TaskDoingContainer() {
                         isCorrect,
                     },
                 });
-                if (submitRes?.result === false) {
+
+                const errorMsg = submitRes?.response?.data?.message || submitRes?.data?.message || submitRes?.message;
+                const errorCode = submitRes?.response?.data?.code || submitRes?.code || submitRes?.data?.code;
+                const isError =
+                    submitRes?.result === false ||
+                    submitRes?.response?.data?.result === false ||
+                    (submitRes?.result !== true && submitRes?.response?.data?.result !== true && !!errorMsg);
+
+                if (isError) {
                     setLocalQuizAnswers((prev) => {
                         const next = { ...prev };
                         delete next[normalizedQuestionId];
                         return next;
                     });
-                    message.error('Có lỗi xảy ra khi lưu đáp án!');
+
+                    if (errorCode === 'STUDENT_TASK-PROGRESS-ERROR-0004') {
+                        Modal.confirm({
+                            title: 'Đã vượt quá số lần làm sai',
+                            content:
+                                'Bạn đã làm sai vượt quá số lần quy định cho nhiệm vụ này. Bạn có muốn đặt lại tiến trình để làm lại từ đầu không?',
+                            okText: 'Làm lại từ đầu',
+                            cancelText: 'Hủy',
+                            onOk: async () => {
+                                const success = await handleResetSubtask();
+                                if (success) {
+                                    window.location.reload();
+                                }
+                            },
+                        });
+                    } else {
+                        message.error(errorMsg || 'Có lỗi xảy ra khi lưu đáp án!');
+                    }
                     return;
                 }
 
@@ -1297,7 +1471,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi lưu đáp án!');
             }
         },
-        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted ],
+        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted, handleResetSubtask ],
     );
 
     /**
@@ -1564,6 +1738,7 @@ function TaskDoingContainer() {
         // Progress info
         taskProgress: currentSubtaskProgress,
         taskStatus: getTaskStatus(),
+        taskProgressMap: taskProgressMap,
         hasCompleted,
         isLastSubtask: isLastSubtaskOverall,
 
@@ -1580,6 +1755,7 @@ function TaskDoingContainer() {
         previousText,
         onFileChange: handleFileUpload,
         onTextResponseSubmit: handleTextResponseSubmit,
+        onResetSubtask: handleResetSubtask,
         quizSubmissionMap,
         questionMap,
         onQuizAnswerSubmit: handleQuizAnswerSubmit,
@@ -1590,6 +1766,11 @@ function TaskDoingContainer() {
 
         // Educator feedback / reviews
         currentSubtaskReviews,
+        onViewReviewDetail: handleViewReviewDetail,
+        reviewDetailLoading,
+        selectedReviewDetail,
+        reviewDetailModalOpen,
+        onCloseReviewDetail: handleCloseReviewDetail,
 
         // Certificate and congrats
         isGeneratingCert,

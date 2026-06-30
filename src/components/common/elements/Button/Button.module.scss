@@ -64,12 +64,21 @@
     }
 
     &:not(.disabled) {
-        // @include hover {
-        //     background-color: #43C0FA;
+        transition: all 0.2s ease-in-out;
 
-        //     &.outline {
-        //         background: rgba(12, 166, 237, 0.10);
-        //     }
-        // }
+        &:hover {
+            opacity: 0.9;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        &.outline:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+            opacity: 1;
+        }
+        
+        &.danger-outline:hover {
+            background-color: rgba(248, 38, 38, 0.04);
+            opacity: 1;
+        }
     }
 }

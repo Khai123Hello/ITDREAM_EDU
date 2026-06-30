@@ -1,11 +1,38 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import TableOfContents from '@components/common/editor/TableOfContents';
+import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import classNames from 'classnames';
 
 import styles from './detail.module.scss';
 
 function BlogDetailDesktop({ blog, urlBase, loading }) {
     const navigate = useNavigate();
+    const [ activeId, setActiveId ] = React.useState('');
+
+    React.useEffect(() => {
+        if (!blog || !blog.content) return;
+        const headingElements = document.querySelectorAll(
+            '.tfo-blocks-content h1, .tfo-blocks-content h2, .tfo-blocks-content h3',
+        );
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveId(entry.target.id);
+                    }
+                });
+            },
+            { rootMargin: '0px 0px -60% 0px', threshold: 0.1 },
+        );
+
+        headingElements.forEach((el) => observer.observe(el));
+
+        return () => {
+            headingElements.forEach((el) => observer.unobserve(el));
+        };
+    }, [ blog ]);
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -95,7 +122,12 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
         <div className={styles.blogDetailContainer}>
             {/* MAIN LAYOUT */}
             <div className={styles.mainLayout}>
-                {/* LEFT CONTENT AREA */}
+                {/* LEFT SIDEBAR: Table of Contents */}
+                <aside className={styles.tocSidebar}>
+                    <TableOfContents content={content} activeId={activeId} />
+                </aside>
+
+                {/* CENTER CONTENT AREA */}
                 <article className={styles.contentArea}>
                     {/* BACK BUTTON */}
                     <button className={styles.backBtn} onClick={() => navigate('/blog')}>
@@ -158,7 +190,9 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
                     {/* HTML CONTENT BODY */}
                     <section className={styles.articleBody}>
-                        <div className={styles.richContent} dangerouslySetInnerHTML={{ __html: content }} />
+                        <div className={styles.richContent}>
+                            <TipTapJsonRenderer content={content} />
+                        </div>
                     </section>
 
                     {/* AUTHOR BIO CARD */}

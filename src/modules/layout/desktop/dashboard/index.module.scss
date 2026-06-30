@@ -1,23 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Bricolage+Grotesque:wght@400;600;700;800&display=swap');
 
-$white:      #ffffff;
-$bg:         #f7f8fa;
-$border:     #e2e5eb;
-$text:       #0f1623;
-$text2:      #4a5568;
-$text3:      #8a94a6;
-$green:      #22c55e;
-$greenDark:  #16a34a;
-$greenBg:    #f0fdf4;
-$amber:      #f59e0b;
-$red:        #ef4444;
-$shadow:     0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.05);
-$shadowH:    0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07);
-$font:       'Plus Jakarta Sans', system-ui, sans-serif;
-$fontDisplay:'Bricolage Grotesque', system-ui, sans-serif;
-$radius:     12px;
-$radiusSm:   8px;
+// ==========================================================================
+// COLOR PALETTE & VARIABLES
+// ==========================================================================
+$white:       #ffffff;
+$bg:          #f8fafc; // Soft slate white background
+$border:      #f1f5f9; // Very light grey border
+$border-hover:#e2e8f0;
+$text:        #0f172a; // Slate 900
+$text-muted:  #475569; // Slate 600
+$text-light:  #94a3b8; // Slate 400
 
+// Main Accent Colors
+$emerald:     #10b981; // emerald 500
+$emerald-dark:#059669; // emerald 600
+$emerald-bg:  #ecfdf5; // emerald 50
+
+$blue:        #3b82f6;
+$blue-bg:     #eff6ff;
+
+$amber:       #f59e0b;
+$amber-bg:    #fef3c7;
+
+$purple:      #9333ea;
+$purple-bg:   #faf5ff;
+
+$red:         #ef4444;
+
+// Shadows & Radii
+$shadow:      0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+$shadow-hover:0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+$radius:      16px; // Cohesive border radius for all cards
+$radius-sm:   10px;
+
+$font:        'Plus Jakarta Sans', system-ui, sans-serif;
+$font-display:'Bricolage Grotesque', system-ui, sans-serif;
+
+// ==========================================================================
+// BASE LAYOUT
+// ==========================================================================
 .container {
     background: $bg;
     min-height: 100vh;
@@ -28,21 +49,178 @@ $radiusSm:   8px;
 .main {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 36px 24px 60px;
+    padding: 40px 24px 80px;
+}
+
+// ==========================================================================
+// WELCOME BANNER
+// ==========================================================================
+.welcomeBanner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: $radius;
+    padding: 32px 40px;
+    margin-bottom: 24px;
+    box-shadow: $shadow;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        right: -30px;
+        top: -30px;
+        border-radius: 50%;
+    }
 }
 
 .greeting {
-    font-family: $fontDisplay;
-    font-size: 32px;
+    font-family: $font-display;
+    font-size: 30px;
     font-weight: 800;
-    color: $text;
-    margin-bottom: 24px;
+    color: $white;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
 }
 
-// TOP CARDS
+.welcomeSubtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+// ==========================================================================
+// STATS GRID & CARDS
+// ==========================================================================
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.statsCard {
+    background: $white;
+    border-radius: $radius;
+    padding: 20px;
+    box-shadow: $shadow;
+    border: 1px solid $border;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-hover;
+        border-color: $border-hover;
+    }
+}
+
+.statsIcon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.iconLearning { background: $blue-bg; color: $blue; }
+.iconCompleted { background: $amber-bg; color: $amber; }
+.iconOrgs { background: $purple-bg; color: $purple; }
+.iconProfile { background: $emerald-bg; color: $emerald; }
+
+.statsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.statsNumber {
+    font-size: 24px;
+    font-weight: 800;
+    color: $text;
+    font-family: $font-display;
+    line-height: 1.1;
+}
+
+.statsLabel {
+    font-size: 12px;
+    color: $text-muted;
+    font-weight: 500;
+}
+
+.statsCardProfile {
+    align-items: flex-start;
+}
+
+.profileHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+
+    .statsLabel { margin-bottom: 0; }
+}
+
+.profilePercentage {
+    font-size: 13px;
+    font-weight: 700;
+    color: $emerald;
+}
+
+.progressBarBgMini {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progressBarFillMini {
+    height: 100%;
+    background: $emerald;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.btnUpdateProfile {
+    background: none;
+    border: none;
+    color: $emerald;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    transition: color 0.2s;
+
+    &:hover {
+        color: $emerald-dark;
+    }
+}
+
+.chevronMini::after { content: ' ›'; }
+
+// ==========================================================================
+// URGENT NOTIFICATION CARDS
+// ==========================================================================
 .topCards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 16px;
     margin-bottom: 32px;
 }
@@ -50,273 +228,299 @@ $radiusSm:   8px;
 .topCard {
     background: $white;
     border-radius: $radius;
-    padding: 18px;
+    padding: 20px;
     box-shadow: $shadow;
     border: 1px solid $border;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-hover;
+        border-color: $border-hover;
+    }
 }
 
 .badgeRow {
     display: flex;
     gap: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .badgeDot {
     width: 28px;
-    height: 8px;
-    border-radius: 4px;
+    height: 6px;
+    border-radius: 3px;
 }
 
 .dotFilled { background: $red; }
 .dotFilled2 { background: $amber; }
-.dotCompleted { background: $green; }
-.dotEmpty { background: $border; }
+.dotCompleted { background: $emerald; }
+.dotEmpty { background: #e2e8f0; }
 
 .recommendedBadge {
     font-size: 11px;
-    color: $text3;
-    margin-bottom: 6px;
-    display: flex;
+    font-weight: 700;
+    color: $emerald;
+    margin-bottom: 8px;
+    display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    background: $emerald-bg;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: fit-content;
 
-    svg { color: $green; }
+    svg { color: $emerald; }
 }
 
 .companyName {
     font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 2px;
+    font-size: 14px;
+    color: $text;
+    margin-bottom: 4px;
 }
-
-.companyBa { color: #012169; }
-.companySky { color: #0770CF; }
-.companyTata { color: #004B87; }
-.companyComcast { font-size: 13px; font-weight: 900; color: #be2bbb; }
-.companySiemens { font-size: 13px; font-weight: 900; color: #009999; letter-spacing: 1px; }
 
 .roleText {
     font-size: 13px;
-    color: $text2;
+    color: $text-muted;
     margin-bottom: 14px;
+    line-height: 1.4;
 }
 
 .topCardTitle {
     font-weight: 600;
     font-size: 14px;
     color: $text;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .topCardDesc {
     font-size: 12px;
-    color: $text3;
-    margin-bottom: 12px;
+    color: $text-light;
+    margin-bottom: 14px;
+    line-height: 1.5;
 }
 
-.cardActions {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-}
-
-.btnDismiss {
-    background: none;
-    border: none;
-    color: $text3;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: inherit;
-}
-
-.linkBtn {
-    background: none;
-    border: none;
-    color: $green;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-}
-
-.chevron::after { content: ' ›'; }
-
-// TWO COLUMN
+// ==========================================================================
+// TWO COLUMN LAYOUT (65% / 35%)
+// ==========================================================================
 .twoCol {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    grid-template-columns: 1.75fr 1fr;
+    gap: 28px;
 }
 
 .sectionTitle {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-weight: 700;
-    font-size: 17px;
+    font-size: 18px;
     color: $text;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    font-family: $font-display;
 }
 
-.sectionIcon { font-size: 20px; }
+.sectionIcon {
+    font-size: 20px;
+}
 
-// SIM CARD
+// ==========================================================================
+// SIMULATION CARD (Active)
+// ==========================================================================
 .simCard {
     background: $white;
     border: 1px solid $border;
     border-radius: $radius;
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
     box-shadow: $shadow;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .simCardClickable {
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: $shadowH;
+        transform: translateY(-3px);
+        box-shadow: $shadow-hover;
+        border-color: $border-hover;
     }
 }
 
 .simCardBody {
-    h4 { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-    p { font-size: 12px; color: $text2; margin-bottom: 6px; line-height: 1.4; }
+    h4 {
+        font-weight: 700;
+        font-size: 15px;
+        margin: 0 0 6px 0;
+        color: $text;
+    }
+    p {
+        font-size: 12px;
+        color: $text-muted;
+        margin: 0 0 12px 0;
+        line-height: 1.5;
+        max-width: 480px;
+    }
 }
 
 .progressRow {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     margin: 8px 0 12px;
 }
 
 .progressBarBg {
     flex: 1;
-    height: 6px;
-    background: $border;
-    border-radius: 3px;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
     overflow: hidden;
 }
 
 .progressBarFill {
     height: 100%;
-    background: $green;
-    border-radius: 3px;
-    transition: width 0.3s ease;
+    background: $emerald;
+    border-radius: 4px;
+    transition: width 0.4s ease;
 }
 
 .progressPercent {
-    font-size: 11px;
-    font-weight: 600;
-    color: $text2;
-    min-width: 28px;
+    font-size: 12px;
+    font-weight: 700;
+    color: $text;
+    min-width: 32px;
 }
 
 .tasksLeft {
     font-size: 12px;
-    color: $text3;
+    color: $text-light;
     margin-bottom: 12px;
 }
 
 .simLogo {
     flex-shrink: 0;
-    margin-left: 16px;
+    margin-left: 20px;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 14px;
     color: #004B87;
+    background: $border;
+    padding: 8px 12px;
+    border-radius: $radius-sm;
 }
 
 .simLogoImg {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     object-fit: contain;
-    border-radius: $radiusSm;
+    border-radius: $radius-sm;
     border: 1px solid $border;
-    padding: 4px;
+    padding: 6px;
     background: $white;
     flex-shrink: 0;
-    margin-left: 16px;
+    margin-left: 20px;
 }
 
-// RECOMMENDED SIM CARD
+// ==========================================================================
+// RECOMMENDED SIMULATION CARD
+// ==========================================================================
 .recSimCard {
     background: $white;
     border: 1px solid $border;
     border-radius: $radius;
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
     box-shadow: $shadow;
     display: flex;
-    gap: 14px;
+    gap: 18px;
     align-items: flex-start;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-hover;
+        border-color: $border-hover;
+    }
 }
 
 .recSimThumb {
-    width: 80px;
-    height: 60px;
-    border-radius: $radiusSm;
+    width: 90px;
+    height: 70px;
+    border-radius: $radius-sm;
+    overflow: hidden;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.thumbBa {
-    background: linear-gradient(135deg, #012169 0%, #c41e3a 100%);
-}
-
-.thumbSky {
-    background: linear-gradient(135deg, #0770CF 0%, #00b4d8 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .recSimBody {
     flex: 1;
 
-    .simTitle {
-        font-weight: 500;
+    .companyName {
+        font-weight: 700;
         font-size: 13px;
+        color: $emerald;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .simTitle {
+        font-weight: 600;
+        font-size: 14px;
         color: $text;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
+        line-height: 1.4;
     }
 }
 
 .recSimMeta {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-size: 11px;
-    color: $text3;
-    margin-bottom: 10px;
+    color: $text-muted;
+    margin-bottom: 14px;
     flex-wrap: wrap;
 
-    span { display: flex; align-items: center; gap: 3px; }
+    span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
 }
 
-// VIEW ALL
+// ==========================================================================
+// VIEW ALL LINK
+// ==========================================================================
 .viewAll {
-    color: $green;
-    font-weight: 600;
+    color: $emerald;
+    font-weight: 700;
     font-size: 13px;
     text-align: center;
     display: block;
-    margin-top: 8px;
+    margin: 16px 0 32px;
     text-decoration: none;
     cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover {
+        color: $emerald-dark;
+    }
 }
 
-// ACHIEVEMENT
+// ==========================================================================
+// ACHIEVEMENT & CERTIFICATE CARD
+// ==========================================================================
 .achievementCard {
     background: $white;
     border: 1px solid $border;
@@ -326,31 +530,40 @@ $radiusSm:   8px;
     display: flex;
     align-items: center;
     gap: 20px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-hover;
+        border-color: $border-hover;
+    }
+
+    h4 {
+        font-weight: 700;
+        font-size: 15px;
+        color: $text;
+        margin: 0 0 6px 0;
+    }
 }
 
 .trophyIcon {
-    width: 70px;
-    height: 70px;
-    background: $greenBg;
+    width: 64px;
+    height: 64px;
+    background: $emerald-bg;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 28px;
     flex-shrink: 0;
-}
-
-.achievementCard h4 {
-    font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 6px;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.1);
 }
 
 .achievementDesc {
     font-size: 13px;
-    color: $text2;
+    color: $text-muted;
     line-height: 1.5;
-    margin-bottom: 12px;
+    margin: 0 0 8px 0;
 }
 
 .achievementMeta {
@@ -360,26 +573,26 @@ $radiusSm:   8px;
 }
 
 .certificateBtn {
-    background-color: $green;
+    background-color: $emerald;
     color: $white;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 12px;
-    padding: 6px 14px;
-    border-radius: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 8px;
+    margin-top: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 1px solid transparent;
+    border: none;
 
     &:hover {
-        background-color: $greenDark;
+        background-color: $emerald-dark;
         color: $white;
         transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
     }
 
     &:active {
@@ -387,58 +600,368 @@ $radiusSm:   8px;
     }
 }
 
-// JOB CARD
+// ==========================================================================
+// JOB / BUSINESS PARTNER CARD
+// ==========================================================================
 .jobCard {
     background: $white;
     border: 1px solid $border;
     border-radius: $radius;
-    padding: 16px;
-    margin-bottom: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
     box-shadow: $shadow;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    h4 { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-    p { font-size: 12px; color: $text2; margin-bottom: 10px; }
-}
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-hover;
+        border-color: $border-hover;
+    }
 
-.closeDate {
-    font-size: 11px;
-    color: $text3;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    h4 {
+        font-weight: 700;
+        font-size: 14px;
+        color: $text;
+        margin: 0 0 6px 0;
+    }
+    p {
+        font-size: 12px;
+        color: $text-muted;
+        margin: 0 0 14px 0;
+        line-height: 1.5;
+    }
 }
 
 .companyBadge {
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 12px;
-    font-weight: 900;
+    margin-left: 16px;
+    border-radius: $radius-sm;
+    border: 1px solid $border;
+    overflow: hidden;
+    padding: 4px;
+}
+
+// ==========================================================================
+// GLOBAL BUTTON STYLES & INTERACTION
+// ==========================================================================
+.cardActions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.btnDismiss {
+    background: none;
+    border: none;
+    color: $text-light;
     font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.2s;
+
+    &:hover {
+        color: $text-muted;
+    }
 }
 
-.redbullBadge {
-    background: #cc1e2c;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 900;
-    font-size: 11px;
+.linkBtn {
+    background: none;
+    border: none;
+    color: $emerald;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    transition: color 0.2s, transform 0.2s;
+
+    &:hover {
+        color: $emerald-dark;
+        transform: translateX(2px);
+    }
 }
 
-// STATES
+.chevron::after {
+    content: ' ›';
+    font-size: 15px;
+    line-height: 1;
+}
+
+// ==========================================================================
+// LOADING & EMPTY STATES
+// ==========================================================================
 .loadingBox, .emptyBox {
     background: $white;
-    border: 1px dashed $border;
+    border: 2px dashed $border;
     border-radius: $radius;
-    padding: 32px;
+    padding: 40px;
     text-align: center;
-    color: $text3;
+    color: $text-light;
     font-size: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+// ==========================================================================
+// PREFERENCE SETUP SCREEN (Trang mở đầu chọn sở thích)
+// ==========================================================================
+.prefContainer {
+    background: $white;
+    border-radius: $radius;
+    padding: 40px;
+    box-shadow: $shadow;
+    border: 1px solid $border;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.prefHeader {
+    text-align: center;
+    margin-bottom: 36px;
+
+    h2 {
+        font-family: $font-display;
+        font-size: 26px;
+        font-weight: 800;
+        color: $text;
+        margin: 12px 0 8px;
+        letter-spacing: -0.5px;
+    }
+
+    p {
+        font-size: 14px;
+        color: $text-muted;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+.prefHeaderIcon {
+    font-size: 40px;
+}
+
+.prefSection {
+    margin-bottom: 32px;
+    border-top: 1px solid $border;
+    padding-top: 24px;
+
+    h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: $text;
+        margin: 0 0 4px 0;
+    }
+}
+
+.prefSectionDesc {
+    font-size: 13px;
+    color: $text-light;
+    margin: 0 0 16px 0;
+}
+
+.prefPillGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.prefPill {
+    background: $white;
+    border: 1.5px solid #cbd5e1; // Slate-300
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+
+    &:hover {
+        border-color: $emerald;
+        color: $emerald;
+        background: $emerald-bg;
+    }
+}
+
+.prefPillSelected {
+    background: $emerald;
+    border-color: $emerald;
+    color: $white;
+
+    &:hover {
+        background: $emerald-dark;
+        border-color: $emerald-dark;
+        color: $white;
+    }
+}
+
+.pillCheck {
+    font-weight: bold;
+}
+
+.orgSelectionGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.orgSelectCard {
+    background: $white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    user-select: none;
+
+    &:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+    }
+}
+
+.orgSelectCardSelected {
+    border-color: $emerald;
+    background: $emerald-bg;
+
+    &:hover {
+        border-color: $emerald-dark;
+    }
+}
+
+.orgSelectLogo {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid $border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: $white;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.orgSelectLogoText {
+    font-weight: bold;
+    font-size: 16px;
+    color: $text-muted;
+}
+
+.orgSelectInfo {
+    flex: 1;
+
+    h4 {
+        font-weight: 700;
+        font-size: 13px;
+        color: $text;
+        margin: 0 0 2px 0;
+    }
+
+    p {
+        font-size: 11px;
+        color: $text-muted;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+    }
+}
+
+.orgSelectCheckbox {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.customCheckbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    background: $white;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: transparent;
+        transition: all 0.2s;
+    }
+}
+
+.customCheckboxChecked {
+    border-color: $emerald;
+    background: $emerald;
+
+    &::after {
+        background: $white;
+    }
+}
+
+.prefActions {
+    margin-top: 36px;
+    text-align: center;
+    border-top: 1px solid $border;
+    padding-top: 24px;
+}
+
+.btnSubmitPref {
+    background: $emerald;
+    color: $white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 32px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+        background: $emerald-dark;
+        box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3);
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
 }
