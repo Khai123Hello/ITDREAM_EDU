@@ -359,7 +359,7 @@ function SimulationCompletedPage({
                     </div>
 
                     {/* Educator reviews section */}
-                    {(!feedbacksLoading && subtaskFeedbacks.length === 0) ? null : (
+                    {!feedbacksLoading && subtaskFeedbacks.length === 0 ? null : (
                         <div className="tfo-feedback-section">
                             <div className="tfo-feedback-header">
                                 <span className="tfo-feedback-header-icon">💬</span>
@@ -387,7 +387,9 @@ function SimulationCompletedPage({
                                                                 Giảng viên nhận xét
                                                             </span>
                                                         </div>
-                                                        <div className="tfo-feedback-comment-content">{review.content}</div>
+                                                        <div className="tfo-feedback-comment-content">
+                                                            {review.content}
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>

@@ -248,8 +248,8 @@ function DashboardDesktop({
     const hasEmail = !!(profile?.email || profile?.account?.email);
 
     const preferences = profile?.preferences || [];
-    const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
-    const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
+    const hasSpecialization = preferences.some((p) => p.specializationId && String(p.specializationId) !== '0');
+    const hasOrganization = preferences.some((p) => p.organizationId && String(p.organizationId) !== '0');
 
     const completionStatus = [ hasFullName, hasEmail, hasSpecialization, hasOrganization ];
     const hasPhone = profile?.phone || profile?.account?.phone;
@@ -270,20 +270,36 @@ function DashboardDesktop({
     const enrolledIds = enrolledSims.map((item) => item.simulation?.id).filter(Boolean);
     const nonEnrolledSims = allSimulations.filter((sim) => !enrolledIds.includes(sim.id));
 
-    const prefSpecIds = preferences.map((p) => p.specializationId).filter(Boolean);
-    const prefOrgIds = preferences.map((p) => p.organizationId).filter(Boolean);
+    const prefSpecIds = preferences
+        .map((p) => p.specializationId)
+        .filter(Boolean)
+        .map(String);
+    const prefOrgIds = preferences
+        .map((p) => p.organizationId)
+        .filter(Boolean)
+        .map(String);
 
-    let recommendedSims = nonEnrolledSims.filter((sim) => {
-        const matchesSpec = sim.category?.id && prefSpecIds.includes(sim.category.id);
-        const matchesOrg = sim.educator?.organization?.id && prefOrgIds.includes(sim.educator.organization.id);
-        return matchesSpec || matchesOrg;
-    });
+    const hasPreferences = prefSpecIds.length > 0 || prefOrgIds.length > 0;
 
-    // Fallback if no matching preferences or no preferences selected
-    if (recommendedSims.length === 0) {
-        recommendedSims = nonEnrolledSims.slice(0, 3);
-    } else {
+    let recommendedSims = [];
+
+    if (hasPreferences) {
+        recommendedSims = nonEnrolledSims.filter((sim) => {
+            const matchesSpec = sim.category?.id && prefSpecIds.includes(String(sim.category.id));
+            const matchesOrg = sim.educator?.organization?.id && prefOrgIds.includes(String(sim.educator.organization.id));
+            return matchesSpec || matchesOrg;
+        });
+        
+        console.log('--- DEBUG FILTERING ---');
+        console.log('1. prefSpecIds:', prefSpecIds);
+        console.log('2. prefOrgIds:', prefOrgIds);
+        console.log('3. nonEnrolledSims:', nonEnrolledSims.map(s => ({ id: s.id, categoryId: s.category?.id, title: s.title })));
+        console.log('4. recommendedSims results:', recommendedSims.map(s => s.title));
+        console.log('-----------------------');
+
         recommendedSims = recommendedSims.slice(0, 3);
+    } else {
+        recommendedSims = nonEnrolledSims.slice(0, 3);
     }
 
     const filteredRecommendedSims = recommendedSims.filter((sim) => !dismissedRecSimIds.includes(sim.id));

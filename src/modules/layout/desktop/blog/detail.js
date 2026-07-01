@@ -80,13 +80,14 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
     const readingTime = estimateReadingTime(content);
 
-    const displayDate = modifiedDate || createdDate
-        ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric',
-        })
-        : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    const displayDate =
+        modifiedDate || createdDate
+            ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric',
+            })
+            : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
     // Use actual subjects/related blogs if returned, otherwise fallback to high-quality demo articles
     const relatedArticles =
@@ -184,12 +185,8 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                     <header className={styles.articleHeader}>
                         {/* Subject pill + category tag row */}
                         <div className={styles.subjectPillRow}>
-                            {subject && (
-                                <span className={styles.subjectPill}>{subject}</span>
-                            )}
-                            {category && (
-                                <span className={styles.categoryTag}>{category.name}</span>
-                            )}
+                            {subject && <span className={styles.subjectPill}>{subject}</span>}
+                            {category && <span className={styles.categoryTag}>{category.name}</span>}
                         </div>
 
                         <h1 className={styles.articleTitle}>{name}</h1>
@@ -200,19 +197,27 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                 <div className={styles.authorAvatarWrapper}>
                                     {educator.profileAccountDto?.avatar || educator.account?.avatar ? (
                                         <img
-                                            src={getImageUrl(educator.profileAccountDto?.avatar || educator.account?.avatar)}
+                                            src={getImageUrl(
+                                                educator.profileAccountDto?.avatar || educator.account?.avatar,
+                                            )}
                                             alt="author"
                                             className={styles.authorAvatar}
                                         />
                                     ) : (
                                         <div className={styles.authorAvatarFallback}>
-                                            {(educator.account?.fullName || educator.profileAccountDto?.fullName || 'U').charAt(0)}
+                                            {(
+                                                educator.account?.fullName ||
+                                                educator.profileAccountDto?.fullName ||
+                                                'U'
+                                            ).charAt(0)}
                                         </div>
                                     )}
                                 </div>
                                 <div className={styles.authorDetails}>
                                     <span className={styles.authorName}>
-                                        {educator.account?.fullName || educator.profileAccountDto?.fullName || 'Chuyên gia ITDream'}
+                                        {educator.account?.fullName ||
+                                            educator.profileAccountDto?.fullName ||
+                                            'Chuyên gia ITDream'}
                                     </span>
                                     {educator.organization && (
                                         <span className={styles.orgName}>{educator.organization.name}</span>
@@ -247,13 +252,19 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                 <div className={styles.authorCardAvatarWrapper}>
                                     {educator.profileAccountDto?.avatar || educator.account?.avatar ? (
                                         <img
-                                            src={getImageUrl(educator.profileAccountDto?.avatar || educator.account?.avatar)}
+                                            src={getImageUrl(
+                                                educator.profileAccountDto?.avatar || educator.account?.avatar,
+                                            )}
                                             alt="author avatar"
                                             className={styles.authorCardAvatar}
                                         />
                                     ) : (
                                         <div className={styles.authorCardAvatarFallback}>
-                                            {(educator.account?.fullName || educator.profileAccountDto?.fullName || 'U').charAt(0)}
+                                            {(
+                                                educator.account?.fullName ||
+                                                educator.profileAccountDto?.fullName ||
+                                                'U'
+                                            ).charAt(0)}
                                         </div>
                                     )}
                                 </div>
