@@ -18,7 +18,7 @@ const AppFooter = () => {
                 <p className={styles['lp-footer__heading']}>Dành Cho Sinh Viên</p>
 
                 <Link to="/simulations">Xem Dự Án</Link>
-                <Link to="/jobs">Tìm Việc Làm IT</Link>
+                {/* <Link to="/jobs">Tìm Việc Làm IT</Link> */}
                 <Link to="/simulations">Lập Trình Web</Link>
                 <Link to="/simulations">Data & AI</Link>
                 <Link to="/simulations">Mobile Development</Link>
@@ -31,7 +31,7 @@ const AppFooter = () => {
                 <p className={styles['lp-footer__heading']}>Dành Cho Doanh Nghiệp</p>
 
                 <Link to="/login">Đăng Nhập</Link>
-                <Link to="/login">Tài Nguyên Tuyển Dụng</Link>
+                {/* <Link to="/login">Tài Nguyên Tuyển Dụng</Link> */}
                 <Link to="/login">Đăng Ký Demo</Link>
             </div>
 
@@ -47,7 +47,7 @@ const AppFooter = () => {
                 <p className={styles['lp-footer__heading']}>Về ITDream</p>
 
                 <Link to="/">Câu Chuyện Của Chúng Tôi</Link>
-                <Link to="/">Tuyển Dụng</Link>
+                {/* <Link to="/">Tuyển Dụng</Link> */}
                 <Link to="/">Câu Hỏi Thường Gặp</Link>
             </div>
 
