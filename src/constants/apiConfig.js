@@ -533,8 +533,9 @@ const apiConfig = {
             headers: baseHeader,
         },
         clearAll: {
-            baseURL: `${apiUrl}v1/notification/clear_all`,
+            baseURL: `${apiUrl}v1/notification/read`,
             method: 'DELETE',
+            permissionCode: 'NO_ST_R',
             headers: baseHeader,
         },
     },
