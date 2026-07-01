@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
+import { FileTextOutlined } from '@ant-design/icons';
 
 import styles from './TaskPanel.module.scss';
 
@@ -201,6 +202,11 @@ function TaskPanel({
                             {activeSubTask.description && (
                                 <p className={styles.detailDescription}>{activeSubTask.description}</p>
                             )}
+                            {!activeSubTask.description && !activeSubTask.content && (
+                                <div className={styles.emptyBodyPlaceholder}>
+                                    <FileTextOutlined className={styles.emptyBodyIcon} />
+                                </div>
+                            )}
                             <TipTapJsonRenderer
                                 content={activeSubTask.content}
                                 quizSubmissionMap={quizSubmissionMap}
@@ -219,6 +225,11 @@ function TaskPanel({
                             <div className={styles.detailContent}>
                                 <h1 className={styles.detailTitle}>{parent.title || parent.name}</h1>
                                 {parent.description && <p className={styles.detailDescription}>{parent.description}</p>}
+                                {!parent.description && !parent.content && (
+                                    <div className={styles.emptyBodyPlaceholder}>
+                                        <FileTextOutlined className={styles.emptyBodyIcon} />
+                                    </div>
+                                )}
                                 <TipTapJsonRenderer
                                     content={parent.content}
                                     quizSubmissionMap={quizSubmissionMap}
