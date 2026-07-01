@@ -78,9 +78,9 @@ const AppHeader = () => {
                             <a href="/blog" className={isActive('/blog')} onClick={handleNavClick('/blog')}>
                                 Blog
                             </a>
-                            <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
+                            {/* <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
                                 Việc làm IT
-                            </a>
+                            </a> */}
                         </>
                     ) : (
                         <>
@@ -90,9 +90,9 @@ const AppHeader = () => {
                             <a href="/blog" className={isActive('/blog')} onClick={handleNavClick('/blog')}>
                                 Blog
                             </a>
-                            <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
+                            {/* <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
                                 Việc làm IT
-                            </a>
+                            </a> */}
                         </>
                     )}
                 </div>

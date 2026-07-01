@@ -285,13 +285,13 @@ function SimulationListDesktop({
                             >
                                 Dưới 60 phút
                             </button>
-                            <button
+                            {/* <button
                                 type="button"
                                 className={`${styles.quickPill} ${activeQuickFilter === 'hiring' ? styles.quickPillActive : ''}`}
                                 onClick={() => setActiveQuickFilter('hiring')}
                             >
                                 Đang tuyển dụng
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 

@@ -6,6 +6,14 @@ import classNames from 'classnames';
 
 import styles from './detail.module.scss';
 
+// Estimate reading time from markdoc/plain content string
+function estimateReadingTime(content) {
+    if (!content) return 1;
+    const plainText = content.replace(/[#*_{}[\]()|`<>]/g, ' ');
+    const wordCount = plainText.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(wordCount / 200));
+}
+
 function BlogDetailDesktop({ blog, urlBase, loading }) {
     const navigate = useNavigate();
     const [ activeId, setActiveId ] = React.useState('');
@@ -68,7 +76,17 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
         );
     }
 
-    const { name, image, category, content, educator, subject, subjects } = blog;
+    const { name, image, category, content, educator, subject, subjects, modifiedDate, createdDate } = blog;
+
+    const readingTime = estimateReadingTime(content);
+
+    const displayDate = modifiedDate || createdDate
+        ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+        })
+        : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
     // Use actual subjects/related blogs if returned, otherwise fallback to high-quality demo articles
     const relatedArticles =
@@ -145,38 +163,65 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                         Quay lại danh sách Blog
                     </button>
 
+                    {/* BREADCRUMB */}
+                    <nav className={styles.breadcrumb}>
+                        <span className={styles.breadcrumbLink} onClick={() => navigate('/')}>
+                            Trang chủ
+                        </span>
+                        <span className={styles.breadcrumbSep}>/</span>
+                        <span className={styles.breadcrumbLink} onClick={() => navigate('/blog')}>
+                            Blog
+                        </span>
+                        {category && (
+                            <>
+                                <span className={styles.breadcrumbSep}>/</span>
+                                <span className={styles.breadcrumbCurrent}>{category.name}</span>
+                            </>
+                        )}
+                    </nav>
+
                     {/* ARTICLE HEADER */}
                     <header className={styles.articleHeader}>
-                        {category && <span className={styles.categoryTag}>{category.name}</span>}
+                        {/* Subject pill + category tag row */}
+                        <div className={styles.subjectPillRow}>
+                            {subject && (
+                                <span className={styles.subjectPill}>{subject}</span>
+                            )}
+                            {category && (
+                                <span className={styles.categoryTag}>{category.name}</span>
+                            )}
+                        </div>
+
                         <h1 className={styles.articleTitle}>{name}</h1>
-                        <p className={styles.articleExcerpt}>{subject}</p>
 
                         {/* AUTHOR META */}
                         {educator && (
                             <div className={styles.authorMeta}>
                                 <div className={styles.authorAvatarWrapper}>
-                                    {educator.profileAccountDto?.avatar ? (
+                                    {educator.profileAccountDto?.avatar || educator.account?.avatar ? (
                                         <img
-                                            src={getImageUrl(educator.profileAccountDto.avatar)}
+                                            src={getImageUrl(educator.profileAccountDto?.avatar || educator.account?.avatar)}
                                             alt="author"
                                             className={styles.authorAvatar}
                                         />
                                     ) : (
                                         <div className={styles.authorAvatarFallback}>
-                                            {educator.profileAccountDto?.fullName?.charAt(0) || 'U'}
+                                            {(educator.account?.fullName || educator.profileAccountDto?.fullName || 'U').charAt(0)}
                                         </div>
                                     )}
                                 </div>
                                 <div className={styles.authorDetails}>
                                     <span className={styles.authorName}>
-                                        {educator.profileAccountDto?.fullName || 'Chuyên gia ITDream'}
+                                        {educator.account?.fullName || educator.profileAccountDto?.fullName || 'Chuyên gia ITDream'}
                                     </span>
                                     {educator.organization && (
                                         <span className={styles.orgName}>{educator.organization.name}</span>
                                     )}
                                 </div>
                                 <span className={styles.divider}>•</span>
-                                <span className={styles.readTime}>6 phút đọc</span>
+                                <span className={styles.readTime}>{displayDate}</span>
+                                <span className={styles.divider}>•</span>
+                                <span className={styles.readTime}>{readingTime} phút đọc</span>
                             </div>
                         )}
                     </header>
@@ -200,21 +245,21 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                         <section className={styles.authorSection}>
                             <div className={styles.authorCard}>
                                 <div className={styles.authorCardAvatarWrapper}>
-                                    {educator.profileAccountDto?.avatar ? (
+                                    {educator.profileAccountDto?.avatar || educator.account?.avatar ? (
                                         <img
-                                            src={getImageUrl(educator.profileAccountDto.avatar)}
+                                            src={getImageUrl(educator.profileAccountDto?.avatar || educator.account?.avatar)}
                                             alt="author avatar"
                                             className={styles.authorCardAvatar}
                                         />
                                     ) : (
                                         <div className={styles.authorCardAvatarFallback}>
-                                            {educator.profileAccountDto?.fullName?.charAt(0) || 'U'}
+                                            {(educator.account?.fullName || educator.profileAccountDto?.fullName || 'U').charAt(0)}
                                         </div>
                                     )}
                                 </div>
                                 <div className={styles.authorCardInfo}>
                                     <span className={styles.authorCardSubtitle}>TÁC GIẢ BÀI VIẾT</span>
-                                    <h3>{educator.profileAccountDto?.fullName}</h3>
+                                    <h3>{educator.account?.fullName || educator.profileAccountDto?.fullName}</h3>
                                     {educator.organization && (
                                         <p className={styles.authorCardOrg}>
                                             Giảng viên tại <strong>{educator.organization.name}</strong>
@@ -227,7 +272,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                         Chuyên gia định hướng nghề nghiệp, có hơn 10 năm kinh nghiệm giảng dạy và đào
                                         tạo nguồn nhân lực công nghệ chất lượng cao tại Việt Nam.
                                     </p>
-                                    {educator.profileAccountDto?.email && (
+                                    {(educator.profileAccountDto?.email || educator.account?.email) && (
                                         <div className={styles.authorCardEmail}>
                                             <svg
                                                 width="14"
@@ -240,7 +285,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                                                 <polyline points="22,6 12,13 2,6"></polyline>
                                             </svg>
-                                            {educator.profileAccountDto.email}
+                                            {educator.profileAccountDto?.email || educator.account?.email}
                                         </div>
                                     )}
                                 </div>
