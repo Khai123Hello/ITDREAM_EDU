@@ -7,9 +7,8 @@ import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
 import dayjs from 'dayjs';
 import DOMPurify from 'dompurify';
-
+import { FileTextOutlined } from '@ant-design/icons';
 import TaskPanel from '../components/TaskPanel';
-
 import styles from './detail.module.scss';
 
 const parseOverviewData = (overviewStr) => {
@@ -558,8 +557,8 @@ function SimulationDetailDesktop({
                                     onSelectTask={handleTaskSelect}
                                 />
                             ) : (
-                                <div className={styles.emptyWrap}>
-                                    <Empty description="Chưa có nhiệm vụ nào" />
+                                <div className={styles.emptyBodyPlaceholder}>
+                                    <FileTextOutlined className={styles.emptyBodyIcon} />
                                 </div>
                             )}
                         </div>
