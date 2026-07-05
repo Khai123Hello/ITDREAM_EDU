@@ -16,7 +16,7 @@ const AppHeader = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, profile } = useAuth();
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [ dropdownOpen, setDropdownOpen ] = useState(false);
     const { execute: executeLogoutApi } = useFetch(apiConfig.account.logout);
 
     const isActive = (path) => (location.pathname === path ? styles.active : '');
@@ -78,9 +78,9 @@ const AppHeader = () => {
                             <a href="/blog" className={isActive('/blog')} onClick={handleNavClick('/blog')}>
                                 Blog
                             </a>
-                            {/* <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
-                                Việc làm IT
-                            </a> */}
+                            <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
+                                Cơ hội việc làm
+                            </a>
                         </>
                     ) : (
                         <>
@@ -90,9 +90,6 @@ const AppHeader = () => {
                             <a href="/blog" className={isActive('/blog')} onClick={handleNavClick('/blog')}>
                                 Blog
                             </a>
-                            {/* <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
-                                Việc làm IT
-                            </a> */}
                         </>
                     )}
                 </div>

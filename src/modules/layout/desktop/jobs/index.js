@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import LoadingComponent from '@components/common/loading/LoadingComponent';
 import { AppConstants } from '@constants';
 import apiConfig from '@constants/apiConfig';
@@ -34,15 +36,42 @@ const getJobTags = (job) => {
     return tags;
 };
 
+const getOrgLogo = (job) => {
+    const logo = job?.educator?.organization?.logoUrl || job?.educator?.profileAccountDto?.avatar || job?.educator?.account?.avatar;
+    if (!logo) return null;
+    return logo.startsWith('http') ? logo : `${AppConstants.contentRootUrl}${logo}`;
+};
+
+const getPlainTextFromTipTap = (content) => {
+    if (!content) return '';
+    const trimmed = content.trim();
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        try {
+            const parsed = JSON.parse(trimmed);
+            const extractText = (node) => {
+                if (!node) return '';
+                if (node.text) return node.text + ' ';
+                if (node.content) return node.content.map(extractText).join('');
+                return '';
+            };
+            return extractText(parsed).trim();
+        } catch (e) {
+            return content;
+        }
+    }
+    return content;
+};
+
 function JobsDesktop() {
-    const [selectedJobId, setSelectedJobId] = useState(null);
-    const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'saved'
+    const navigate = useNavigate();
+    const [ selectedJobId, setSelectedJobId ] = useState(null);
+    const [ selectedTab, setSelectedTab ] = useState('all'); // 'all', 'saved'
 
     // Dropdown filters
-    const [opportunityFilter, setOpportunityFilter] = useState('Tất cả');
-    const [roleFilter, setRoleFilter] = useState('Tất cả');
-    const [selectedProvinceId, setSelectedProvinceId] = useState(null);
-    const [selectedWardId, setSelectedWardId] = useState(null);
+    const [ opportunityFilter, setOpportunityFilter ] = useState('Tất cả');
+    const [ roleFilter, setRoleFilter ] = useState('Tất cả');
+    const [ selectedProvinceId, setSelectedProvinceId ] = useState(null);
+    const [ selectedWardId, setSelectedWardId ] = useState(null);
 
     // Fetch provinces on mount
     const { data: provinces } = useFetch(apiConfig.nation.client_list, {
@@ -52,7 +81,7 @@ function JobsDesktop() {
     });
 
     // Fetch wards dynamically based on province
-    const [wards, setWards] = useState([]);
+    const [ wards, setWards ] = useState([]);
     const { execute: fetchWards } = useFetch(apiConfig.nation.client_list, {
         immediate: false,
     });
@@ -70,7 +99,7 @@ function JobsDesktop() {
             setWards([]);
             setSelectedWardId(null);
         }
-    }, [selectedProvinceId, fetchWards]);
+    }, [ selectedProvinceId, fetchWards ]);
 
     const handleSelectJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -89,7 +118,7 @@ function JobsDesktop() {
         if (selectedWardId) params.wardId = selectedWardId;
 
         return params;
-    }, [opportunityFilter, roleFilter, selectedProvinceId, selectedWardId]);
+    }, [ opportunityFilter, roleFilter, selectedProvinceId, selectedWardId ]);
 
     // Fetch saved job IDs on mount
     const { data: savedJobIdsResponse, execute: fetchSavedJobs } = useFetch(apiConfig.job.listSaveJob, {
@@ -112,7 +141,7 @@ function JobsDesktop() {
     // Load jobs on query parameters change
     useEffect(() => {
         fetchJobs();
-    }, [queryParams, fetchJobs]);
+    }, [ queryParams, fetchJobs ]);
 
     // Active job details resolver
     const jobs = jobsResponse?.content || [];
@@ -123,25 +152,44 @@ function JobsDesktop() {
             return jobs.filter((job) => savedJobIds.includes(job.id));
         }
         return jobs;
-    }, [jobs, selectedTab, savedJobIds]);
+    }, [ jobs, selectedTab, savedJobIds ]);
 
     const activeJob = useMemo(() => {
         return filteredJobs.find((job) => job.id === selectedJobId) || filteredJobs[0] || null;
-    }, [filteredJobs, selectedJobId]);
+    }, [ filteredJobs, selectedJobId ]);
+
+    const {
+        data: activeJobDetail,
+        loading: detailLoading,
+        execute: fetchJobDetail,
+    } = useFetch(apiConfig.job.guestGet, {
+        mappingData: (res) => res.data || null,
+        immediate: false,
+    });
+
+    useEffect(() => {
+        if (activeJob?.id) {
+            fetchJobDetail({
+                pathParams: { id: activeJob.id },
+            });
+        }
+    }, [ activeJob?.id, fetchJobDetail ]);
+
+    const displayJob = activeJobDetail && activeJobDetail.id === activeJob?.id ? activeJobDetail : activeJob;
 
     // Reset selected job if it gets filtered out of the list
     useEffect(() => {
         if (selectedJobId && filteredJobs.length > 0 && !filteredJobs.some((j) => j.id === selectedJobId)) {
             setSelectedJobId(null);
         }
-    }, [filteredJobs, selectedJobId]);
+    }, [ filteredJobs, selectedJobId ]);
 
     // Toggle save job action
     const { execute: callSaveJob } = useFetch(apiConfig.job.saveJob, {}, false);
     const handleToggleSaveJob = (e, jobId) => {
         e.stopPropagation();
         const isSaved = savedJobIds.includes(jobId);
-        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [...savedJobIds, jobId];
+        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [ ...savedJobIds, jobId ];
 
         callSaveJob({
             dataBody: { jobPostIds: newSavedIds },
@@ -316,9 +364,12 @@ function JobsDesktop() {
                                 <div className={styles.cardTitle}>{job.title}</div>
                                 <div className={styles.cardDesc}>
                                     {job.content
-                                        ? job.content.length > 120
-                                            ? job.content.substring(0, 120) + '...'
-                                            : job.content
+                                        ? (() => {
+                                            const plainText = getPlainTextFromTipTap(job.content);
+                                            return plainText.length > 120
+                                                ? plainText.substring(0, 120) + '...'
+                                                : plainText;
+                                        })()
                                         : ''}
                                 </div>
                                 <div className={styles.cardMeta}>
@@ -331,7 +382,7 @@ function JobsDesktop() {
                                             />
                                             <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
                                         </svg>
-                                        {job.province?.name || 'Toàn quốc'}
+                                        {job.address?.toLowerCase() === 'online' ? 'Online' : (job.province?.name || 'Toàn quốc')}
                                     </span>
                                     <span>
                                         <svg viewBox="0 0 24 24" fill="none">
@@ -348,8 +399,8 @@ function JobsDesktop() {
                                                 ? dayjs(job.date).format('DD/MM/YYYY')
                                                 : 'N/A'
                                             : job.endDate
-                                              ? `Hạn: ${dayjs(job.endDate).format('DD/MM/YYYY')}`
-                                              : 'N/A'}
+                                                ? `Hạn: ${dayjs(job.endDate).format('DD/MM/YYYY')}`
+                                                : 'N/A'}
                                     </span>
                                     <button
                                         className={classNames(styles.saveBtn, {
@@ -371,29 +422,23 @@ function JobsDesktop() {
 
                 {/* RIGHT: DETAIL PANEL */}
                 <div className={styles.rightColumn}>
-                    {activeJob ? (
+                    {displayJob ? (
                         <div className={classNames(styles.detailPanel, styles.visible)}>
                             <div
                                 className={styles.detailHeroImg}
                                 style={{
-                                    backgroundImage: activeJob.image
-                                        ? `url(${activeJob.image.startsWith('http') ? activeJob.image : `${AppConstants.contentRootUrl}${activeJob.image}`})`
+                                    backgroundImage: displayJob.image
+                                        ? `url(${displayJob.image.startsWith('http') ? displayJob.image : `${AppConstants.contentRootUrl}${displayJob.image}`})`
                                         : 'linear-gradient(135deg, #0f2042, #1b3564)',
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
                                     height: '180px',
                                 }}
-                            >
-                                <div className={styles.logoOverlay}>
-                                    {activeJob.educator?.organization?.name ||
-                                        activeJob.educator?.profileAccountDto?.fullName ||
-                                        'ITDream'}
-                                </div>
-                            </div>
+                            />
 
                             <div className={styles.detailBody}>
                                 <div className={styles.detailTags}>
-                                    {getJobTags(activeJob).map((tag, i) => (
+                                    {getJobTags(displayJob).map((tag, i) => (
                                         <span
                                             key={i}
                                             className={classNames(styles.tag, {
@@ -405,7 +450,25 @@ function JobsDesktop() {
                                         </span>
                                     ))}
                                 </div>
-                                <div className={styles.detailTitle}>{activeJob.title}</div>
+                                <div className={styles.detailTitle}>{displayJob.title}</div>
+
+                                {/* ORGANIZATION & AUTHOR DETAILS */}
+                                {displayJob.educator?.organization?.name && (
+                                    <div className={styles.authorSection}>
+                                        {getOrgLogo(displayJob) && (
+                                            <img
+                                                src={getOrgLogo(displayJob)}
+                                                alt="logo"
+                                                className={styles.orgLogo}
+                                            />
+                                        )}
+                                        <div className={styles.authorInfo}>
+                                            <div className={styles.orgName}>
+                                                {displayJob.educator.organization.name}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className={styles.detailMetaRow}>
                                     <svg viewBox="0 0 24 24" fill="none">
@@ -418,15 +481,15 @@ function JobsDesktop() {
                                         />
                                     </svg>
                                     <span className={styles.label}>
-                                        {activeJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
+                                        {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
                                     </span>{' '}
-                                    {activeJob.type === 1
-                                        ? activeJob.date
-                                            ? dayjs(activeJob.date).format('DD/MM/YYYY')
+                                    {displayJob.type === 1
+                                        ? displayJob.date
+                                            ? dayjs(displayJob.date).format('DD/MM/YYYY')
                                             : 'N/A'
-                                        : activeJob.endDate
-                                          ? dayjs(activeJob.endDate).format('DD/MM/YYYY')
-                                          : 'N/A'}
+                                        : displayJob.endDate
+                                            ? dayjs(displayJob.endDate).format('DD/MM/YYYY')
+                                            : 'N/A'}
                                 </div>
                                 <div className={styles.detailMetaRow}>
                                     <svg viewBox="0 0 24 24" fill="none">
@@ -438,16 +501,17 @@ function JobsDesktop() {
                                         <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
                                     </svg>
                                     <span className={styles.label}>Địa điểm làm việc:</span>{' '}
-                                    {activeJob.address ? `${activeJob.address}, ` : ''}
-                                    {activeJob.province?.name || 'Toàn quốc'}
+                                    {displayJob.address?.toLowerCase() === 'online'
+                                        ? 'Online'
+                                        : `${displayJob.address ? `${displayJob.address}, ` : ''}${displayJob.province?.name || 'Toàn quốc'}`}
                                 </div>
 
                                 <div className={styles.actionBtns}>
                                     <button
                                         className={styles.btnPrimary}
                                         onClick={() => {
-                                            if (activeJob.jobUrl) {
-                                                window.open(activeJob.jobUrl, '_blank');
+                                            if (displayJob.jobUrl) {
+                                                window.open(displayJob.jobUrl, '_blank');
                                             } else {
                                                 message.warning('Không tìm thấy đường dẫn tuyển dụng.');
                                             }
@@ -472,16 +536,19 @@ function JobsDesktop() {
                                 </div>
 
                                 <div className={styles.detailDescWrapper}>
-                                    {activeJob.content &&
-                                        activeJob.content.split('\n').map((para, i) => (
-                                            <p key={i} className={styles.detailDesc}>
-                                                {para}
-                                            </p>
-                                        ))}
+                                    {detailLoading && !activeJobDetail ? (
+                                        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                                            <LoadingComponent />
+                                        </div>
+                                    ) : (
+                                        displayJob.content && (
+                                            <TipTapJsonRenderer content={displayJob.content} />
+                                        )
+                                    )}
                                 </div>
 
                                 {/* SIMULATIONS */}
-                                {activeJob.simulations && activeJob.simulations.length > 0 && (
+                                {displayJob.simulations && displayJob.simulations.length > 0 && (
                                     <>
                                         <hr className={styles.divider} />
                                         <div className={styles.detailSectionTitle}>Mô phỏng công việc liên quan</div>
@@ -491,10 +558,24 @@ function JobsDesktop() {
                                             công trong công việc.
                                         </p>
 
-                                        {activeJob.simulations.map((sim) => (
-                                            <div key={sim.id} className={styles.simCard} style={{ marginBottom: 12 }}>
-                                                <div className={styles.simThumb}>
-                                                    {sim.category?.name?.substring(0, 7).toUpperCase() || ''}
+                                        {displayJob.simulations.map((sim) => (
+                                            <div
+                                                key={sim.id}
+                                                className={styles.simCard}
+                                                style={{ marginBottom: 12 }}
+                                                onClick={() => navigate(`/simulations/${sim.id}`)}
+                                            >
+                                                <div
+                                                    className={styles.simThumb}
+                                                    style={{
+                                                        backgroundImage: sim.thumbnail
+                                                            ? `url(${sim.thumbnail.startsWith('http') ? sim.thumbnail : `${AppConstants.contentRootUrl}${sim.thumbnail}`})`
+                                                            : 'none',
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                    }}
+                                                >
+                                                    {!sim.thumbnail && (sim.category?.name?.substring(0, 7).toUpperCase() || '')}
                                                 </div>
                                                 <div className={styles.simInfo}>
                                                     <div className={styles.simLabel}>{sim.category?.name || ''}</div>
@@ -520,6 +601,16 @@ function JobsDesktop() {
                                                         </div>
                                                         <span>{sim.duration || '2-3 giờ'}</span>
                                                     </div>
+                                                    {(sim.totalParticipant !== undefined || (sim.avgStar !== undefined && sim.avgStar > 0)) && (
+                                                        <div className={styles.simExtraMeta}>
+                                                            {sim.totalParticipant !== undefined && (
+                                                                <span>👤 {sim.totalParticipant} học viên</span>
+                                                            )}
+                                                            {sim.avgStar !== undefined && sim.avgStar > 0 && (
+                                                                <span>⭐ {sim.avgStar} / 5</span>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}

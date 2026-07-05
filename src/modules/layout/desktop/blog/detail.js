@@ -47,7 +47,7 @@ function parseContentData(content) {
 
 // ─── Reading Progress Bar ───
 function ReadingProgressBar() {
-    const [progress, setProgress] = useState(0);
+    const [ progress, setProgress ] = useState(0);
 
     useEffect(() => {
         const updateProgress = () => {
@@ -91,8 +91,8 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
 
 function BlogDetailDesktop({ blog, urlBase, loading }) {
     const navigate = useNavigate();
-    const [activeId, setActiveId] = useState('');
-    const [activeChapter, setActiveChapter] = useState(0);
+    const [ activeId, setActiveId ] = useState('');
+    const [ activeChapter, setActiveChapter ] = useState(0);
     const articleRef = useRef(null);
 
     const parsedContent = blog ? parseContentData(blog.content) : null;
@@ -118,13 +118,13 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
         headingElements.forEach((el) => observer.observe(el));
         return () => headingElements.forEach((el) => observer.unobserve(el));
-    }, [blog, currentContent, activeChapter]);
+    }, [ blog, currentContent, activeChapter ]);
 
     // Reset to top when switching chapters
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setActiveId('');
-    }, [activeChapter]);
+    }, [ activeChapter ]);
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -167,10 +167,10 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
     const displayDate =
         modifiedDate || createdDate
             ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
-                  day: 'numeric',
-                  month: 'numeric',
-                  year: 'numeric',
-              })
+                day: 'numeric',
+                month: 'numeric',
+                year: 'numeric',
+            })
             : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
     // Related articles
@@ -178,29 +178,29 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
         subjects?.content && subjects.content.length > 0 && subjects.content[0] !== null
             ? subjects.content
             : [
-                  {
-                      id: 101,
-                      name: 'Kỹ năng mềm quyết định sự thành công trong công việc',
-                      subject: 'Khám phá tầm quan trọng của kỹ năng giao tiếp, làm việc nhóm và giải quyết vấn đề...',
-                      category: { name: 'Kỹ năng nghề nghiệp' },
-                      image: null,
-                  },
-                  {
-                      id: 102,
-                      name: 'Xu hướng làm việc từ xa và mô hình Hybrid năm 2026',
-                      subject:
+                {
+                    id: 101,
+                    name: 'Kỹ năng mềm quyết định sự thành công trong công việc',
+                    subject: 'Khám phá tầm quan trọng của kỹ năng giao tiếp, làm việc nhóm và giải quyết vấn đề...',
+                    category: { name: 'Kỹ năng nghề nghiệp' },
+                    image: null,
+                },
+                {
+                    id: 102,
+                    name: 'Xu hướng làm việc từ xa và mô hình Hybrid năm 2026',
+                    subject:
                           'Những thay đổi lớn trong cách các doanh nghiệp vận hành và cách tối ưu hiệu suất làm việc...',
-                      category: { name: 'Xu hướng công nghệ' },
-                      image: null,
-                  },
-                  {
-                      id: 103,
-                      name: 'Xây dựng thương hiệu cá nhân cho lập trình viên',
-                      subject: 'Làm thế nào để tạo hồ sơ GitHub nổi bật, viết blog kỹ thuật và kết nối hiệu quả...',
-                      category: { name: 'Phát triển bản thân' },
-                      image: null,
-                  },
-              ];
+                    category: { name: 'Xu hướng công nghệ' },
+                    image: null,
+                },
+                {
+                    id: 103,
+                    name: 'Xây dựng thương hiệu cá nhân cho lập trình viên',
+                    subject: 'Làm thế nào để tạo hồ sơ GitHub nổi bật, viết blog kỹ thuật và kết nối hiệu quả...',
+                    category: { name: 'Phát triển bản thân' },
+                    image: null,
+                },
+            ];
 
     // Popular articles for sidebar
     const sidebarArticles = [

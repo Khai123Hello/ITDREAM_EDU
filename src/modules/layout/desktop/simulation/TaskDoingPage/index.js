@@ -164,9 +164,9 @@ function QuizBlock({
     errorCount = 0,
     totalError = 0,
 }) {
-    const [selected, setSelected] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
-    const [isRetrying, setIsRetrying] = useState(false);
+    const [ selected, setSelected ] = useState(null);
+    const [ submitted, setSubmitted ] = useState(false);
+    const [ isRetrying, setIsRetrying ] = useState(false);
 
     const correct = (block.options || []).findIndex((o) => o.answer === true);
     const savedAnswer = submittedAnswer?.answer;
@@ -189,7 +189,7 @@ function QuizBlock({
 
         prevQuestionIdRef.current = questionId;
         prevSavedAnswerRef.current = savedAnswer;
-    }, [questionId, savedAnswer]);
+    }, [ questionId, savedAnswer ]);
 
     const effectiveSelected = savedAnswer && !isRetrying ? savedOptionIndex : selected;
     const effectiveSubmitted = Boolean(savedAnswer) && !isRetrying ? true : submitted;
@@ -318,118 +318,118 @@ function BlockItem({
     totalError = 0,
 }) {
     switch (block.type) {
-        case 'meta':
-            return (
-                <div className="tfo-block-meta">
-                    <span className="tfo-block-meta-val">{block.duration}</span>
-                    <span className="tfo-block-meta-dot">·</span>
-                    <span className="tfo-block-meta-val">{block.level}</span>
-                </div>
-            );
+                    case 'meta':
+                        return (
+                            <div className="tfo-block-meta">
+                                <span className="tfo-block-meta-val">{block.duration}</span>
+                                <span className="tfo-block-meta-dot">·</span>
+                                <span className="tfo-block-meta-val">{block.level}</span>
+                            </div>
+                        );
 
-        case 'section':
-            return (
-                <div className="tfo-block-section">
-                    <div className="tfo-block-section-header">
-                        <span className="tfo-block-section-icon">{block.icon}</span>
-                        <span className="tfo-block-section-title">{block.title}</span>
-                    </div>
-                    <ul className="tfo-block-section-list">
-                        {(block.bullets || []).filter(Boolean).map((b, i) => (
-                            <li key={i}>{b}</li>
-                        ))}
-                    </ul>
-                </div>
-            );
+                    case 'section':
+                        return (
+                            <div className="tfo-block-section">
+                                <div className="tfo-block-section-header">
+                                    <span className="tfo-block-section-icon">{block.icon}</span>
+                                    <span className="tfo-block-section-title">{block.title}</span>
+                                </div>
+                                <ul className="tfo-block-section-list">
+                                    {(block.bullets || []).filter(Boolean).map((b, i) => (
+                                        <li key={i}>{b}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        );
 
-        case 'text':
-            return <p className="tfo-block-text">{block.content}</p>;
+                    case 'text':
+                        return <p className="tfo-block-text">{block.content}</p>;
 
-        case 'h1':
-            return <h2 className="tfo-block-h1">{block.content}</h2>;
+                    case 'h1':
+                        return <h2 className="tfo-block-h1">{block.content}</h2>;
 
-        case 'h2':
-            return <h3 className="tfo-block-h2">{block.content}</h3>;
+                    case 'h2':
+                        return <h3 className="tfo-block-h2">{block.content}</h3>;
 
-        case 'h3':
-            return <h4 className="tfo-block-h3">{block.content}</h4>;
+                    case 'h3':
+                        return <h4 className="tfo-block-h3">{block.content}</h4>;
 
-        case 'bullet':
-            return (
-                <div className="tfo-block-bullet-wrap">
-                    <span className="tfo-block-bullet-dot">•</span>
-                    <span className="tfo-block-bullet-text">{block.content}</span>
-                </div>
-            );
+                    case 'bullet':
+                        return (
+                            <div className="tfo-block-bullet-wrap">
+                                <span className="tfo-block-bullet-dot">•</span>
+                                <span className="tfo-block-bullet-text">{block.content}</span>
+                            </div>
+                        );
 
-        case 'numbered': {
-            const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
-            return (
-                <div className="tfo-block-bullet-wrap">
-                    <span className="tfo-block-num-label">{num}.</span>
-                    <span className="tfo-block-bullet-text">{block.content}</span>
-                </div>
-            );
-        }
-
-        case 'divider':
-            return <hr className="tfo-block-divider" />;
-
-        case 'callout':
-            return (
-                <div className="tfo-block-callout">
-                    <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
-                    <span className="tfo-block-callout-text">{block.content}</span>
-                </div>
-            );
-
-        case 'code':
-            return (
-                <div className="tfo-block-code">
-                    <pre>{block.content}</pre>
-                </div>
-            );
-
-        case 'step': {
-            const renderStepBody = (text) => {
-                if (!text) return '';
-                const parts = text.split(/(`[^`]+`)/g);
-                return parts.map((part, pi) => {
-                    if (part.startsWith('`') && part.endsWith('`')) {
-                        return <code key={pi}>{part.slice(1, -1)}</code>;
+                    case 'numbered': {
+                        const num = allBlocks.filter((b, i) => b.type === 'numbered' && i <= idx).length;
+                        return (
+                            <div className="tfo-block-bullet-wrap">
+                                <span className="tfo-block-num-label">{num}.</span>
+                                <span className="tfo-block-bullet-text">{block.content}</span>
+                            </div>
+                        );
                     }
-                    return part;
-                });
-            };
-            return (
-                <div className="tfo-block-step">
-                    <div className="tfo-block-step-badge">{idx + 1}</div>
-                    <div className="tfo-block-step-content">
-                        <span className="tfo-block-step-label">{block.label}</span>
-                        <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
-                    </div>
-                </div>
-            );
-        }
 
-        case 'quiz': {
-            const questionKey = (block.question || '').trim();
-            const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
-            return (
-                <QuizBlock
-                    block={block}
-                    submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
-                    questionId={questionId}
-                    onQuizAnswerSubmit={onQuizAnswerSubmit}
-                    hasCompleted={hasCompleted}
-                    errorCount={errorCount}
-                    totalError={totalError}
-                />
-            );
-        }
+                    case 'divider':
+                        return <hr className="tfo-block-divider" />;
 
-        default:
-            return null;
+                    case 'callout':
+                        return (
+                            <div className="tfo-block-callout">
+                                <span className="tfo-block-callout-icon">{block.icon || '💡'}</span>
+                                <span className="tfo-block-callout-text">{block.content}</span>
+                            </div>
+                        );
+
+                    case 'code':
+                        return (
+                            <div className="tfo-block-code">
+                                <pre>{block.content}</pre>
+                            </div>
+                        );
+
+                    case 'step': {
+                        const renderStepBody = (text) => {
+                            if (!text) return '';
+                            const parts = text.split(/(`[^`]+`)/g);
+                            return parts.map((part, pi) => {
+                                if (part.startsWith('`') && part.endsWith('`')) {
+                                    return <code key={pi}>{part.slice(1, -1)}</code>;
+                                }
+                                return part;
+                            });
+                        };
+                        return (
+                            <div className="tfo-block-step">
+                                <div className="tfo-block-step-badge">{idx + 1}</div>
+                                <div className="tfo-block-step-content">
+                                    <span className="tfo-block-step-label">{block.label}</span>
+                                    <span className="tfo-block-step-body">{renderStepBody(block.body)}</span>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    case 'quiz': {
+                        const questionKey = (block.question || '').trim();
+                        const questionId = questionKey ? (questionMap[questionKey] ?? null) : null;
+                        return (
+                            <QuizBlock
+                                block={block}
+                                submittedAnswer={questionId ? quizSubmissionMap[questionId] : null}
+                                questionId={questionId}
+                                onQuizAnswerSubmit={onQuizAnswerSubmit}
+                                hasCompleted={hasCompleted}
+                                errorCount={errorCount}
+                                totalError={totalError}
+                            />
+                        );
+                    }
+
+                    default:
+                        return null;
     }
 }
 
@@ -450,7 +450,7 @@ function BlocksContent({
         } catch {
             return [];
         }
-    }, [blocksJson]);
+    }, [ blocksJson ]);
 
     return (
         <div className="tfo-blocks-content">
@@ -497,41 +497,41 @@ function extractBlocksFromMarkdoc(markdoc) {
         const body = match[3];
 
         switch (tag) {
-            case 'callout':
-                blocks.push({ type: 'callout', icon: attrs.icon || '💡', content: body.trim() });
-                break;
-            case 'step':
-                blocks.push({ type: 'step', label: attrs.label || '', body: body.trim() });
-                break;
-            case 'section':
-                blocks.push({
-                    type: 'section',
-                    icon: attrs.icon || '🎓',
-                    title: attrs.title || '',
-                    bullets: body
-                        .split('\n')
-                        .filter((l) => l.trim())
-                        .map((l) => l.replace(/^[-*]\s*/, '').trim()),
-                });
-                break;
-            case 'quiz': {
-                const optRe = /\{%\s*option\b([^%]*?)%}([\s\S]*?){%\s*\/option\s*%}/g;
-                const options = [];
-                let om;
-                while ((om = optRe.exec(body)) !== null) {
-                    const optAttrs = parseMarkdocAttrs(om[1]);
-                    const optText = om[2].trim();
-                    options.push({
-                        answer: optAttrs.correct === 'true',
-                        option: optText,
-                        value: optText,
-                    });
-                }
-                if (options.length > 0) {
-                    blocks.push({ type: 'quiz', question: attrs.question || '', options });
-                }
-                break;
-            }
+                        case 'callout':
+                            blocks.push({ type: 'callout', icon: attrs.icon || '💡', content: body.trim() });
+                            break;
+                        case 'step':
+                            blocks.push({ type: 'step', label: attrs.label || '', body: body.trim() });
+                            break;
+                        case 'section':
+                            blocks.push({
+                                type: 'section',
+                                icon: attrs.icon || '🎓',
+                                title: attrs.title || '',
+                                bullets: body
+                                    .split('\n')
+                                    .filter((l) => l.trim())
+                                    .map((l) => l.replace(/^[-*]\s*/, '').trim()),
+                            });
+                            break;
+                        case 'quiz': {
+                            const optRe = /\{%\s*option\b([^%]*?)%}([\s\S]*?){%\s*\/option\s*%}/g;
+                            const options = [];
+                            let om;
+                            while ((om = optRe.exec(body)) !== null) {
+                                const optAttrs = parseMarkdocAttrs(om[1]);
+                                const optText = om[2].trim();
+                                options.push({
+                                    answer: optAttrs.correct === 'true',
+                                    option: optText,
+                                    value: optText,
+                                });
+                            }
+                            if (options.length > 0) {
+                                blocks.push({ type: 'quiz', question: attrs.question || '', options });
+                            }
+                            break;
+                        }
         }
         lastIdx = match.index + match[0].length;
     }
@@ -584,10 +584,10 @@ const isExternalUrl = (str) => {
 function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
     // Xác định mode mặc định dựa vào submission trước đó
     const defaultMode = previousFile && isExternalUrl(previousFile) ? 'link' : 'file';
-    const [mode, setMode] = useState(defaultMode);
-    const [dragging, setDragging] = useState(false);
-    const [file, setFile] = useState(null);
-    const [linkInput, setLinkInput] = useState('');
+    const [ mode, setMode ] = useState(defaultMode);
+    const [ dragging, setDragging ] = useState(false);
+    const [ file, setFile ] = useState(null);
+    const [ linkInput, setLinkInput ] = useState('');
 
     useEffect(() => {
         setFile(null);
@@ -598,7 +598,7 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
         } else if (previousFile) {
             setMode('file');
         }
-    }, [previousFile]);
+    }, [ previousFile ]);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -942,23 +942,23 @@ export default function TaskDoingPage({
     onUpdateComment = () => {},
     onDeleteComment = () => {},
 }) {
-    const [textInput, setTextInput] = useState('');
-    const [inlineQuestionIds, setInlineQuestionIds] = useState([]);
+    const [ textInput, setTextInput ] = useState('');
+    const [ inlineQuestionIds, setInlineQuestionIds ] = useState([]);
 
     useEffect(() => {
         setTextInput(previousText || '');
-    }, [previousText]);
+    }, [ previousText ]);
 
     useEffect(() => {
         setInlineQuestionIds([]);
-    }, [selectedSubtaskId]);
+    }, [ selectedSubtaskId ]);
 
     const renderMedia = () => {
         if (!mediaPath) return null;
         const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
         const ext = mediaPath.split('.').pop().toLowerCase();
 
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -967,7 +967,7 @@ export default function TaskDoingPage({
                 </div>
             );
         }
-        if (['mp4', 'webm', 'ogg'].includes(ext)) {
+        if ([ 'mp4', 'webm', 'ogg' ].includes(ext)) {
             return (
                 <div className="tfo-media-section">
                     <div className="tfo-media-container">
@@ -1169,16 +1169,16 @@ export default function TaskDoingPage({
                                                                 const questionId = block.id
                                                                     ? String(block.id)
                                                                     : block.question
-                                                                      ? questionMap[block.question.trim()]
-                                                                      : null;
+                                                                        ? questionMap[block.question.trim()]
+                                                                        : null;
                                                                 return !inlineQuestionIds.includes(String(questionId));
                                                             })
                                                             .map((block, idx) => {
                                                                 const questionId = block.id
                                                                     ? String(block.id)
                                                                     : block.question
-                                                                      ? questionMap[block.question.trim()]
-                                                                      : null;
+                                                                        ? questionMap[block.question.trim()]
+                                                                        : null;
                                                                 return (
                                                                     <QuizBlock
                                                                         key={questionId || idx}
@@ -1205,111 +1205,111 @@ export default function TaskDoingPage({
                                                 {isCompleted &&
                                                     currentSubtaskReviews &&
                                                     currentSubtaskReviews.length > 0 && (
-                                                        <div className="tfo-subtask-reviews-section">
-                                                            <div className="tfo-subtask-reviews-header">
+                                                    <div className="tfo-subtask-reviews-section">
+                                                        <div className="tfo-subtask-reviews-header">
                                                                 Nhận xét từ Giảng viên ({currentSubtaskReviews.length})
-                                                            </div>
-                                                            <div className="tfo-subtask-reviews-list">
-                                                                {currentSubtaskReviews.map((review) => {
-                                                                    const reviewerName =
+                                                        </div>
+                                                        <div className="tfo-subtask-reviews-list">
+                                                            {currentSubtaskReviews.map((review) => {
+                                                                const reviewerName =
                                                                         review.creator?.fullName ||
                                                                         review.creator?.username ||
                                                                         review.createdBy ||
                                                                         'Giảng viên';
-                                                                    const reviewerAvatar = review.creator?.avatar
-                                                                        ? review.creator.avatar.startsWith('http')
-                                                                            ? review.creator.avatar
-                                                                            : `${urlBase}${review.creator.avatar}`
-                                                                        : null;
-                                                                    const initials = getInitials(reviewerName);
-                                                                    const avatarBg = getAvatarColor(reviewerName);
+                                                                const reviewerAvatar = review.creator?.avatar
+                                                                    ? review.creator.avatar.startsWith('http')
+                                                                        ? review.creator.avatar
+                                                                        : `${urlBase}${review.creator.avatar}`
+                                                                    : null;
+                                                                const initials = getInitials(reviewerName);
+                                                                const avatarBg = getAvatarColor(reviewerName);
 
-                                                                    return (
-                                                                        <div
-                                                                            key={review.id}
-                                                                            className="tfo-review-display saved-card"
-                                                                            onClick={() =>
-                                                                                onViewReviewDetail &&
+                                                                return (
+                                                                    <div
+                                                                        key={review.id}
+                                                                        className="tfo-review-display saved-card"
+                                                                        onClick={() =>
+                                                                            onViewReviewDetail &&
                                                                                 onViewReviewDetail(review.id)
-                                                                            }
-                                                                            style={{ cursor: 'pointer' }}
-                                                                        >
-                                                                            <div className="tfo-review-display__header">
-                                                                                {reviewerAvatar ? (
-                                                                                    <img
-                                                                                        src={reviewerAvatar}
-                                                                                        alt={reviewerName}
-                                                                                        className="tfo-review-display__avatar"
-                                                                                    />
-                                                                                ) : (
-                                                                                    <div
-                                                                                        style={{ background: avatarBg }}
-                                                                                        className="tfo-review-display__avatar-initials"
-                                                                                    >
-                                                                                        {initials}
-                                                                                    </div>
-                                                                                )}
-                                                                                <div className="tfo-review-display__meta">
-                                                                                    <div className="tfo-review-display__name">
-                                                                                        {reviewerName}
-                                                                                    </div>
-                                                                                    <div className="tfo-review-display__role">
-                                                                                        Giáo viên hướng dẫn
-                                                                                    </div>
+                                                                        }
+                                                                        style={{ cursor: 'pointer' }}
+                                                                    >
+                                                                        <div className="tfo-review-display__header">
+                                                                            {reviewerAvatar ? (
+                                                                                <img
+                                                                                    src={reviewerAvatar}
+                                                                                    alt={reviewerName}
+                                                                                    className="tfo-review-display__avatar"
+                                                                                />
+                                                                            ) : (
+                                                                                <div
+                                                                                    style={{ background: avatarBg }}
+                                                                                    className="tfo-review-display__avatar-initials"
+                                                                                >
+                                                                                    {initials}
                                                                                 </div>
-                                                                                <span className="tfo-review-display__date">
-                                                                                    {review.createdDate
-                                                                                        ? dayjs(
-                                                                                              review.createdDate,
-                                                                                          ).format('DD/MM/YYYY')
-                                                                                        : '-'}
-                                                                                </span>
+                                                                            )}
+                                                                            <div className="tfo-review-display__meta">
+                                                                                <div className="tfo-review-display__name">
+                                                                                    {reviewerName}
+                                                                                </div>
+                                                                                <div className="tfo-review-display__role">
+                                                                                        Giáo viên hướng dẫn
+                                                                                </div>
                                                                             </div>
-                                                                            <blockquote className="tfo-review-display__quote">
-                                                                                {review.content}
-                                                                            </blockquote>
+                                                                            <span className="tfo-review-display__date">
+                                                                                {review.createdDate
+                                                                                    ? dayjs(
+                                                                                        review.createdDate,
+                                                                                    ).format('DD/MM/YYYY')
+                                                                                    : '-'}
+                                                                            </span>
                                                                         </div>
-                                                                    );
-                                                                })}
-                                                            </div>
+                                                                        <blockquote className="tfo-review-display__quote">
+                                                                            {review.content}
+                                                                        </blockquote>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
-                                                    )}
+                                                    </div>
+                                                )}
                                                 {/* Nút Làm lại - hiển thị khi chưa hoàn thành nhiệm vụ và đã vượt quá số lần làm sai (isExceeded) */}
                                                 {!isCompleted &&
                                                     isExceeded &&
                                                     (requiresFileUpload ||
                                                         requiresTextResponse ||
                                                         quizBlocks.length > 0) && (
-                                                        <div
-                                                            style={{
-                                                                marginBottom: 16,
-                                                                display: 'flex',
-                                                                justifyContent: 'flex-end',
-                                                            }}
+                                                    <div
+                                                        style={{
+                                                            marginBottom: 16,
+                                                            display: 'flex',
+                                                            justifyContent: 'flex-end',
+                                                        }}
+                                                    >
+                                                        <button
+                                                            className="tfo-reset-subtask-btn"
+                                                            onClick={onResetSubtask}
                                                         >
-                                                            <button
-                                                                className="tfo-reset-subtask-btn"
-                                                                onClick={onResetSubtask}
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                width="16"
+                                                                height="16"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                strokeWidth="2.5"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                className="tfo-reset-icon"
                                                             >
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width="16"
-                                                                    height="16"
-                                                                    viewBox="0 0 24 24"
-                                                                    fill="none"
-                                                                    stroke="currentColor"
-                                                                    strokeWidth="2.5"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    className="tfo-reset-icon"
-                                                                >
-                                                                    <polyline points="23 4 23 10 17 10" />
-                                                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                                                                </svg>
+                                                                <polyline points="23 4 23 10 17 10" />
+                                                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                                                            </svg>
                                                                 Làm lại nhiệm vụ
-                                                            </button>
-                                                        </div>
-                                                    )}
+                                                        </button>
+                                                    </div>
+                                                )}
 
                                                 {/* File upload section */}
                                                 {requiresFileUpload && (

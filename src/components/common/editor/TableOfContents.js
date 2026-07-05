@@ -20,7 +20,7 @@ export function extractHeadings(content) {
     const headings = [];
     const walk = (nodes) => {
         if (!nodes) return;
-        const arr = Array.isArray(nodes) ? nodes : [nodes];
+        const arr = Array.isArray(nodes) ? nodes : [ nodes ];
         arr.forEach((node) => {
             if (node.type === 'heading') {
                 const text = node.content?.map((c) => c.text || '').join('') || '';
@@ -43,7 +43,7 @@ export function extractHeadings(content) {
 }
 
 export default function TableOfContents({ content, activeId }) {
-    const headings = useMemo(() => extractHeadings(content), [content]);
+    const headings = useMemo(() => extractHeadings(content), [ content ]);
 
     const handleScrollTo = (id) => {
         const element = document.getElementById(id);

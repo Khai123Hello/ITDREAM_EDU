@@ -142,7 +142,7 @@ function TaskDoingContainer() {
         }
     };
 
-    const [simulationEnrollmentId, setSimulationEnrollmentId] = useState(
+    const [ simulationEnrollmentId, setSimulationEnrollmentId ] = useState(
         () => getSessionData().simulationEnrollmentId || null,
     );
 
@@ -168,13 +168,13 @@ function TaskDoingContainer() {
             // Clear the flag to avoid showing it again on subsequent loads
             sessionStorage.removeItem(`enrollmentSuccess-${simulationId}`);
         }
-    }, [simulationEnrollmentId, simulationId]);
+    }, [ simulationEnrollmentId, simulationId ]);
 
     // State management
-    const [selectedParentTaskId, setSelectedParentTaskId] = useState(
+    const [ selectedParentTaskId, setSelectedParentTaskId ] = useState(
         () => getSessionData().selectedParentTaskId || null,
     );
-    const [selectedSubtaskId, setSelectedSubtaskId] = useState(() => getSessionData().selectedSubtaskId || null);
+    const [ selectedSubtaskId, setSelectedSubtaskId ] = useState(() => getSessionData().selectedSubtaskId || null);
 
     React.useEffect(() => {
         if (selectedParentTaskId !== null || selectedSubtaskId !== null) {
@@ -187,7 +187,7 @@ function TaskDoingContainer() {
                 }),
             );
         }
-    }, [selectedParentTaskId, selectedSubtaskId, sessionKey]);
+    }, [ selectedParentTaskId, selectedSubtaskId, sessionKey ]);
 
     // Load task list for sidebar
     const {
@@ -278,7 +278,7 @@ function TaskDoingContainer() {
     );
 
     const { profile } = useAuth();
-    const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+    const [ isGeneratingCert, setIsGeneratingCert ] = useState(false);
 
     const { execute: uploadFile } = useFetch(apiConfig.file.upload, {}, false);
     const { execute: createQuizHistory } = useFetch(apiConfig.questionQuizHistory.create, {}, false);
@@ -332,7 +332,7 @@ function TaskDoingContainer() {
     );
 
     // Comments state & fetches
-    const [showComments, setShowComments] = useState(false);
+    const [ showComments, setShowComments ] = useState(false);
 
     const {
         data: commentsData,
@@ -385,16 +385,16 @@ function TaskDoingContainer() {
                 params: { simulationId: parseInt(simulationId) },
             });
         }
-    }, [simulationId, fetchSimulationDetail, checkEnrollment]);
+    }, [ simulationId, fetchSimulationDetail, checkEnrollment ]);
 
     // State to store mapping of question text to question ID
-    const [questionMap, setQuestionMap] = useState({});
+    const [ questionMap, setQuestionMap ] = useState({});
     // Đáp án quiz đã xác nhận đúng trên UI, dùng khi progressDetail chưa kịp refetch
-    const [localQuizAnswers, setLocalQuizAnswers] = useState({});
+    const [ localQuizAnswers, setLocalQuizAnswers ] = useState({});
 
     // Tiến độ được tạo cục bộ (tránh race condition khi API refetch chưa phản hồi xong)
-    const [localProgressMap, setLocalProgressMap] = useState({});
-    const [isContinuing, setIsContinuing] = useState(false);
+    const [ localProgressMap, setLocalProgressMap ] = useState({});
+    const [ isContinuing, setIsContinuing ] = useState(false);
     const initializingProgressRef = React.useRef(false);
     const creatingProgressTasksRef = React.useRef(new Set());
     const attemptedProgressCreationRef = React.useRef(new Set());
@@ -402,7 +402,7 @@ function TaskDoingContainer() {
     // Clear attempted progress creations when enrollment ID changes
     React.useEffect(() => {
         attemptedProgressCreationRef.current.clear();
-    }, [simulationEnrollmentId]);
+    }, [ simulationEnrollmentId ]);
 
     // Load task list on mount
     React.useEffect(() => {
@@ -411,7 +411,7 @@ function TaskDoingContainer() {
                 params: { simulationId: parseInt(simulationId) },
             });
         }
-    }, [simulationId, fetchTaskList]);
+    }, [ simulationId, fetchTaskList ]);
 
     // Load task progress & educator reviews on mount
     React.useEffect(() => {
@@ -424,7 +424,7 @@ function TaskDoingContainer() {
                 params: { simulationEnrollmentId, size: 1000 },
             });
         }
-    }, [simulationEnrollmentId, refetchProgress, fetchReviews]);
+    }, [ simulationEnrollmentId, refetchProgress, fetchReviews ]);
 
     const hasCompleted = useMemo(() => {
         if (enrollmentData?.content) {
@@ -432,7 +432,7 @@ function TaskDoingContainer() {
             return enrollment?.progress === 100;
         }
         return false;
-    }, [enrollmentData, simulationId]);
+    }, [ enrollmentData, simulationId ]);
 
     // Đồng bộ simulationEnrollmentId từ dữ liệu checkEnrollment
     React.useEffect(() => {
@@ -451,9 +451,9 @@ function TaskDoingContainer() {
                 setSimulationEnrollmentId(null);
             }
         }
-    }, [enrollmentData, simulationId, sessionKey]);
+    }, [ enrollmentData, simulationId, sessionKey ]);
 
-    const progressList = useMemo(() => taskProgressData?.content || [], [taskProgressData]);
+    const progressList = useMemo(() => taskProgressData?.content || [], [ taskProgressData ]);
 
     // Đồng bộ và dọn dẹp local progress khi dữ liệu chính thức từ server đã tải về
     React.useEffect(() => {
@@ -471,7 +471,7 @@ function TaskDoingContainer() {
                 return changed ? next : prev;
             });
         }
-    }, [progressList]);
+    }, [ progressList ]);
 
     // Map task progress by task ID (gộp tiến độ cục bộ)
     const taskProgressMap = useMemo(() => {
@@ -489,7 +489,7 @@ function TaskDoingContainer() {
         });
 
         return progressMap;
-    }, [progressList, localProgressMap]);
+    }, [ progressList, localProgressMap ]);
 
     const taskProgressMapRef = React.useRef({});
     taskProgressMapRef.current = taskProgressMap;
@@ -516,12 +516,12 @@ function TaskDoingContainer() {
             }
             return (a.orderInParent || 0) - (b.orderInParent || 0);
         });
-    }, [taskListData, parentTasks]);
+    }, [ taskListData, parentTasks ]);
 
     // Get selected parent task details
     const selectedParentTask = useMemo(() => {
         return parentTasks.find((t) => t.id === defaultSelectedParentId);
-    }, [parentTasks, defaultSelectedParentId]);
+    }, [ parentTasks, defaultSelectedParentId ]);
 
     const initializedProgressRef = React.useRef(false);
     const appliedResumeRef = React.useRef(false);
@@ -575,7 +575,7 @@ function TaskDoingContainer() {
             }
             return null;
         },
-        [createTaskProgress, simulationEnrollmentId],
+        [ createTaskProgress, simulationEnrollmentId ],
     );
 
     /**
@@ -713,7 +713,7 @@ function TaskDoingContainer() {
             setSelectedParentTaskId(parentId);
         }
         setSelectedSubtaskId(latestTask.id);
-    }, [parentTasks, progressList, taskListData, allSubtasksOrdered, ensureTaskProgress]);
+    }, [ parentTasks, progressList, taskListData, allSubtasksOrdered, ensureTaskProgress ]);
 
     // Tự động đảm bảo có progress khi người dùng chọn bất kỳ subtask nào (Giải quyết triệt để lỗi Tiến độ nhiệm vụ chưa sẵn sàng và lỗi hoàn thành Task Cha)
     React.useEffect(() => {
@@ -806,7 +806,7 @@ function TaskDoingContainer() {
         } else {
             setSelectedSubtaskId(null);
         }
-    }, [defaultSelectedParentId, subtasks, selectedSubtaskId]);
+    }, [ defaultSelectedParentId, subtasks, selectedSubtaskId ]);
 
     // Fetch selected subtask details when selectedSubtaskId changes
     React.useEffect(() => {
@@ -818,11 +818,11 @@ function TaskDoingContainer() {
         } else {
             setSubtaskDetail(null);
         }
-    }, [selectedSubtaskId, fetchSubtaskDetail, setSubtaskDetail]);
+    }, [ selectedSubtaskId, fetchSubtaskDetail, setSubtaskDetail ]);
 
     React.useEffect(() => {
         setLocalQuizAnswers({});
-    }, [selectedSubtaskId]);
+    }, [ selectedSubtaskId ]);
 
     // Fetch task questions and build question mapping when selectedSubtaskId changes
     React.useEffect(() => {
@@ -847,7 +847,7 @@ function TaskDoingContainer() {
             setTaskQuestions([]);
             setQuestionMap({});
         }
-    }, [selectedSubtaskId, fetchTaskQuestions, setTaskQuestions]);
+    }, [ selectedSubtaskId, fetchTaskQuestions, setTaskQuestions ]);
 
     // Fetch comments when subtask selection changes
     React.useEffect(() => {
@@ -856,7 +856,7 @@ function TaskDoingContainer() {
                 params: { taskId: selectedSubtaskId, simulationEnrollmentId, size: 1000 },
             });
         }
-    }, [selectedSubtaskId, simulationEnrollmentId, fetchComments]);
+    }, [ selectedSubtaskId, simulationEnrollmentId, fetchComments ]);
 
     const handleCreateComment = useCallback(
         async (content, parentId = null) => {
@@ -887,7 +887,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi đăng bình luận.');
             }
         },
-        [selectedSubtaskId, simulationEnrollmentId, createCommentApi, fetchComments],
+        [ selectedSubtaskId, simulationEnrollmentId, createCommentApi, fetchComments ],
     );
 
     const handleUpdateComment = useCallback(
@@ -916,7 +916,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi cập nhật bình luận.');
             }
         },
-        [selectedSubtaskId, simulationEnrollmentId, updateCommentApi, fetchComments],
+        [ selectedSubtaskId, simulationEnrollmentId, updateCommentApi, fetchComments ],
     );
 
     const handleDeleteComment = useCallback(
@@ -940,14 +940,14 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi xóa bình luận.');
             }
         },
-        [selectedSubtaskId, simulationEnrollmentId, deleteCommentApi, fetchComments],
+        [ selectedSubtaskId, simulationEnrollmentId, deleteCommentApi, fetchComments ],
     );
 
     // Get current subtask progress info
     const currentSubtaskProgress = useMemo(() => {
         if (!selectedSubtaskId) return null;
         return taskProgressMap[selectedSubtaskId] || null;
-    }, [selectedSubtaskId, taskProgressMap]);
+    }, [ selectedSubtaskId, taskProgressMap ]);
 
     // Filter educator reviews for the current subtask
     const currentSubtaskReviews = useMemo(() => {
@@ -973,12 +973,12 @@ function TaskDoingContainer() {
             currentSubtaskProgress.taskProgressId,
         );
         return filtered;
-    }, [reviewData, currentSubtaskProgress?.taskProgressId]);
+    }, [ reviewData, currentSubtaskProgress?.taskProgressId ]);
 
     // Review Detail Modal States & Callbacks
-    const [selectedReviewDetail, setSelectedReviewDetail] = useState(null);
-    const [reviewDetailModalOpen, setReviewDetailModalOpen] = useState(false);
-    const [reviewDetailLoading, setReviewDetailLoading] = useState(false);
+    const [ selectedReviewDetail, setSelectedReviewDetail ] = useState(null);
+    const [ reviewDetailModalOpen, setReviewDetailModalOpen ] = useState(false);
+    const [ reviewDetailLoading, setReviewDetailLoading ] = useState(false);
 
     const { execute: fetchReviewDetail } = useFetch(
         apiConfig.reviewSubmission.studentGet,
@@ -1005,7 +1005,7 @@ function TaskDoingContainer() {
                 setReviewDetailLoading(false);
             }
         },
-        [fetchReviewDetail],
+        [ fetchReviewDetail ],
     );
 
     const handleCloseReviewDetail = useCallback(() => {
@@ -1024,7 +1024,7 @@ function TaskDoingContainer() {
                 },
             });
         }
-    }, [currentSubtaskProgress?.taskProgressId, currentSubtaskProgress?.status, hasCompleted, fetchReviews]);
+    }, [ currentSubtaskProgress?.taskProgressId, currentSubtaskProgress?.status, hasCompleted, fetchReviews ]);
 
     // Handle parent task selection
     const handleSelectParentTask = useCallback((parentTaskId) => {
@@ -1034,7 +1034,7 @@ function TaskDoingContainer() {
     // Calculate active index and canGoBack / canGoNext
     const activeSubtaskIndex = useMemo(() => {
         return subtasks.findIndex((s) => s.id === selectedSubtaskId);
-    }, [subtasks, selectedSubtaskId]);
+    }, [ subtasks, selectedSubtaskId ]);
 
     const isLastSubtaskOverall = useMemo(() => {
         if (parentTasks.length === 0 || subtasks.length === 0 || !selectedParentTask) return false;
@@ -1042,11 +1042,11 @@ function TaskDoingContainer() {
         const isLastParent = activeParentIndex === parentTasks.length - 1;
         const isLastSub = activeSubtaskIndex === subtasks.length - 1;
         return isLastParent && isLastSub;
-    }, [parentTasks, selectedParentTask, subtasks, activeSubtaskIndex]);
+    }, [ parentTasks, selectedParentTask, subtasks, activeSubtaskIndex ]);
 
     const activeSubtaskIndexOverall = useMemo(() => {
         return allSubtasksOrdered.findIndex((s) => s.id === selectedSubtaskId);
-    }, [allSubtasksOrdered, selectedSubtaskId]);
+    }, [ allSubtasksOrdered, selectedSubtaskId ]);
 
     const canGoBack = activeSubtaskIndexOverall > 0;
     const canGoNext = activeSubtaskIndex >= 0;
@@ -1061,7 +1061,7 @@ function TaskDoingContainer() {
             }
             setSelectedSubtaskId(prevSubtask.id);
         }
-    }, [canGoBack, activeSubtaskIndexOverall, allSubtasksOrdered]);
+    }, [ canGoBack, activeSubtaskIndexOverall, allSubtasksOrdered ]);
 
     // Load progress detail when taskProgressId changes
     // Khi vừa chuyển sang Task con có task Question, phải kiểm tra phần này liền để hiện phần trả lời trước đó
@@ -1073,7 +1073,7 @@ function TaskDoingContainer() {
         } else {
             setProgressDetail(null);
         }
-    }, [currentSubtaskProgress?.taskProgressId, fetchProgressDetail, setProgressDetail]);
+    }, [ currentSubtaskProgress?.taskProgressId, fetchProgressDetail, setProgressDetail ]);
 
     // Xác định yêu cầu nộp bài từ submissionType của subtask:
     // 0 = không yêu cầu, 1 = file, 2 = text, 3 = file + text
@@ -1084,7 +1084,7 @@ function TaskDoingContainer() {
     // Extract và sắp xếp submissions từ data.content của studentGet (Sắp xếp tăng dần theo thời gian/id để phần tử mới nhất ở cuối)
     const submissions = useMemo(() => {
         const rawSubmissions = getSubmissions(progressDetail);
-        return [...rawSubmissions].sort((a, b) => {
+        return [ ...rawSubmissions ].sort((a, b) => {
             const timeA = a.createdDate ? new Date(a.createdDate).getTime() : 0;
             const timeB = b.createdDate ? new Date(b.createdDate).getTime() : 0;
             if (timeA !== timeB) {
@@ -1092,21 +1092,21 @@ function TaskDoingContainer() {
             }
             return (a.id || 0) - (b.id || 0);
         });
-    }, [progressDetail]);
+    }, [ progressDetail ]);
 
     // Tìm câu trả lời file đã nộp mới nhất (Sửa tìm đáp án mới nhất)
     const previousFile = useMemo(() => {
         if (!requiresFileUpload) return null;
-        const found = [...submissions].reverse().find((s) => !s.taskQuestion && isFilePath(getSubmissionAnswer(s)));
+        const found = [ ...submissions ].reverse().find((s) => !s.taskQuestion && isFilePath(getSubmissionAnswer(s)));
         return found ? getSubmissionAnswer(found) : null;
-    }, [submissions, requiresFileUpload]);
+    }, [ submissions, requiresFileUpload ]);
 
     // Tìm câu trả lời text đã nộp mới nhất (Sửa tìm đáp án mới nhất)
     const previousText = useMemo(() => {
         if (!requiresTextResponse) return '';
-        const found = [...submissions].reverse().find((s) => !s.taskQuestion && !isFilePath(getSubmissionAnswer(s)));
+        const found = [ ...submissions ].reverse().find((s) => !s.taskQuestion && !isFilePath(getSubmissionAnswer(s)));
         return found ? getSubmissionAnswer(found) : '';
-    }, [submissions, requiresTextResponse]);
+    }, [ submissions, requiresTextResponse ]);
 
     // Bản đồ đáp án đúng lấy từ API questions
     const correctAnswersMap = useMemo(() => {
@@ -1151,7 +1151,7 @@ function TaskDoingContainer() {
             }
         });
         return map;
-    }, [taskQuestions]);
+    }, [ taskQuestions ]);
 
     const quizBlocksFromQuestions = useMemo(() => {
         const questionsList = Array.isArray(taskQuestions) ? taskQuestions : [];
@@ -1207,7 +1207,7 @@ function TaskDoingContainer() {
                 options: mappedOptions,
             };
         });
-    }, [taskQuestions]);
+    }, [ taskQuestions ]);
 
     // Map quiz submissions theo taskQuestionId (chỉ câu đã có taskQuestion.id mới là trắc nghiệm) (Sửa BUG-10)
     const quizSubmissionMap = useMemo(() => {
@@ -1222,14 +1222,14 @@ function TaskDoingContainer() {
             }
         });
 
-        Object.entries(localQuizAnswers).forEach(([questionId, data]) => {
+        Object.entries(localQuizAnswers).forEach(([ questionId, data ]) => {
             if (!map[questionId]) {
                 map[questionId] = data;
             }
         });
 
         return map;
-    }, [submissions, localQuizAnswers, correctAnswersMap]);
+    }, [ submissions, localQuizAnswers, correctAnswersMap ]);
 
     // Kiểm tra xem toàn bộ câu hỏi trắc nghiệm đã được trả lời đúng chưa
     const hasRequiredQuizSubmissions = useMemo(() => {
@@ -1241,7 +1241,7 @@ function TaskDoingContainer() {
             const questionId = block.id ? String(block.id) : getQuestionIdFromMap(questionMap, block.question);
             return questionId && quizSubmissionMap[questionId] && quizSubmissionMap[questionId].isCorrect;
         });
-    }, [quizBlocksFromQuestions, quizSubmissionMap, questionMap]);
+    }, [ quizBlocksFromQuestions, quizSubmissionMap, questionMap ]);
 
     // Handle file upload - lưu file hoặc đường dẫn vào studentSubmission
     const handleFileUpload = useCallback(
@@ -1297,7 +1297,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi nộp bài!');
             }
         },
-        [currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail, hasCompleted],
+        [ currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail, hasCompleted ],
     );
 
     // Handle text response submit - lưu câu trả lời text vào studentSubmission
@@ -1327,7 +1327,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi lưu câu trả lời!');
             }
         },
-        [currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted],
+        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted ],
     );
 
     /**
@@ -1471,7 +1471,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi lưu đáp án!');
             }
         },
-        [currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted, handleResetSubtask],
+        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted, handleResetSubtask ],
     );
 
     /**
@@ -1496,7 +1496,7 @@ function TaskDoingContainer() {
         }
 
         return true;
-    }, [hasRequiredQuizSubmissions, previousFile, previousText, requiresFileUpload, requiresTextResponse]);
+    }, [ hasRequiredQuizSubmissions, previousFile, previousText, requiresFileUpload, requiresTextResponse ]);
 
     const getSubtasksForParent = useCallback(
         (parentTaskId) => {
@@ -1510,7 +1510,7 @@ function TaskDoingContainer() {
                 )
                 .sort((a, b) => (a.orderInParent || 0) - (b.orderInParent || 0));
         },
-        [taskListData],
+        [ taskListData ],
     );
 
     /**

@@ -115,8 +115,8 @@ const ProfileComponent = (props) => {
         user?.gender === MALE
             ? translate.formatMessage(commonMessage.male)
             : user?.gender
-              ? translate.formatMessage(commonMessage.female)
-              : '';
+                ? translate.formatMessage(commonMessage.female)
+                : '';
     const navigation = useNavigate();
     const params = useParams();
 
@@ -124,10 +124,10 @@ const ProfileComponent = (props) => {
     const { execute: executeUpdateProfile } = useFetch(apiConfig.user.updateProfile);
     const { execute: executeStudentUpdate } = useFetch(apiConfig.student.clientUpdate);
 
-    const [categories, setCategories] = useState([]);
-    const [organizations, setOrganizations] = useState([]);
-    const [selectedSpecializations, setSelectedSpecializations] = useState([]);
-    const [selectedOrganizations, setSelectedOrganizations] = useState([]);
+    const [ categories, setCategories ] = useState([]);
+    const [ organizations, setOrganizations ] = useState([]);
+    const [ selectedSpecializations, setSelectedSpecializations ] = useState([]);
+    const [ selectedOrganizations, setSelectedOrganizations ] = useState([]);
 
     const { execute: fetchCategories, loading: categoriesLoading } = useFetch(apiConfig.category.autoComplete);
     const { execute: fetchOrganizations, loading: organizationsLoading } = useFetch(apiConfig.organization.list);
@@ -141,8 +141,8 @@ const ProfileComponent = (props) => {
                         const categoriesArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                              ? res.data.content
-                              : [];
+                                ? res.data.content
+                                : [];
                         setCategories(categoriesArray);
                     }
                 },
@@ -153,14 +153,14 @@ const ProfileComponent = (props) => {
                         const orgArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                              ? res.data.content
-                              : [];
+                                ? res.data.content
+                                : [];
                         setOrganizations(orgArray);
                     }
                 },
             });
         }
-    }, [isStudent, fetchCategories, fetchOrganizations]);
+    }, [ isStudent, fetchCategories, fetchOrganizations ]);
 
     useEffect(() => {
         if (user && isStudent) {
@@ -171,18 +171,18 @@ const ProfileComponent = (props) => {
             setSelectedSpecializations(specIds);
             setSelectedOrganizations(orgIds);
         }
-    }, [user, isStudent]);
+    }, [ user, isStudent ]);
 
     const { form, mixinFuncs, onValuesChange } = useBasicForm({
         onSubmit,
         setIsChangedFormValues,
     });
 
-    const [imageUrl, setImageUrl] = useState(null);
+    const [ imageUrl, setImageUrl ] = useState(null);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
     const editingFieldRef = useRef(null);
-    const [editingField, setEditingField] = useState(null);
+    const [ editingField, setEditingField ] = useState(null);
 
     const getAvatarUrl = (path) => {
         if (!path) return '';
@@ -225,7 +225,7 @@ const ProfileComponent = (props) => {
         if (imageUrl) {
             form.setFieldValue('avatarPath', imageUrl);
         }
-    }, [imageUrl]);
+    }, [ imageUrl ]);
 
     const onFinish = () => {
         const values = form.getFieldsValue();
@@ -311,7 +311,7 @@ const ProfileComponent = (props) => {
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
         }
-    }, [user, form, editingField]);
+    }, [ user, form, editingField ]);
 
     const handleSetEditingField = (field) => {
         if (editingFieldRef.current === field) {
@@ -647,9 +647,9 @@ const ProfileComponent = (props) => {
                                     <div className={styles.fieldValue}>
                                         {user?.birthday || user?.account?.birthday
                                             ? dayjs(
-                                                  user?.birthday || user?.account?.birthday,
-                                                  'DD/MM/YYYY HH:mm:ss',
-                                              ).format('DD/MM/YYYY')
+                                                user?.birthday || user?.account?.birthday,
+                                                'DD/MM/YYYY HH:mm:ss',
+                                            ).format('DD/MM/YYYY')
                                             : '—'}
                                     </div>
                                 )}

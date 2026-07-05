@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from 'react';
+import { SearchOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 import classNames from 'classnames';
 
 import styles from './index.module.scss';
 
 function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory, onCategoryChange }) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [currentPage, setCurrentPage] = useState(0);
+    const [ searchQuery, setSearchQuery ] = useState('');
+    const [ currentPage, setCurrentPage ] = useState(0);
     const itemsPerPage = 8;
 
     const getImageUrl = (imagePath) => {
@@ -32,7 +34,7 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
             );
         }
         return result;
-    }, [blogs, selectedCategory, searchQuery]);
+    }, [ blogs, selectedCategory, searchQuery ]);
 
     // Total pages calculation
     const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
@@ -41,7 +43,7 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
     const paginatedBlogs = useMemo(() => {
         const start = currentPage * itemsPerPage;
         return filteredBlogs.slice(start, start + itemsPerPage);
-    }, [filteredBlogs, currentPage]);
+    }, [ filteredBlogs, currentPage ]);
 
     // Determine the featured blog on the first page
     const featuredBlog = currentPage === 0 ? filteredBlogs[0] : null;
@@ -73,67 +75,40 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                     <p>
                         Cập nhật những tin tức mới nhất, hướng nghiệp thực tế và chia sẻ chuyên môn từ các chuyên gia.
                     </p>
-
-                    {/* SEARCH INPUT */}
-                    <div className={styles.searchContainer}>
-                        <div className={styles.searchInputWrapper}>
-                            <svg
-                                className={styles.searchIcon}
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                            >
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <input
-                                type="text"
-                                className={styles.searchInput}
-                                placeholder="Tìm kiếm bài viết theo tiêu đề, chủ đề..."
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                            />
-                            {searchQuery && (
-                                <button className={styles.clearSearchBtn} onClick={handleClearSearch}>
-                                    <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2.5"
-                                    >
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            )}
-                        </div>
-                    </div>
                 </div>
             </section>
 
-            {/* CATEGORIES NAVIGATION */}
+            {/* CATEGORIES & SEARCH NAVIGATION */}
             <section className={styles.categoriesSection}>
-                <div className={styles.categoriesContainer}>
-                    <button
-                        className={classNames(styles.categoryBtn, { [styles.active]: !selectedCategory })}
-                        onClick={() => handleCategoryClick(null)}
-                    >
-                        Tất cả bài viết
-                    </button>
-                    {categories.map((cat) => (
+                <div className={styles.filterBarContainer}>
+                    <div className={styles.categoriesContainer}>
                         <button
-                            key={cat.id}
-                            className={classNames(styles.categoryBtn, { [styles.active]: selectedCategory === cat.id })}
-                            onClick={() => handleCategoryClick(cat.id)}
+                            className={classNames(styles.categoryBtn, { [styles.active]: !selectedCategory })}
+                            onClick={() => handleCategoryClick(null)}
                         >
-                            {cat.name}
+                            Tất cả bài viết
                         </button>
-                    ))}
+                        {categories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                className={classNames(styles.categoryBtn, { [styles.active]: selectedCategory === cat.id })}
+                                onClick={() => handleCategoryClick(cat.id)}
+                            >
+                                {cat.name}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className={styles.searchWrapper}>
+                        <Input
+                            prefix={<SearchOutlined className={styles.searchIcon} />}
+                            placeholder="Tìm kiếm bài viết..."
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            allowClear
+                            className={styles.searchInput}
+                        />
+                    </div>
                 </div>
             </section>
 

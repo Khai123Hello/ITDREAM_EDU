@@ -30,26 +30,26 @@ function DashboardDesktop({
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const name = profile?.fullName || profile?.account?.fullName || '';
-    const [dismissedOrgs, setDismissedOrgs] = useState([]);
-    const [dismissedCardKeys, setDismissedCardKeys] = useState([]);
-    const [dismissedRecSimIds, setDismissedRecSimIds] = useState([]);
+    const [ dismissedOrgs, setDismissedOrgs ] = useState([]);
+    const [ dismissedCardKeys, setDismissedCardKeys ] = useState([]);
+    const [ dismissedRecSimIds, setDismissedRecSimIds ] = useState([]);
 
-    const [selectedSpecs, setSelectedSpecs] = useState([]);
-    const [selectedOrgs, setSelectedOrgs] = useState([]);
+    const [ selectedSpecs, setSelectedSpecs ] = useState([]);
+    const [ selectedOrgs, setSelectedOrgs ] = useState([]);
 
     const { execute: executeUpdateProfile, loading: updatingPreferences } = useFetch(apiConfig.student.clientUpdate);
 
-    const [previewModalVisible, setPreviewModalVisible] = useState(false);
-    const [previewLoading, setPreviewLoading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [currentDownloadUrl, setCurrentDownloadUrl] = useState(null);
-    const [currentFileName, setCurrentFileName] = useState('');
+    const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
+    const [ previewLoading, setPreviewLoading ] = useState(false);
+    const [ previewUrl, setPreviewUrl ] = useState(null);
+    const [ currentDownloadUrl, setCurrentDownloadUrl ] = useState(null);
+    const [ currentFileName, setCurrentFileName ] = useState('');
 
     const toggleSpec = (id) => {
         if (selectedSpecs.includes(id)) {
             setSelectedSpecs(selectedSpecs.filter((s) => s !== id));
         } else {
-            setSelectedSpecs([...selectedSpecs, id]);
+            setSelectedSpecs([ ...selectedSpecs, id ]);
         }
     };
 
@@ -57,7 +57,7 @@ function DashboardDesktop({
         if (selectedOrgs.includes(id)) {
             setSelectedOrgs(selectedOrgs.filter((o) => o !== id));
         } else {
-            setSelectedOrgs([...selectedOrgs, id]);
+            setSelectedOrgs([ ...selectedOrgs, id ]);
         }
     };
 
@@ -251,7 +251,7 @@ function DashboardDesktop({
     const hasSpecialization = preferences.some((p) => p.specializationId && p.specializationId !== 0);
     const hasOrganization = preferences.some((p) => p.organizationId && p.organizationId !== 0);
 
-    const completionStatus = [hasFullName, hasEmail, hasSpecialization, hasOrganization];
+    const completionStatus = [ hasFullName, hasEmail, hasSpecialization, hasOrganization ];
     const hasPhone = profile?.phone || profile?.account?.phone;
     if (hasPhone) {
         completionStatus.push(true);
@@ -350,7 +350,7 @@ function DashboardDesktop({
     const filteredDynamicCards = dynamicCards.filter((card) => !dismissedCardKeys.includes(card.key));
 
     const handleDismissCard = (key) => {
-        setDismissedCardKeys([...dismissedCardKeys, key]);
+        setDismissedCardKeys([ ...dismissedCardKeys, key ]);
     };
 
     return (
@@ -619,7 +619,7 @@ function DashboardDesktop({
                                                 <button
                                                     className={styles.btnDismiss}
                                                     onClick={() =>
-                                                        setDismissedRecSimIds([...dismissedRecSimIds, sim.id])
+                                                        setDismissedRecSimIds([ ...dismissedRecSimIds, sim.id ])
                                                     }
                                                 >
                                                     Bỏ qua
@@ -731,7 +731,7 @@ function DashboardDesktop({
                                             <div className={styles.cardActions}>
                                                 <button
                                                     className={styles.btnDismiss}
-                                                    onClick={() => setDismissedOrgs([...dismissedOrgs, org.id])}
+                                                    onClick={() => setDismissedOrgs([ ...dismissedOrgs, org.id ])}
                                                 >
                                                     Không quan tâm
                                                 </button>
