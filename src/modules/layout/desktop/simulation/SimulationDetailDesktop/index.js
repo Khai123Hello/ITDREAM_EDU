@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { FileTextOutlined } from '@ant-design/icons';
 import RatingStar from '@components/common/elements/RatingStar';
 import { AppConstants } from '@constants';
 import useAuth from '@hooks/useAuth';
@@ -7,8 +8,9 @@ import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
 import dayjs from 'dayjs';
 import DOMPurify from 'dompurify';
-import { FileTextOutlined } from '@ant-design/icons';
+
 import TaskPanel from '../components/TaskPanel';
+
 import styles from './detail.module.scss';
 
 const parseOverviewData = (overviewStr) => {

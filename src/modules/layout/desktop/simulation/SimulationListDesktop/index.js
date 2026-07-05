@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { SearchOutlined } from '@ant-design/icons';
 import SimulationCard from '@components/common/elements/SimulationCard';
 import { DEFAULT_PAGE_SIZE } from '@constants';
+import useAuth from '@hooks/useAuth';
 import { Empty, Input, Pagination, Spin } from 'antd';
 
 import styles from './index.module.scss';
@@ -123,6 +124,7 @@ function SimulationListDesktop({
     onPaginationChange,
 }) {
     const navigate = useNavigate();
+    const { profile: user } = useAuth();
     const [ searchValue, setSearchValue ] = useState(filters.title || '');
 
     // Local filter states for horizontal filters
@@ -203,6 +205,21 @@ function SimulationListDesktop({
         } else if (activeQuickFilter === 'hiring') {
             // Mock hiring for even IDs
             list = list.filter((sim) => sim.id % 2 === 0);
+        } else if (activeQuickFilter === 'recommended') {
+            const prefs = user?.preferences || [];
+            const specIds = prefs.map(p => p.specializationId).filter(Boolean);
+            const orgIds = prefs.map(p => p.organizationId).filter(Boolean);
+            
+            if (specIds.length > 0 || orgIds.length > 0) {
+                list = list.filter((sim) => {
+                    const matchesCategory = sim.category && specIds.includes(sim.category.id);
+                    const matchesOrg = sim.educator?.organization && orgIds.includes(sim.educator.organization.id);
+                    return matchesCategory || matchesOrg;
+                });
+            } else {
+                // If no preferences set, show empty list to trigger the onboarding warning
+                list = [];
+            }
         }
 
         // 2. Dropdown duration filter
@@ -218,7 +235,7 @@ function SimulationListDesktop({
         }
 
         return list;
-    }, [ simulations, activeQuickFilter, localDuration ]);
+    }, [ simulations, activeQuickFilter, localDuration, user ]);
 
     const total = processedList.length;
     const current = pagination.current || 1;
@@ -267,6 +284,15 @@ function SimulationListDesktop({
                                 }}
                             >
                                 Tất cả
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.quickPill} ${activeQuickFilter === 'recommended' ? styles.quickPillActive : ''}`}
+                                onClick={() => {
+                                    setActiveQuickFilter('recommended');
+                                }}
+                            >
+                                Đề xuất cho bạn ✨
                             </button>
                             <button
                                 type="button"
@@ -367,9 +393,17 @@ function SimulationListDesktop({
                         <div className={styles.emptyContainer}>
                             <Empty
                                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                description="Không tìm thấy bài mô phỏng nào phù hợp với bộ lọc"
+                                description={
+                                    activeQuickFilter === 'recommended'
+                                        ? "Chưa có đề xuất phù hợp. Bạn hãy thiết lập Mục tiêu nghề nghiệp ở trang cá nhân để nhận các bài mô phỏng tối ưu nhất!"
+                                        : "Không tìm thấy bài mô phỏng nào phù hợp với bộ lọc"
+                                }
                             />
-                            {hasActiveFilters && (
+                            {activeQuickFilter === 'recommended' ? (
+                                <button className={styles.clearBtnLarge} onClick={() => navigate('/profile')} style={{ background: '#16a34a', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+                                    Thiết lập mục tiêu ngay 🎯
+                                </button>
+                            ) : hasActiveFilters && (
                                 <button className={styles.clearBtnLarge} onClick={handleClearFilters}>
                                     Xóa bộ lọc
                                 </button>

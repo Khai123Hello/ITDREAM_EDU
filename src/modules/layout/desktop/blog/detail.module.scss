@@ -946,3 +946,239 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         grid-template-columns: 1fr;
     }
 }
+
+/* =============================================
+   READING PROGRESS BAR
+   ============================================= */
+.readingProgressWrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(0,0,0,0.06);
+    z-index: 9999;
+}
+
+.readingProgressBar {
+    height: 100%;
+    background: linear-gradient(90deg, $primary-teal, #6c63ff);
+    transition: width 0.1s linear;
+    border-radius: 0 2px 2px 0;
+}
+
+/* =============================================
+   CHAPTER NAVIGATOR (LEFT SIDEBAR)
+   ============================================= */
+.chapterNav {
+    background: #fff;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 20px;
+    box-shadow: $shadow-sm;
+}
+
+.chapterNavLabel {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $text-light;
+    margin: 0 0 10px;
+}
+
+.chapterList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chapterBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+
+    &:hover {
+        background: $bg-light;
+    }
+}
+
+.chapterBtnActive {
+    background: rgba(22, 142, 133, 0.08) !important;
+
+    .chapterNum {
+        background: $primary-teal;
+        color: #fff;
+        border-color: $primary-teal;
+    }
+
+    .chapterTitle {
+        color: $primary-teal;
+        font-weight: 600;
+    }
+}
+
+.chapterNum {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: $bg-light;
+    border: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: $text-secondary;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.chapterTitle {
+    font-size: 12.5px;
+    color: $text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.15s;
+}
+
+/* =============================================
+   CHAPTER INDICATOR STRIP (in article)
+   ============================================= */
+.chapterIndicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, rgba(22,142,133,0.05), rgba(108,99,255,0.05));
+    border: 1px solid rgba(22,142,133,0.15);
+    border-radius: 12px;
+    margin-bottom: 28px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.chapterIndicatorInner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chapterIndicatorNum {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $primary-teal;
+    background: rgba(22,142,133,0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.chapterIndicatorTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: $text-main;
+}
+
+.chapterNavBtns {
+    display: flex;
+    gap: 8px;
+}
+
+.chapterNavArrow {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid $border-color;
+    background: #fff;
+    color: $text-secondary;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+        border-color: $primary-teal;
+        color: $primary-teal;
+        background: rgba(22, 142, 133, 0.04);
+    }
+}
+
+.chapterNavArrowNext {
+    background: $primary-teal;
+    color: #fff;
+    border-color: $primary-teal;
+
+    &:hover {
+        background: darken(#168E85, 5%);
+        color: #fff;
+        border-color: darken(#168E85, 5%);
+    }
+}
+
+/* =============================================
+   CHAPTER BOTTOM NAV (prev / next)
+   ============================================= */
+.chapterNavBottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid $border-color;
+}
+
+.chapterNavBottomBtn {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 20px;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    box-shadow: $shadow-sm;
+
+    &:hover {
+        border-color: $primary-teal;
+        box-shadow: $shadow-lg;
+        transform: translateY(-2px);
+    }
+}
+
+.chapterNavBottomBtnNext {
+    text-align: right;
+    align-items: flex-end;
+}
+
+.chapterNavDir {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $primary-teal;
+}
+
+.chapterNavName {
+    font-size: 14px;
+    font-weight: 600;
+    color: $text-main;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+

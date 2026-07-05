@@ -19,10 +19,21 @@ import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
 import routes from '@routes';
 import { getCacheUserKind } from '@services/userService';
-import { Select } from 'antd';
 import { toast } from 'sonner';
 
 import styles from './index.module.scss';
+
+const getSpecIcon = (name) => {
+    const n = name ? name.toLowerCase() : '';
+    if (n.includes('frontend') || n.includes('web')) return '💻';
+    if (n.includes('backend') || n.includes('java') || n.includes('python') || n.includes('node') || n.includes('c#') || n.includes('golang')) return '⚙️';
+    if (n.includes('design') || n.includes('ui') || n.includes('ux') || n.includes('figma') || n.includes('product')) return '🎨';
+    if (n.includes('test') || n.includes('tester') || n.includes('qa') || n.includes('qc') || n.includes('automation')) return '🧪';
+    if (n.includes('mobile') || n.includes('android') || n.includes('ios') || n.includes('flutter') || n.includes('react native')) return '📱';
+    if (n.includes('cloud') || n.includes('devops') || n.includes('docker') || n.includes('aws') || n.includes('kubernetes')) return '☁️';
+    if (n.includes('data') || n.includes('analyst') || n.includes('ai') || n.includes('machine') || n.includes('python') || n.includes('science')) return '📊';
+    return '🚀';
+};
 
 const messages = defineMessages({
     profileUser: 'User Information',
@@ -646,117 +657,93 @@ const ProfileComponent = (props) => {
                                 <div className={styles.fieldLabelSection} style={{ width: '100%', textAlign: 'left' }}>
                                     <div className={styles.fieldIconTitle}>
                                         <TbBriefcase className={styles.fieldIcon} />
-                                        <span className={styles.fieldTitle}>Chuyên ngành & Tổ chức quan tâm</span>
+                                        <span className={styles.fieldTitle}>Tôi muốn trở thành ai? (Mục tiêu nghề nghiệp & Đối tác)</span>
                                     </div>
                                     {editingField === 'preferences' ? (
                                         <div className={styles.fieldEditor} style={{ marginTop: 16 }}>
-                                            <div className={styles.editorSubtitle} style={{ marginBottom: 12 }}>
-                                                Chọn các chuyên ngành và tổ chức bạn quan tâm để lưu vào hồ sơ
+                                            <div className={styles.editorSubtitle} style={{ marginBottom: 16, fontSize: '13px', color: '#64748b' }}>
+                                                Chọn chuyên ngành bạn muốn phát triển và các doanh nghiệp bạn quan tâm để lưu làm mục tiêu nghề nghiệp.
                                             </div>
                                             <div
                                                 className={styles.editorInputs}
-                                                style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+                                                style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
                                             >
                                                 <div>
                                                     <label
                                                         style={{
                                                             display: 'block',
-                                                            fontSize: 13,
-                                                            fontWeight: 500,
-                                                            marginBottom: 6,
-                                                            color: '#4a5568',
+                                                            fontSize: 14,
+                                                            fontWeight: 700,
+                                                            marginBottom: 8,
+                                                            color: '#1e293b',
                                                         }}
                                                     >
-                                                        Chuyên ngành quan tâm
+                                                        🎯 Vai trò & Chuyên ngành mục tiêu
                                                     </label>
-                                                    <Select
-                                                        mode="multiple"
-                                                        placeholder="Chọn chuyên ngành"
-                                                        value={selectedSpecializations}
-                                                        onChange={setSelectedSpecializations}
-                                                        style={{ width: '100%' }}
-                                                        options={(Array.isArray(categories) ? categories : []).map(
-                                                            (cat) => ({
-                                                                label: cat.name,
-                                                                value: cat.id,
-                                                            }),
-                                                        )}
-                                                        loading={categoriesLoading}
-                                                    />
+                                                    <div className={styles.prefVisualGrid}>
+                                                        {(Array.isArray(categories) ? categories : []).map((cat) => {
+                                                            const isSelected = selectedSpecializations.includes(cat.id);
+                                                            return (
+                                                                <div
+                                                                    key={cat.id}
+                                                                    className={`${styles.prefVisualCard} ${isSelected ? styles.prefVisualCardSelected : ''}`}
+                                                                    onClick={() => {
+                                                                        if (isSelected) {
+                                                                            setSelectedSpecializations(selectedSpecializations.filter(id => id !== cat.id));
+                                                                        } else {
+                                                                            setSelectedSpecializations([ ...selectedSpecializations, cat.id ]);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <span className={styles.prefVisualIcon}>{getSpecIcon(cat.name)}</span>
+                                                                    <span className={styles.prefVisualName}>{cat.name}</span>
+                                                                    <div className={styles.prefVisualCheck}>
+                                                                        <TbCheck className={styles.checkIcon} />
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <label
                                                         style={{
                                                             display: 'block',
-                                                            fontSize: 13,
-                                                            fontWeight: 500,
-                                                            marginBottom: 6,
-                                                            color: '#4a5568',
+                                                            fontSize: 14,
+                                                            fontWeight: 700,
+                                                            marginBottom: 8,
+                                                            color: '#1e293b',
                                                         }}
                                                     >
-                                                        Tổ chức quan tâm
+                                                        🏢 Doanh nghiệp & Đối tác mục tiêu
                                                     </label>
-                                                    <Select
-                                                        mode="multiple"
-                                                        placeholder="Chọn tổ chức"
-                                                        value={selectedOrganizations}
-                                                        onChange={setSelectedOrganizations}
-                                                        style={{ width: '100%' }}
-                                                        optionLabelProp="labelName"
-                                                        options={(Array.isArray(organizations)
-                                                            ? organizations
-                                                            : []
-                                                        ).map((org) => {
+                                                    <div className={styles.orgVisualGrid}>
+                                                        {(Array.isArray(organizations) ? organizations : []).map((org) => {
+                                                            const isSelected = selectedOrganizations.includes(org.id);
                                                             const logo = getAvatarUrl(org.logoUrl);
-                                                            return {
-                                                                label: (
-                                                                    <div
-                                                                        style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: 8,
-                                                                        }}
-                                                                    >
-                                                                        {logo ? (
-                                                                            <img
-                                                                                src={logo}
-                                                                                alt={org.name || org.shortName}
-                                                                                style={{
-                                                                                    width: 20,
-                                                                                    height: 20,
-                                                                                    borderRadius: '50%',
-                                                                                    objectFit: 'cover',
-                                                                                }}
-                                                                            />
-                                                                        ) : (
-                                                                            <div
-                                                                                style={{
-                                                                                    width: 20,
-                                                                                    height: 20,
-                                                                                    borderRadius: '50%',
-                                                                                    backgroundColor: '#e2e8f0',
-                                                                                    display: 'flex',
-                                                                                    alignItems: 'center',
-                                                                                    justifyContent: 'center',
-                                                                                    fontSize: 10,
-                                                                                    fontWeight: 'bold',
-                                                                                    color: '#4a5568',
-                                                                                }}
-                                                                            >
-                                                                                {(org.name || org.shortName || 'O')
-                                                                                    .charAt(0)
-                                                                                    .toUpperCase()}
-                                                                            </div>
-                                                                        )}
-                                                                        <span>{org.name || org.shortName}</span>
+                                                            return (
+                                                                <div
+                                                                    key={org.id}
+                                                                    className={`${styles.orgVisualCard} ${isSelected ? styles.orgVisualCardSelected : ''}`}
+                                                                    onClick={() => {
+                                                                        if (isSelected) {
+                                                                            setSelectedOrganizations(selectedOrganizations.filter(id => id !== org.id));
+                                                                        } else {
+                                                                            setSelectedOrganizations([ ...selectedOrganizations, org.id ]);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <div className={styles.orgVisualLogo}>
+                                                                        {logo ? <img src={logo} alt={org.name} /> : <span>{org.name?.charAt(0).toUpperCase()}</span>}
                                                                     </div>
-                                                                ),
-                                                                value: org.id,
-                                                                labelName: org.name || org.shortName,
-                                                            };
+                                                                    <span className={styles.orgVisualName}>{org.shortName || org.name}</span>
+                                                                    <div className={styles.orgVisualCheck}>
+                                                                        <TbCheck className={styles.checkIcon} />
+                                                                    </div>
+                                                                </div>
+                                                            );
                                                         })}
-                                                        loading={organizationsLoading}
-                                                    />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

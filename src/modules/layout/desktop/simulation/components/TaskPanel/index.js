@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import { FileTextOutlined } from '@ant-design/icons';
+import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 
 import styles from './TaskPanel.module.scss';
 
