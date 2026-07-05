@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 const useQueryParams = () => {
-    let [ searchParams, setSearchParams ] = useSearchParams();
+    let [searchParams, setSearchParams] = useSearchParams();
 
     // return a URLSearchParams object
     const serializeParams = (object = {}) => {

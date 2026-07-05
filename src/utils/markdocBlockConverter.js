@@ -59,94 +59,94 @@ export function blocksToMarkdoc(blocks) {
 
     blocks.forEach((block) => {
         switch (block.type) {
-                        case 'text': {
-                            const text = stripHtml(block.content || '');
-                            if (text) lines.push(text, '');
-                            break;
-                        }
+            case 'text': {
+                const text = stripHtml(block.content || '');
+                if (text) lines.push(text, '');
+                break;
+            }
 
-                        case 'h1':
-                            lines.push(`# ${stripHtml(block.content || '')}`);
-                            lines.push('');
-                            break;
+            case 'h1':
+                lines.push(`# ${stripHtml(block.content || '')}`);
+                lines.push('');
+                break;
 
-                        case 'h2':
-                            lines.push(`## ${stripHtml(block.content || '')}`);
-                            lines.push('');
-                            break;
+            case 'h2':
+                lines.push(`## ${stripHtml(block.content || '')}`);
+                lines.push('');
+                break;
 
-                        case 'h3':
-                            lines.push(`### ${stripHtml(block.content || '')}`);
-                            lines.push('');
-                            break;
+            case 'h3':
+                lines.push(`### ${stripHtml(block.content || '')}`);
+                lines.push('');
+                break;
 
-                        case 'bullet':
-                            lines.push(`- ${stripHtml(block.content || '')}`);
-                            break;
+            case 'bullet':
+                lines.push(`- ${stripHtml(block.content || '')}`);
+                break;
 
-                        case 'numbered':
-                            lines.push(`1. ${stripHtml(block.content || '')}`);
-                            break;
+            case 'numbered':
+                lines.push(`1. ${stripHtml(block.content || '')}`);
+                break;
 
-                        case 'divider':
-                            lines.push('---');
-                            lines.push('');
-                            break;
+            case 'divider':
+                lines.push('---');
+                lines.push('');
+                break;
 
-                        case 'code':
-                            lines.push('```');
-                            lines.push(block.content || '');
-                            lines.push('```');
-                            lines.push('');
-                            break;
+            case 'code':
+                lines.push('```');
+                lines.push(block.content || '');
+                lines.push('```');
+                lines.push('');
+                break;
 
-                        case 'callout': {
-                            const icon = block.icon || '💡';
-                            const content = block.content || '';
-                            lines.push(`{% callout icon="${icon}" %}`);
-                            lines.push(content);
-                            lines.push('{% /callout %}');
-                            lines.push('');
-                            break;
-                        }
+            case 'callout': {
+                const icon = block.icon || '💡';
+                const content = block.content || '';
+                lines.push(`{% callout icon="${icon}" %}`);
+                lines.push(content);
+                lines.push('{% /callout %}');
+                lines.push('');
+                break;
+            }
 
-                        case 'step': {
-                            const label = block.label || 'Bước';
-                            const body = block.body || '';
-                            lines.push(`{% step label="${label}" %}`);
-                            lines.push(body);
-                            lines.push('{% /step %}');
-                            lines.push('');
-                            break;
-                        }
+            case 'step': {
+                const label = block.label || 'Bước';
+                const body = block.body || '';
+                lines.push(`{% step label="${label}" %}`);
+                lines.push(body);
+                lines.push('{% /step %}');
+                lines.push('');
+                break;
+            }
 
-                        case 'section': {
-                            const icon = block.icon || '🎓';
-                            const title = block.title || '';
-                            const bullets = Array.isArray(block.bullets) ? block.bullets : [];
-                            lines.push(`{% section icon="${icon}" title="${title}" %}`);
-                            bullets.filter(Boolean).forEach((b) => lines.push(`- ${b}`));
-                            lines.push('{% /section %}');
-                            lines.push('');
-                            break;
-                        }
+            case 'section': {
+                const icon = block.icon || '🎓';
+                const title = block.title || '';
+                const bullets = Array.isArray(block.bullets) ? block.bullets : [];
+                lines.push(`{% section icon="${icon}" title="${title}" %}`);
+                bullets.filter(Boolean).forEach((b) => lines.push(`- ${b}`));
+                lines.push('{% /section %}');
+                lines.push('');
+                break;
+            }
 
-                        case 'quiz': {
-                            const question = block.question || '';
-                            const options = Array.isArray(block.options) ? block.options : [];
-                            const dataQId = block.dataQuestionCode ? ` data-question-code="${block.dataQuestionCode}"` : '';
-                            lines.push(`{% quiz question="${question}"${dataQId} %}`);
-                            options.forEach((opt) => {
-                                const isCorrect = opt.answer === true;
-                                lines.push(`  {% option correct=${isCorrect} %}${opt.option || ''}{% /option %}`);
-                            });
-                            lines.push('{% /quiz %}');
-                            lines.push('');
-                            break;
-                        }
+            case 'quiz': {
+                const question = block.question || '';
+                const options = Array.isArray(block.options) ? block.options : [];
+                const dataQId = block.dataQuestionCode ? ` data-question-code="${block.dataQuestionCode}"` : '';
+                lines.push(`{% quiz question="${question}"${dataQId} %}`);
+                options.forEach((opt) => {
+                    const isCorrect = opt.answer === true;
+                    lines.push(`  {% option correct=${isCorrect} %}${opt.option || ''}{% /option %}`);
+                });
+                lines.push('{% /quiz %}');
+                lines.push('');
+                break;
+            }
 
-                        default:
-                            break;
+            default:
+                break;
         }
     });
 
@@ -255,54 +255,54 @@ export function tipTapToMarkdoc(node) {
     const childrenContent = (node.content || []).map(tipTapToMarkdoc).join('');
 
     switch (node.type) {
-                    case 'doc':
-                        return (node.content || []).map(tipTapToMarkdoc).join('\n\n').trim();
-                    case 'paragraph':
-                        return childrenContent;
-                    case 'heading': {
-                        const level = node.attrs?.level || 1;
-                        return `${'#'.repeat(level)} ${childrenContent}`;
-                    }
-                    case 'bulletList':
-                        return (node.content || []).map(tipTapToMarkdoc).join('\n');
-                    case 'orderedList':
-                        return (node.content || [])
-                            .map((child, idx) => {
-                                const itemContent = tipTapToMarkdoc(child);
-                                // Replace bullet prefix with numbered index
-                                return itemContent.replace(/^-\s+/, `${idx + 1}. `);
-                            })
-                            .join('\n');
-                    case 'listItem':
-                        return `- ${childrenContent}`;
-                    case 'codeBlock':
-                        return `\`\`\`\n${childrenContent}\n\`\`\``;
-                    case 'horizontalRule':
-                        return '---';
-                    case 'callout': {
-                        const icon = node.attrs?.icon || '💡';
-                        return `{% callout icon="${icon}" %}\n${childrenContent.trim()}\n{% /callout %}`;
-                    }
-                    case 'step': {
-                        const label = node.attrs?.label || 'Bước';
-                        return `{% step label="${label}" %}\n${childrenContent.trim()}\n{% /step %}`;
-                    }
-                    case 'section': {
-                        const icon = node.attrs?.icon || '🎓';
-                        const title = node.attrs?.title || '';
-                        return `{% section icon="${icon}" title="${title}" %}\n${childrenContent.trim()}\n{% /section %}`;
-                    }
-                    case 'quiz': {
-                        const question = node.attrs?.question || '';
-                        const dataQId = node.attrs?.dataQuestionCode ? ` data-question-code="${node.attrs.dataQuestionCode}"` : '';
-                        return `{% quiz question="${question}"${dataQId} %}\n${childrenContent.trim()}\n{% /quiz %}`;
-                    }
-                    case 'option': {
-                        const correct = node.attrs?.correct === true;
-                        return `{% option correct=${correct} %}${childrenContent.trim()}{% /option %}`;
-                    }
-                    default:
-                        return childrenContent;
+        case 'doc':
+            return (node.content || []).map(tipTapToMarkdoc).join('\n\n').trim();
+        case 'paragraph':
+            return childrenContent;
+        case 'heading': {
+            const level = node.attrs?.level || 1;
+            return `${'#'.repeat(level)} ${childrenContent}`;
+        }
+        case 'bulletList':
+            return (node.content || []).map(tipTapToMarkdoc).join('\n');
+        case 'orderedList':
+            return (node.content || [])
+                .map((child, idx) => {
+                    const itemContent = tipTapToMarkdoc(child);
+                    // Replace bullet prefix with numbered index
+                    return itemContent.replace(/^-\s+/, `${idx + 1}. `);
+                })
+                .join('\n');
+        case 'listItem':
+            return `- ${childrenContent}`;
+        case 'codeBlock':
+            return `\`\`\`\n${childrenContent}\n\`\`\``;
+        case 'horizontalRule':
+            return '---';
+        case 'callout': {
+            const icon = node.attrs?.icon || '💡';
+            return `{% callout icon="${icon}" %}\n${childrenContent.trim()}\n{% /callout %}`;
+        }
+        case 'step': {
+            const label = node.attrs?.label || 'Bước';
+            return `{% step label="${label}" %}\n${childrenContent.trim()}\n{% /step %}`;
+        }
+        case 'section': {
+            const icon = node.attrs?.icon || '🎓';
+            const title = node.attrs?.title || '';
+            return `{% section icon="${icon}" title="${title}" %}\n${childrenContent.trim()}\n{% /section %}`;
+        }
+        case 'quiz': {
+            const question = node.attrs?.question || '';
+            const dataQId = node.attrs?.dataQuestionCode ? ` data-question-code="${node.attrs.dataQuestionCode}"` : '';
+            return `{% quiz question="${question}"${dataQId} %}\n${childrenContent.trim()}\n{% /quiz %}`;
+        }
+        case 'option': {
+            const correct = node.attrs?.correct === true;
+            return `{% option correct=${correct} %}${childrenContent.trim()}{% /option %}`;
+        }
+        default:
+            return childrenContent;
     }
 }
 
@@ -319,11 +319,11 @@ const tagToNodeMap = {
 };
 
 const tagAttrMap = {
-    'callout-block': [ 'icon' ],
-    'step-block': [ 'label' ],
-    'section-block': [ 'icon', 'title' ],
-    'quiz-block': [ 'question', 'data-question-code' ],
-    'option-block': [ 'correct' ],
+    'callout-block': ['icon'],
+    'step-block': ['label'],
+    'section-block': ['icon', 'title'],
+    'quiz-block': ['question', 'data-question-code'],
+    'option-block': ['correct'],
 };
 
 const attrNameMap = {
@@ -426,7 +426,7 @@ function htmlToTipTapJson(el) {
         const parsed = htmlToTipTapJson(child);
         if (parsed) {
             if (parsed.type === 'text' && activeMarks.length > 0) {
-                parsed.marks = [ ...(parsed.marks || []), ...activeMarks ];
+                parsed.marks = [...(parsed.marks || []), ...activeMarks];
             }
             children.push(parsed);
         }
@@ -437,76 +437,76 @@ function htmlToTipTapJson(el) {
     let attrs = {};
 
     switch (tag) {
-                    case 'p':
-                    case 'div':
-                        type = 'paragraph';
-                        break;
-                    case 'h1':
-                        type = 'heading';
-                        attrs = { level: 1 };
-                        break;
-                    case 'h2':
-                        type = 'heading';
-                        attrs = { level: 2 };
-                        break;
-                    case 'h3':
-                        type = 'heading';
-                        attrs = { level: 3 };
-                        break;
-                    case 'h4':
-                        type = 'heading';
-                        attrs = { level: 4 };
-                        break;
-                    case 'h5':
-                        type = 'heading';
-                        attrs = { level: 5 };
-                        break;
-                    case 'h6':
-                        type = 'heading';
-                        attrs = { level: 6 };
-                        break;
-                    case 'ul':
-                        type = el.getAttribute('data-type') === 'taskList' ? 'taskList' : 'bulletList';
-                        break;
-                    case 'ol':
-                        type = 'orderedList';
-                        break;
-                    case 'li':
-                        type = 'listItem';
-                        break;
-                    case 'pre':
-                        type = 'codeBlock';
-                        break;
-                    case 'blockquote':
-                        type = 'blockquote';
-                        break;
-                    default:
-                        if (nodeType) {
-                            type = nodeType;
-                            attrs = parseAttrs(el);
-                        } else if (
-                            [
-                                'strong',
-                                'b',
-                                'em',
-                                'i',
-                                'u',
-                                's',
-                                'strike',
-                                'del',
-                                'code',
-                                'a',
-                                'sub',
-                                'sup',
-                                'mark',
-                                'highlight',
-                            ].includes(tag)
-                        ) {
-                            // Inline mark wrapper — return children directly
-                            return children.length === 1 ? children[0] : { type: 'paragraph', content: children };
-                        } else {
-                            return children.length > 0 ? children : null;
-                        }
+        case 'p':
+        case 'div':
+            type = 'paragraph';
+            break;
+        case 'h1':
+            type = 'heading';
+            attrs = { level: 1 };
+            break;
+        case 'h2':
+            type = 'heading';
+            attrs = { level: 2 };
+            break;
+        case 'h3':
+            type = 'heading';
+            attrs = { level: 3 };
+            break;
+        case 'h4':
+            type = 'heading';
+            attrs = { level: 4 };
+            break;
+        case 'h5':
+            type = 'heading';
+            attrs = { level: 5 };
+            break;
+        case 'h6':
+            type = 'heading';
+            attrs = { level: 6 };
+            break;
+        case 'ul':
+            type = el.getAttribute('data-type') === 'taskList' ? 'taskList' : 'bulletList';
+            break;
+        case 'ol':
+            type = 'orderedList';
+            break;
+        case 'li':
+            type = 'listItem';
+            break;
+        case 'pre':
+            type = 'codeBlock';
+            break;
+        case 'blockquote':
+            type = 'blockquote';
+            break;
+        default:
+            if (nodeType) {
+                type = nodeType;
+                attrs = parseAttrs(el);
+            } else if (
+                [
+                    'strong',
+                    'b',
+                    'em',
+                    'i',
+                    'u',
+                    's',
+                    'strike',
+                    'del',
+                    'code',
+                    'a',
+                    'sub',
+                    'sup',
+                    'mark',
+                    'highlight',
+                ].includes(tag)
+            ) {
+                // Inline mark wrapper — return children directly
+                return children.length === 1 ? children[0] : { type: 'paragraph', content: children };
+            } else {
+                return children.length > 0 ? children : null;
+            }
     }
 
     if (type === 'codeBlock') {
@@ -516,7 +516,7 @@ function htmlToTipTapJson(el) {
         return {
             type: 'codeBlock',
             attrs: lang ? { language: lang } : {},
-            content: text ? [ { type: 'text', text } ] : [],
+            content: text ? [{ type: 'text', text }] : [],
         };
     }
 
@@ -528,7 +528,7 @@ function htmlToTipTapJson(el) {
         return {
             type: 'taskItem',
             attrs,
-            content: filteredChildren.length > 0 ? filteredChildren : [ { type: 'paragraph' } ],
+            content: filteredChildren.length > 0 ? filteredChildren : [{ type: 'paragraph' }],
         };
     }
 
@@ -545,7 +545,7 @@ function htmlChildrenToContent(el, parentMarks = []) {
         const parsed = htmlToTipTapJson(child);
         if (parsed) {
             if (parsed.type === 'text' && parentMarks.length > 0) {
-                parsed.marks = [ ...(parsed.marks || []), ...parentMarks ];
+                parsed.marks = [...(parsed.marks || []), ...parentMarks];
             }
             items.push(parsed);
         }

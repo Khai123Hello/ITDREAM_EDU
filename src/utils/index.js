@@ -41,7 +41,7 @@ export const convertGlobImportToArray = (modules) =>
     modules.filter((module) => !!module.default).map((module) => module.default);
 
 export const destructCamelCaseString = (string) => {
-    const arrString = [ ...string ];
+    const arrString = [...string];
     const newArrString = [];
     arrString.forEach((char, index) => {
         if (char.charCodeAt(0) > 90) {
@@ -224,7 +224,7 @@ export const formatCurrencyValue = (value, setting = {}) => {
         const currencySymbolPosition = setting?.currency_position;
         const moneyRatio = setting?.moneyRatio || 1;
         const euroValue = value / 100;
-        const [ integerPart, decimalPart = '' ] = euroValue.toFixed(decimalSpace).split('.');
+        const [integerPart, decimalPart = ''] = euroValue.toFixed(decimalSpace).split('.');
         const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, groupSeparator);
         const formattedNumber = decimalPart
             ? `${formattedIntegerPart}${decimalSeparator}${decimalPart}`
@@ -257,8 +257,8 @@ export const convertStringToLowerCase = (str) => {
 export const ensureArray = (arr, defaultValue) =>
     Array.isArray(arr) ? arr : Array.isArray(defaultValue) ? defaultValue : [];
 
-export function cleanObject(obj = {}, { clear = [ undefined ], recursive = true } = {}) {
-    return Object.entries(obj).reduce((acc, [ key, value ]) => {
+export function cleanObject(obj = {}, { clear = [undefined], recursive = true } = {}) {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
         if (recursive && isObject(value) && !isArray(value)) {
             acc[key] = cleanObject(value, { clear });
         } else if (!clear.includes(value) || (isArray(value) && value.length > 0)) {
@@ -405,7 +405,7 @@ export function getCurrentTimePeriod() {
     }
 
     // Xác định thứ trong tuần
-    const weekdays = [ 'Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy' ];
+    const weekdays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
     const currentDay = weekdays[dayOfWeek];
 
     return { timePeriod, currentDay };
@@ -422,11 +422,11 @@ export const getValueDiscount = (discountOption) => {
     const today = dayjs();
     const weekName = today.format('d');
 
-    const arrayDiscountOption = Object.entries(discountOptionValue)?.map(([ key, value ]) => ({
+    const arrayDiscountOption = Object.entries(discountOptionValue)?.map(([key, value]) => ({
         time: key,
         dataDiscount: value,
     }));
-    const arrayTimeOfDay = Object.entries(timeOfDay)?.map(([ key, value ]) => ({
+    const arrayTimeOfDay = Object.entries(timeOfDay)?.map(([key, value]) => ({
         timeOfDay: key,
         ...value,
     }));
@@ -600,16 +600,16 @@ export function formatTime(input, translate, message) {
         return minutes === 0
             ? ''.concat(hours).concat(translate.formatMessage(message.hourUtil))
             : ''
-                .concat(hours, translate.formatMessage(message.hourUtil))
-                .concat(minutes, translate.formatMessage(message.minUtil));
+                  .concat(hours, translate.formatMessage(message.hourUtil))
+                  .concat(minutes, translate.formatMessage(message.minUtil));
     } else {
         var days = Math.floor(hours / 24);
         var daysHours = hours % 24;
         return daysHours === 0
             ? ''.concat(days, 'd')
             : minutes === 0
-                ? ''.concat(days, 'd ').concat(daysHours, translate.formatMessage(message.hourUtil))
-                : ''
+              ? ''.concat(days, 'd ').concat(daysHours, translate.formatMessage(message.hourUtil))
+              : ''
                     .concat(days, 'd ')
                     .concat(daysHours, translate.formatMessage(message.hourUtil))
                     .concat(minutes, translate.formatMessage(message.minUtil));

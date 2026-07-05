@@ -26,12 +26,44 @@ import styles from './index.module.scss';
 const getSpecIcon = (name) => {
     const n = name ? name.toLowerCase() : '';
     if (n.includes('frontend') || n.includes('web')) return '💻';
-    if (n.includes('backend') || n.includes('java') || n.includes('python') || n.includes('node') || n.includes('c#') || n.includes('golang')) return '⚙️';
-    if (n.includes('design') || n.includes('ui') || n.includes('ux') || n.includes('figma') || n.includes('product')) return '🎨';
-    if (n.includes('test') || n.includes('tester') || n.includes('qa') || n.includes('qc') || n.includes('automation')) return '🧪';
-    if (n.includes('mobile') || n.includes('android') || n.includes('ios') || n.includes('flutter') || n.includes('react native')) return '📱';
-    if (n.includes('cloud') || n.includes('devops') || n.includes('docker') || n.includes('aws') || n.includes('kubernetes')) return '☁️';
-    if (n.includes('data') || n.includes('analyst') || n.includes('ai') || n.includes('machine') || n.includes('python') || n.includes('science')) return '📊';
+    if (
+        n.includes('backend') ||
+        n.includes('java') ||
+        n.includes('python') ||
+        n.includes('node') ||
+        n.includes('c#') ||
+        n.includes('golang')
+    )
+        return '⚙️';
+    if (n.includes('design') || n.includes('ui') || n.includes('ux') || n.includes('figma') || n.includes('product'))
+        return '🎨';
+    if (n.includes('test') || n.includes('tester') || n.includes('qa') || n.includes('qc') || n.includes('automation'))
+        return '🧪';
+    if (
+        n.includes('mobile') ||
+        n.includes('android') ||
+        n.includes('ios') ||
+        n.includes('flutter') ||
+        n.includes('react native')
+    )
+        return '📱';
+    if (
+        n.includes('cloud') ||
+        n.includes('devops') ||
+        n.includes('docker') ||
+        n.includes('aws') ||
+        n.includes('kubernetes')
+    )
+        return '☁️';
+    if (
+        n.includes('data') ||
+        n.includes('analyst') ||
+        n.includes('ai') ||
+        n.includes('machine') ||
+        n.includes('python') ||
+        n.includes('science')
+    )
+        return '📊';
     return '🚀';
 };
 
@@ -83,8 +115,8 @@ const ProfileComponent = (props) => {
         user?.gender === MALE
             ? translate.formatMessage(commonMessage.male)
             : user?.gender
-                ? translate.formatMessage(commonMessage.female)
-                : '';
+              ? translate.formatMessage(commonMessage.female)
+              : '';
     const navigation = useNavigate();
     const params = useParams();
 
@@ -92,10 +124,10 @@ const ProfileComponent = (props) => {
     const { execute: executeUpdateProfile } = useFetch(apiConfig.user.updateProfile);
     const { execute: executeStudentUpdate } = useFetch(apiConfig.student.clientUpdate);
 
-    const [ categories, setCategories ] = useState([]);
-    const [ organizations, setOrganizations ] = useState([]);
-    const [ selectedSpecializations, setSelectedSpecializations ] = useState([]);
-    const [ selectedOrganizations, setSelectedOrganizations ] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [organizations, setOrganizations] = useState([]);
+    const [selectedSpecializations, setSelectedSpecializations] = useState([]);
+    const [selectedOrganizations, setSelectedOrganizations] = useState([]);
 
     const { execute: fetchCategories, loading: categoriesLoading } = useFetch(apiConfig.category.autoComplete);
     const { execute: fetchOrganizations, loading: organizationsLoading } = useFetch(apiConfig.organization.list);
@@ -109,8 +141,8 @@ const ProfileComponent = (props) => {
                         const categoriesArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                                ? res.data.content
-                                : [];
+                              ? res.data.content
+                              : [];
                         setCategories(categoriesArray);
                     }
                 },
@@ -121,14 +153,14 @@ const ProfileComponent = (props) => {
                         const orgArray = Array.isArray(res.data)
                             ? res.data
                             : Array.isArray(res.data.content)
-                                ? res.data.content
-                                : [];
+                              ? res.data.content
+                              : [];
                         setOrganizations(orgArray);
                     }
                 },
             });
         }
-    }, [ isStudent, fetchCategories, fetchOrganizations ]);
+    }, [isStudent, fetchCategories, fetchOrganizations]);
 
     useEffect(() => {
         if (user && isStudent) {
@@ -139,18 +171,18 @@ const ProfileComponent = (props) => {
             setSelectedSpecializations(specIds);
             setSelectedOrganizations(orgIds);
         }
-    }, [ user, isStudent ]);
+    }, [user, isStudent]);
 
     const { form, mixinFuncs, onValuesChange } = useBasicForm({
         onSubmit,
         setIsChangedFormValues,
     });
 
-    const [ imageUrl, setImageUrl ] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
     const editingFieldRef = useRef(null);
-    const [ editingField, setEditingField ] = useState(null);
+    const [editingField, setEditingField] = useState(null);
 
     const getAvatarUrl = (path) => {
         if (!path) return '';
@@ -193,7 +225,7 @@ const ProfileComponent = (props) => {
         if (imageUrl) {
             form.setFieldValue('avatarPath', imageUrl);
         }
-    }, [ imageUrl ]);
+    }, [imageUrl]);
 
     const onFinish = () => {
         const values = form.getFieldsValue();
@@ -279,7 +311,7 @@ const ProfileComponent = (props) => {
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
         }
-    }, [ user, form, editingField ]);
+    }, [user, form, editingField]);
 
     const handleSetEditingField = (field) => {
         if (editingFieldRef.current === field) {
@@ -615,9 +647,9 @@ const ProfileComponent = (props) => {
                                     <div className={styles.fieldValue}>
                                         {user?.birthday || user?.account?.birthday
                                             ? dayjs(
-                                                user?.birthday || user?.account?.birthday,
-                                                'DD/MM/YYYY HH:mm:ss',
-                                            ).format('DD/MM/YYYY')
+                                                  user?.birthday || user?.account?.birthday,
+                                                  'DD/MM/YYYY HH:mm:ss',
+                                              ).format('DD/MM/YYYY')
                                             : '—'}
                                     </div>
                                 )}
@@ -657,12 +689,18 @@ const ProfileComponent = (props) => {
                                 <div className={styles.fieldLabelSection} style={{ width: '100%', textAlign: 'left' }}>
                                     <div className={styles.fieldIconTitle}>
                                         <TbBriefcase className={styles.fieldIcon} />
-                                        <span className={styles.fieldTitle}>Tôi muốn trở thành ai? (Mục tiêu nghề nghiệp & Đối tác)</span>
+                                        <span className={styles.fieldTitle}>
+                                            Tôi muốn trở thành ai? (Mục tiêu nghề nghiệp & Đối tác)
+                                        </span>
                                     </div>
                                     {editingField === 'preferences' ? (
                                         <div className={styles.fieldEditor} style={{ marginTop: 16 }}>
-                                            <div className={styles.editorSubtitle} style={{ marginBottom: 16, fontSize: '13px', color: '#64748b' }}>
-                                                Chọn chuyên ngành bạn muốn phát triển và các doanh nghiệp bạn quan tâm để lưu làm mục tiêu nghề nghiệp.
+                                            <div
+                                                className={styles.editorSubtitle}
+                                                style={{ marginBottom: 16, fontSize: '13px', color: '#64748b' }}
+                                            >
+                                                Chọn chuyên ngành bạn muốn phát triển và các doanh nghiệp bạn quan tâm
+                                                để lưu làm mục tiêu nghề nghiệp.
                                             </div>
                                             <div
                                                 className={styles.editorInputs}
@@ -689,14 +727,25 @@ const ProfileComponent = (props) => {
                                                                     className={`${styles.prefVisualCard} ${isSelected ? styles.prefVisualCardSelected : ''}`}
                                                                     onClick={() => {
                                                                         if (isSelected) {
-                                                                            setSelectedSpecializations(selectedSpecializations.filter(id => id !== cat.id));
+                                                                            setSelectedSpecializations(
+                                                                                selectedSpecializations.filter(
+                                                                                    (id) => id !== cat.id,
+                                                                                ),
+                                                                            );
                                                                         } else {
-                                                                            setSelectedSpecializations([ ...selectedSpecializations, cat.id ]);
+                                                                            setSelectedSpecializations([
+                                                                                ...selectedSpecializations,
+                                                                                cat.id,
+                                                                            ]);
                                                                         }
                                                                     }}
                                                                 >
-                                                                    <span className={styles.prefVisualIcon}>{getSpecIcon(cat.name)}</span>
-                                                                    <span className={styles.prefVisualName}>{cat.name}</span>
+                                                                    <span className={styles.prefVisualIcon}>
+                                                                        {getSpecIcon(cat.name)}
+                                                                    </span>
+                                                                    <span className={styles.prefVisualName}>
+                                                                        {cat.name}
+                                                                    </span>
                                                                     <div className={styles.prefVisualCheck}>
                                                                         <TbCheck className={styles.checkIcon} />
                                                                     </div>
@@ -718,31 +767,50 @@ const ProfileComponent = (props) => {
                                                         🏢 Doanh nghiệp & Đối tác mục tiêu
                                                     </label>
                                                     <div className={styles.orgVisualGrid}>
-                                                        {(Array.isArray(organizations) ? organizations : []).map((org) => {
-                                                            const isSelected = selectedOrganizations.includes(org.id);
-                                                            const logo = getAvatarUrl(org.logoUrl);
-                                                            return (
-                                                                <div
-                                                                    key={org.id}
-                                                                    className={`${styles.orgVisualCard} ${isSelected ? styles.orgVisualCardSelected : ''}`}
-                                                                    onClick={() => {
-                                                                        if (isSelected) {
-                                                                            setSelectedOrganizations(selectedOrganizations.filter(id => id !== org.id));
-                                                                        } else {
-                                                                            setSelectedOrganizations([ ...selectedOrganizations, org.id ]);
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    <div className={styles.orgVisualLogo}>
-                                                                        {logo ? <img src={logo} alt={org.name} /> : <span>{org.name?.charAt(0).toUpperCase()}</span>}
+                                                        {(Array.isArray(organizations) ? organizations : []).map(
+                                                            (org) => {
+                                                                const isSelected = selectedOrganizations.includes(
+                                                                    org.id,
+                                                                );
+                                                                const logo = getAvatarUrl(org.logoUrl);
+                                                                return (
+                                                                    <div
+                                                                        key={org.id}
+                                                                        className={`${styles.orgVisualCard} ${isSelected ? styles.orgVisualCardSelected : ''}`}
+                                                                        onClick={() => {
+                                                                            if (isSelected) {
+                                                                                setSelectedOrganizations(
+                                                                                    selectedOrganizations.filter(
+                                                                                        (id) => id !== org.id,
+                                                                                    ),
+                                                                                );
+                                                                            } else {
+                                                                                setSelectedOrganizations([
+                                                                                    ...selectedOrganizations,
+                                                                                    org.id,
+                                                                                ]);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <div className={styles.orgVisualLogo}>
+                                                                            {logo ? (
+                                                                                <img src={logo} alt={org.name} />
+                                                                            ) : (
+                                                                                <span>
+                                                                                    {org.name?.charAt(0).toUpperCase()}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                        <span className={styles.orgVisualName}>
+                                                                            {org.shortName || org.name}
+                                                                        </span>
+                                                                        <div className={styles.orgVisualCheck}>
+                                                                            <TbCheck className={styles.checkIcon} />
+                                                                        </div>
                                                                     </div>
-                                                                    <span className={styles.orgVisualName}>{org.shortName || org.name}</span>
-                                                                    <div className={styles.orgVisualCheck}>
-                                                                        <TbCheck className={styles.checkIcon} />
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })}
+                                                                );
+                                                            },
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

@@ -1,6 +1,6 @@
 function mergeStyles(styles, theme) {
     if (Array.isArray(styles)) {
-        return [ ...styles ].reduce((acc, item) => ({ ...acc, ...mergeStyles(item, theme) }), {});
+        return [...styles].reduce((acc, item) => ({ ...acc, ...mergeStyles(item, theme) }), {});
     }
 
     if (typeof styles === 'function') {

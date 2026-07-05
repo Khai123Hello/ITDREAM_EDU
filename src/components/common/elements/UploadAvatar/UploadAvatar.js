@@ -14,9 +14,9 @@ function UploadAvatar({ onChange, value, error, upload, setImageUrl, imageUrl, d
 
     const { getRootProps, getInputProps } = useDropzone({
         accept: {
-            'image/png': [ '.png' ],
-            'image/jpeg': [ '.jpeg' ],
-            'image/jpg': [ '.jpg' ],
+            'image/png': ['.png'],
+            'image/jpeg': ['.jpeg'],
+            'image/jpg': ['.jpg'],
         },
         disabled: disabled,
         onDrop: (files) => {

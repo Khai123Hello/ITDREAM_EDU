@@ -12,7 +12,7 @@ const PriceFormat = ({ value, settings, prefix = '', suffix = '', showZero = tru
         const formatted = formatCurrencyValue(value, settings);
 
         return `${prefix}${formatted}${suffix}`;
-    }, [ value, settings, prefix, suffix, showZero, defaultValue ]);
+    }, [value, settings, prefix, suffix, showZero, defaultValue]);
 
     return <>{formattedPrice}</>;
 };

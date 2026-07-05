@@ -48,7 +48,7 @@ const parseDurationInHours = (durationStr) => {
 
 // Reusable Dropdown Select Component to mimic Forage's pill-style selectors
 const DropdownFilter = ({ label, value, options, onChange }) => {
-    const [ isOpen, setIsOpen ] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const ref = React.useRef(null);
 
     React.useEffect(() => {
@@ -125,11 +125,11 @@ function SimulationListDesktop({
 }) {
     const navigate = useNavigate();
     const { profile: user } = useAuth();
-    const [ searchValue, setSearchValue ] = useState(filters.title || '');
+    const [searchValue, setSearchValue] = useState(filters.title || '');
 
     // Local filter states for horizontal filters
-    const [ activeQuickFilter, setActiveQuickFilter ] = useState('all');
-    const [ localDuration, setLocalDuration ] = useState('all');
+    const [activeQuickFilter, setActiveQuickFilter] = useState('all');
+    const [localDuration, setLocalDuration] = useState('all');
 
     const searchTimeout = React.useRef(null);
 
@@ -142,20 +142,20 @@ function SimulationListDesktop({
                 onFilterChange({ ...filters, title: value });
             }, 500);
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleSearchClick = useCallback(() => {
         if (searchTimeout.current) clearTimeout(searchTimeout.current);
         onFilterChange({ ...filters, title: searchValue });
-    }, [ filters, onFilterChange, searchValue ]);
+    }, [filters, onFilterChange, searchValue]);
 
     const handleFilterUpdate = useCallback(
         (key, value) => {
             const val = value === 'all' ? undefined : value;
             onFilterChange({ ...filters, [key]: val });
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleClearFilters = useCallback(() => {
@@ -170,29 +170,29 @@ function SimulationListDesktop({
             avgStar: undefined,
             sort: 'createdDate,desc',
         });
-    }, [ onFilterChange ]);
+    }, [onFilterChange]);
 
     const handleCardClick = useCallback(
         (id) => {
             navigate(`/simulations/${id}`);
         },
-        [ navigate ],
+        [navigate],
     );
 
     const categoryOptions = useMemo(() => {
         const list = Array.isArray(categories) ? categories.map((cat) => ({ value: cat.id, label: cat.name })) : [];
-        return [ { value: 'all', label: 'Tất cả' }, ...list ];
-    }, [ categories ]);
+        return [{ value: 'all', label: 'Tất cả' }, ...list];
+    }, [categories]);
 
     const organizationOptions = useMemo(() => {
         const list = Array.isArray(organizations)
             ? organizations.map((org) => ({ value: org.id, label: org.name }))
             : [];
-        return [ { value: 'all', label: 'Tất cả' }, ...list ];
-    }, [ organizations ]);
+        return [{ value: 'all', label: 'Tất cả' }, ...list];
+    }, [organizations]);
 
     const levelOptions = useMemo(() => {
-        return [ { value: 'all', label: 'Tất cả' }, ...LEVEL_OPTIONS ];
+        return [{ value: 'all', label: 'Tất cả' }, ...LEVEL_OPTIONS];
     }, []);
 
     // Apply local filters (Quick filters and local duration filter)
@@ -207,9 +207,9 @@ function SimulationListDesktop({
             list = list.filter((sim) => sim.id % 2 === 0);
         } else if (activeQuickFilter === 'recommended') {
             const prefs = user?.preferences || [];
-            const specIds = prefs.map(p => p.specializationId).filter(Boolean);
-            const orgIds = prefs.map(p => p.organizationId).filter(Boolean);
-            
+            const specIds = prefs.map((p) => p.specializationId).filter(Boolean);
+            const orgIds = prefs.map((p) => p.organizationId).filter(Boolean);
+
             if (specIds.length > 0 || orgIds.length > 0) {
                 list = list.filter((sim) => {
                     const matchesCategory = sim.category && specIds.includes(sim.category.id);
@@ -235,7 +235,7 @@ function SimulationListDesktop({
         }
 
         return list;
-    }, [ simulations, activeQuickFilter, localDuration, user ]);
+    }, [simulations, activeQuickFilter, localDuration, user]);
 
     const total = processedList.length;
     const current = pagination.current || 1;
@@ -244,7 +244,7 @@ function SimulationListDesktop({
     const paginatedList = useMemo(() => {
         const startIndex = (current - 1) * pageSize;
         return processedList.slice(startIndex, startIndex + pageSize);
-    }, [ processedList, current, pageSize ]);
+    }, [processedList, current, pageSize]);
 
     const hasActiveFilters = !!(
         filters.title ||
@@ -395,18 +395,32 @@ function SimulationListDesktop({
                                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                                 description={
                                     activeQuickFilter === 'recommended'
-                                        ? "Chưa có đề xuất phù hợp. Bạn hãy thiết lập Mục tiêu nghề nghiệp ở trang cá nhân để nhận các bài mô phỏng tối ưu nhất!"
-                                        : "Không tìm thấy bài mô phỏng nào phù hợp với bộ lọc"
+                                        ? 'Chưa có đề xuất phù hợp. Bạn hãy thiết lập Mục tiêu nghề nghiệp ở trang cá nhân để nhận các bài mô phỏng tối ưu nhất!'
+                                        : 'Không tìm thấy bài mô phỏng nào phù hợp với bộ lọc'
                                 }
                             />
                             {activeQuickFilter === 'recommended' ? (
-                                <button className={styles.clearBtnLarge} onClick={() => navigate('/profile')} style={{ background: '#16a34a', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+                                <button
+                                    className={styles.clearBtnLarge}
+                                    onClick={() => navigate('/profile')}
+                                    style={{
+                                        background: '#16a34a',
+                                        color: '#fff',
+                                        border: 'none',
+                                        padding: '10px 24px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        fontWeight: 600,
+                                    }}
+                                >
                                     Thiết lập mục tiêu ngay 🎯
                                 </button>
-                            ) : hasActiveFilters && (
-                                <button className={styles.clearBtnLarge} onClick={handleClearFilters}>
-                                    Xóa bộ lọc
-                                </button>
+                            ) : (
+                                hasActiveFilters && (
+                                    <button className={styles.clearBtnLarge} onClick={handleClearFilters}>
+                                        Xóa bộ lọc
+                                    </button>
+                                )
                             )}
                         </div>
                     ) : (

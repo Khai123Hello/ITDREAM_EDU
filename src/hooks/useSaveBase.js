@@ -46,11 +46,11 @@ const useSaveBase = ({
     const translate = useTranslate();
     const confirmModal = useConfirmModal();
     const { params: queryParams, setQueryParams } = useQueryParams();
-    const [ detail, setDetail ] = useState({});
-    const [ detailId, setDetailId ] = useState(params.id);
-    const [ isSubmitting, setSubmit ] = useState(false);
-    const [ isChanged, setChange ] = useState(false);
-    const [ isEditing, setEditing ] = useState(params.id === 'create' ? false : true);
+    const [detail, setDetail] = useState({});
+    const [detailId, setDetailId] = useState(params.id);
+    const [isSubmitting, setSubmit] = useState(false);
+    const [isChanged, setChange] = useState(false);
+    const [isEditing, setEditing] = useState(params.id === 'create' ? false : true);
     const { execute: executeGet, loading } = useFetch(apiConfig.getById, {
         immediate: false,
     });
@@ -59,9 +59,9 @@ const useSaveBase = ({
     const intl = useIntl();
     const title = intl?.formatMessage
         ? intl.formatMessage(message.title, {
-            action: params.id !== 'create',
-            objectName: options.objectName,
-        })
+              action: params.id !== 'create',
+              objectName: options.objectName,
+          })
         : '';
     const notification = useNotification();
 

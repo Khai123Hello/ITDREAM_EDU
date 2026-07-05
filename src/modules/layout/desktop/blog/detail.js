@@ -20,7 +20,7 @@ function estimateReadingTime(content) {
             return '';
         };
         if (parsed.chapters) {
-            plainText = parsed.chapters.map(ch => extractText(JSON.parse(ch.content || '{}'))).join(' ');
+            plainText = parsed.chapters.map((ch) => extractText(JSON.parse(ch.content || '{}'))).join(' ');
         } else {
             plainText = extractText(parsed);
         }
@@ -39,13 +39,15 @@ function parseContentData(content) {
         if (parsed.chapters && Array.isArray(parsed.chapters)) {
             return { type: 'chapters', chapters: parsed.chapters };
         }
-    } catch (_) { /* not JSON */ }
+    } catch (_) {
+        /* not JSON */
+    }
     return { type: 'simple', content };
 }
 
 // ─── Reading Progress Bar ───
 function ReadingProgressBar() {
-    const [ progress, setProgress ] = useState(0);
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         const updateProgress = () => {
@@ -89,16 +91,14 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
 
 function BlogDetailDesktop({ blog, urlBase, loading }) {
     const navigate = useNavigate();
-    const [ activeId, setActiveId ] = useState('');
-    const [ activeChapter, setActiveChapter ] = useState(0);
+    const [activeId, setActiveId] = useState('');
+    const [activeChapter, setActiveChapter] = useState(0);
     const articleRef = useRef(null);
 
     const parsedContent = blog ? parseContentData(blog.content) : null;
     const isChaptered = parsedContent?.type === 'chapters';
     const chapters = isChaptered ? parsedContent.chapters : null;
-    const currentContent = isChaptered
-        ? (chapters[activeChapter]?.content || '')
-        : (parsedContent?.content || '');
+    const currentContent = isChaptered ? chapters[activeChapter]?.content || '' : parsedContent?.content || '';
 
     // IntersectionObserver for TOC tracking
     useEffect(() => {
@@ -118,13 +118,13 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
         headingElements.forEach((el) => observer.observe(el));
         return () => headingElements.forEach((el) => observer.unobserve(el));
-    }, [ blog, currentContent, activeChapter ]);
+    }, [blog, currentContent, activeChapter]);
 
     // Reset to top when switching chapters
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setActiveId('');
-    }, [ activeChapter ]);
+    }, [activeChapter]);
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -164,42 +164,43 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
     const readingTime = estimateReadingTime(content);
 
-    const displayDate = modifiedDate || createdDate
-        ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric',
-        })
-        : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    const displayDate =
+        modifiedDate || createdDate
+            ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
+                  day: 'numeric',
+                  month: 'numeric',
+                  year: 'numeric',
+              })
+            : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
     // Related articles
     const relatedArticles =
         subjects?.content && subjects.content.length > 0 && subjects.content[0] !== null
             ? subjects.content
             : [
-                {
-                    id: 101,
-                    name: 'Kỹ năng mềm quyết định sự thành công trong công việc',
-                    subject: 'Khám phá tầm quan trọng của kỹ năng giao tiếp, làm việc nhóm và giải quyết vấn đề...',
-                    category: { name: 'Kỹ năng nghề nghiệp' },
-                    image: null,
-                },
-                {
-                    id: 102,
-                    name: 'Xu hướng làm việc từ xa và mô hình Hybrid năm 2026',
-                    subject:
+                  {
+                      id: 101,
+                      name: 'Kỹ năng mềm quyết định sự thành công trong công việc',
+                      subject: 'Khám phá tầm quan trọng của kỹ năng giao tiếp, làm việc nhóm và giải quyết vấn đề...',
+                      category: { name: 'Kỹ năng nghề nghiệp' },
+                      image: null,
+                  },
+                  {
+                      id: 102,
+                      name: 'Xu hướng làm việc từ xa và mô hình Hybrid năm 2026',
+                      subject:
                           'Những thay đổi lớn trong cách các doanh nghiệp vận hành và cách tối ưu hiệu suất làm việc...',
-                    category: { name: 'Xu hướng công nghệ' },
-                    image: null,
-                },
-                {
-                    id: 103,
-                    name: 'Xây dựng thương hiệu cá nhân cho lập trình viên',
-                    subject: 'Làm thế nào để tạo hồ sơ GitHub nổi bật, viết blog kỹ thuật và kết nối hiệu quả...',
-                    category: { name: 'Phát triển bản thân' },
-                    image: null,
-                },
-            ];
+                      category: { name: 'Xu hướng công nghệ' },
+                      image: null,
+                  },
+                  {
+                      id: 103,
+                      name: 'Xây dựng thương hiệu cá nhân cho lập trình viên',
+                      subject: 'Làm thế nào để tạo hồ sơ GitHub nổi bật, viết blog kỹ thuật và kết nối hiệu quả...',
+                      category: { name: 'Phát triển bản thân' },
+                      image: null,
+                  },
+              ];
 
     // Popular articles for sidebar
     const sidebarArticles = [
@@ -219,11 +220,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                     {/* LEFT SIDEBAR: TOC + Chapter Navigator */}
                     <aside className={styles.tocSidebar}>
                         {/* Chapter navigator (if chaptered blog) */}
-                        <ChapterNavigator
-                            chapters={chapters}
-                            activeIndex={activeChapter}
-                            onSelect={setActiveChapter}
-                        />
+                        <ChapterNavigator chapters={chapters} activeIndex={activeChapter} onSelect={setActiveChapter} />
 
                         <TableOfContents content={currentContent} activeId={activeId} />
                     </aside>
@@ -232,7 +229,14 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                     <article className={styles.contentArea} ref={articleRef}>
                         {/* BACK BUTTON */}
                         <button className={styles.backBtn} onClick={() => navigate('/blog')}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                            >
                                 <line x1="19" y1="12" x2="5" y2="12"></line>
                                 <polyline points="12 19 5 12 12 5"></polyline>
                             </svg>
@@ -241,9 +245,13 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
                         {/* BREADCRUMB */}
                         <nav className={styles.breadcrumb}>
-                            <span className={styles.breadcrumbLink} onClick={() => navigate('/')}>Trang chủ</span>
+                            <span className={styles.breadcrumbLink} onClick={() => navigate('/')}>
+                                Trang chủ
+                            </span>
                             <span className={styles.breadcrumbSep}>/</span>
-                            <span className={styles.breadcrumbLink} onClick={() => navigate('/blog')}>Blog</span>
+                            <span className={styles.breadcrumbLink} onClick={() => navigate('/blog')}>
+                                Blog
+                            </span>
                             {category && (
                                 <>
                                     <span className={styles.breadcrumbSep}>/</span>
@@ -266,19 +274,27 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                     <div className={styles.authorAvatarWrapper}>
                                         {educator.profileAccountDto?.avatar || educator.account?.avatar ? (
                                             <img
-                                                src={getImageUrl(educator.profileAccountDto?.avatar || educator.account?.avatar)}
+                                                src={getImageUrl(
+                                                    educator.profileAccountDto?.avatar || educator.account?.avatar,
+                                                )}
                                                 alt="author"
                                                 className={styles.authorAvatar}
                                             />
                                         ) : (
                                             <div className={styles.authorAvatarFallback}>
-                                                {(educator.account?.fullName || educator.profileAccountDto?.fullName || 'U').charAt(0)}
+                                                {(
+                                                    educator.account?.fullName ||
+                                                    educator.profileAccountDto?.fullName ||
+                                                    'U'
+                                                ).charAt(0)}
                                             </div>
                                         )}
                                     </div>
                                     <div className={styles.authorDetails}>
                                         <span className={styles.authorName}>
-                                            {educator.account?.fullName || educator.profileAccountDto?.fullName || 'Chuyên gia ITDream'}
+                                            {educator.account?.fullName ||
+                                                educator.profileAccountDto?.fullName ||
+                                                'Chuyên gia ITDream'}
                                         </span>
                                         {educator.organization && (
                                             <span className={styles.orgName}>{educator.organization.name}</span>
@@ -303,19 +319,29 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                         {isChaptered && chapters.length > 1 && (
                             <div className={styles.chapterIndicator}>
                                 <div className={styles.chapterIndicatorInner}>
-                                    <span className={styles.chapterIndicatorNum}>Chapter {activeChapter + 1} / {chapters.length}</span>
-                                    <span className={styles.chapterIndicatorTitle}>{chapters[activeChapter]?.title}</span>
+                                    <span className={styles.chapterIndicatorNum}>
+                                        Chapter {activeChapter + 1} / {chapters.length}
+                                    </span>
+                                    <span className={styles.chapterIndicatorTitle}>
+                                        {chapters[activeChapter]?.title}
+                                    </span>
                                 </div>
                                 <div className={styles.chapterNavBtns}>
                                     {activeChapter > 0 && (
-                                        <button type="button" className={styles.chapterNavArrow}
-                                            onClick={() => setActiveChapter(i => i - 1)}>
+                                        <button
+                                            type="button"
+                                            className={styles.chapterNavArrow}
+                                            onClick={() => setActiveChapter((i) => i - 1)}
+                                        >
                                             ← Trước
                                         </button>
                                     )}
                                     {activeChapter < chapters.length - 1 && (
-                                        <button type="button" className={classNames(styles.chapterNavArrow, styles.chapterNavArrowNext)}
-                                            onClick={() => setActiveChapter(i => i + 1)}>
+                                        <button
+                                            type="button"
+                                            className={classNames(styles.chapterNavArrow, styles.chapterNavArrowNext)}
+                                            onClick={() => setActiveChapter((i) => i + 1)}
+                                        >
                                             Tiếp theo →
                                         </button>
                                     )}
@@ -334,17 +360,32 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                         {isChaptered && chapters.length > 1 && (
                             <div className={styles.chapterNavBottom}>
                                 {activeChapter > 0 ? (
-                                    <button type="button" className={styles.chapterNavBottomBtn}
-                                        onClick={() => setActiveChapter(i => i - 1)}>
+                                    <button
+                                        type="button"
+                                        className={styles.chapterNavBottomBtn}
+                                        onClick={() => setActiveChapter((i) => i - 1)}
+                                    >
                                         <span className={styles.chapterNavDir}>← Chapter trước</span>
-                                        <span className={styles.chapterNavName}>{chapters[activeChapter - 1]?.title}</span>
+                                        <span className={styles.chapterNavName}>
+                                            {chapters[activeChapter - 1]?.title}
+                                        </span>
                                     </button>
-                                ) : <div />}
+                                ) : (
+                                    <div />
+                                )}
                                 {activeChapter < chapters.length - 1 && (
-                                    <button type="button" className={classNames(styles.chapterNavBottomBtn, styles.chapterNavBottomBtnNext)}
-                                        onClick={() => setActiveChapter(i => i + 1)}>
+                                    <button
+                                        type="button"
+                                        className={classNames(
+                                            styles.chapterNavBottomBtn,
+                                            styles.chapterNavBottomBtnNext,
+                                        )}
+                                        onClick={() => setActiveChapter((i) => i + 1)}
+                                    >
                                         <span className={styles.chapterNavDir}>Chapter tiếp theo →</span>
-                                        <span className={styles.chapterNavName}>{chapters[activeChapter + 1]?.title}</span>
+                                        <span className={styles.chapterNavName}>
+                                            {chapters[activeChapter + 1]?.title}
+                                        </span>
                                     </button>
                                 )}
                             </div>
@@ -357,13 +398,19 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                     <div className={styles.authorCardAvatarWrapper}>
                                         {educator.profileAccountDto?.avatar || educator.account?.avatar ? (
                                             <img
-                                                src={getImageUrl(educator.profileAccountDto?.avatar || educator.account?.avatar)}
+                                                src={getImageUrl(
+                                                    educator.profileAccountDto?.avatar || educator.account?.avatar,
+                                                )}
                                                 alt="author avatar"
                                                 className={styles.authorCardAvatar}
                                             />
                                         ) : (
                                             <div className={styles.authorCardAvatarFallback}>
-                                                {(educator.account?.fullName || educator.profileAccountDto?.fullName || 'U').charAt(0)}
+                                                {(
+                                                    educator.account?.fullName ||
+                                                    educator.profileAccountDto?.fullName ||
+                                                    'U'
+                                                ).charAt(0)}
                                             </div>
                                         )}
                                     </div>
@@ -379,12 +426,19 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                             </p>
                                         )}
                                         <p className={styles.authorCardBio}>
-                                            Chuyên gia định hướng nghề nghiệp, có hơn 10 năm kinh nghiệm giảng dạy và đào
-                                            tạo nguồn nhân lực công nghệ chất lượng cao tại Việt Nam.
+                                            Chuyên gia định hướng nghề nghiệp, có hơn 10 năm kinh nghiệm giảng dạy và
+                                            đào tạo nguồn nhân lực công nghệ chất lượng cao tại Việt Nam.
                                         </p>
                                         {(educator.profileAccountDto?.email || educator.account?.email) && (
                                             <div className={styles.authorCardEmail}>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                <svg
+                                                    width="14"
+                                                    height="14"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2.5"
+                                                >
                                                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                                                     <polyline points="22,6 12,13 2,6"></polyline>
                                                 </svg>

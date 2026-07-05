@@ -9,14 +9,14 @@ const levelConfig = {
 };
 
 const thumbGradients = [
-    [ '#dbeafe', '#bfdbfe' ],
-    [ '#dcfce7', '#bbf7d0' ],
-    [ '#fef9c3', '#fde68a' ],
-    [ '#fce7f3', '#fbcfe8' ],
-    [ '#ede9fe', '#ddd6fe' ],
-    [ '#cffafe', '#a5f3fc' ],
-    [ '#ffedd5', '#fed7aa' ],
-    [ '#f1f5f9', '#e2e8f0' ],
+    ['#dbeafe', '#bfdbfe'],
+    ['#dcfce7', '#bbf7d0'],
+    ['#fef9c3', '#fde68a'],
+    ['#fce7f3', '#fbcfe8'],
+    ['#ede9fe', '#ddd6fe'],
+    ['#cffafe', '#a5f3fc'],
+    ['#ffedd5', '#fed7aa'],
+    ['#f1f5f9', '#e2e8f0'],
 ];
 
 const SimulationCard = ({
@@ -33,7 +33,7 @@ const SimulationCard = ({
 }) => {
     const lvl = levelConfig[level] || levelConfig[1];
     const gradientIndex = (id || Math.random()).toString().length % thumbGradients.length;
-    const [ gStart, gEnd ] = thumbGradients[gradientIndex];
+    const [gStart, gEnd] = thumbGradients[gradientIndex];
 
     const orgName = organization.shortName || organization.name || '';
     const orgInitial = orgName ? orgName.charAt(0).toUpperCase() : '?';
@@ -88,7 +88,7 @@ const SimulationCard = ({
                     )}
                     <span className={styles.metaItem}>
                         <span className={styles.levelDots}>
-                            {[ 1, 2, 3 ].map((i) => (
+                            {[1, 2, 3].map((i) => (
                                 <span
                                     key={i}
                                     className={`${styles.dot} ${i <= level ? styles.dotFilled : styles.dotEmpty}`}

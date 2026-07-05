@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { sendRequest } from '@services/api';
 
 const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, pathParams = {}, dataBody = {} } = {}) => {
-    const [ loading, setLoading ] = useState(false);
-    const [ data, setData ] = useState(null);
-    const [ error, setError ] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
     const isMounted = useRef(true);
     const abortControllerRef = useRef(null);
 
@@ -50,14 +50,14 @@ const useFetch = (apiConfig, { immediate = false, mappingData, params = {}, path
                 if (isMounted.current && !cancelType) setLoading(false);
             }
         },
-        [ apiConfig ],
+        [apiConfig],
     );
 
     useEffect(() => {
         if (immediate) {
             execute();
         }
-    }, [ execute, immediate ]);
+    }, [execute, immediate]);
 
     return { loading, execute, data, error, setData };
 };
