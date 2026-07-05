@@ -448,6 +448,100 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: transparent;
         }
     }
+
+    // ── BlogDesigner Custom Blocks ──
+    // Callout block
+    :global(.bd-callout-node) {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        border-left: 4px solid $primary-teal;
+        background: $primary-teal-light;
+        border-radius: 0 12px 12px 0;
+        padding: 16px 20px;
+        margin: 1.5em 0;
+
+        .bd-callout-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+
+        .bd-callout-content {
+            flex: 1;
+            min-width: 0;
+
+            > * { margin: 0; }
+        }
+    }
+
+    // Step block
+    :global(.bd-step-node) {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        border: 1.5px solid $border-color;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 1em 0;
+        background: $bg-light;
+
+        .bd-step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            border-radius: 50%;
+            background: $primary-teal;
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+        }
+    }
+
+    // Section block
+    :global(.bd-section-node) {
+        background: $bg-light;
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin: 1.5em 0;
+        border: 1px solid $border-color;
+
+        .bd-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            color: $primary-navy;
+        }
+    }
+
+    // YouTube embed
+    :global(.bd-youtube-node) {
+        margin: 1.5em 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+
+        iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+            display: block;
+        }
+
+        // Setup state (before URL entered)
+        .bd-youtube-setup {
+            background: #f1f5f9;
+            padding: 40px;
+            text-align: center;
+            color: $text-secondary;
+        }
+    }
 }
 
 /* =============================================
@@ -636,6 +730,22 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         background: #0f766e;
         box-shadow: 0 6px 16px rgba(22, 142, 133, 0.25);
     }
+}
+
+/* NEWSLETTER COMING SOON */
+.newsletterComingSoon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 10px;
+    background: $primary-teal-light;
+    border: 1.5px dashed rgba($primary-teal, 0.4);
+    color: $primary-teal;
+    font-size: 13px;
+    font-weight: 600;
+    font-style: italic;
 }
 
 /* POPULAR LIST */
@@ -1180,5 +1290,56 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 200px;
+}
+
+/* =============================================
+   RESPONSIVE — Sidebar & Layout
+   ============================================= */
+@media (max-width: 1280px) {
+    .blogDetailContainer {
+        padding: 32px 28px 80px;
+    }
+    .mainLayout {
+        grid-template-columns: 220px 1fr 300px;
+        gap: 36px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .mainLayout {
+        grid-template-columns: 220px 1fr;
+        gap: 28px;
+    }
+    .sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .blogDetailContainer {
+        padding: 20px 16px 60px;
+    }
+    .mainLayout {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .tocSidebar {
+        display: none;
+    }
+    .sidebar {
+        display: none;
+    }
+    .contentArea {
+        padding: 24px 20px;
+    }
+    .articleTitle {
+        font-size: 26px;
+    }
+    .coverImageWrapper {
+        height: 220px;
+    }
+    .relatedGrid {
+        grid-template-columns: 1fr;
+    }
 }
 

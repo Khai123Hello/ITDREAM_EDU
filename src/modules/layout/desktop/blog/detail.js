@@ -71,7 +71,7 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
     if (!chapters || chapters.length <= 1) return null;
     return (
         <div className={styles.chapterNav}>
-            <p className={styles.chapterNavLabel}>📚 Chapters</p>
+            <p className={styles.chapterNavLabel}>📚 Mục lục</p>
             <div className={styles.chapterList}>
                 {chapters.map((ch, idx) => (
                     <button
@@ -81,7 +81,7 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
                         onClick={() => onSelect(idx)}
                     >
                         <span className={styles.chapterNum}>{idx + 1}</span>
-                        <span className={styles.chapterTitle}>{ch.title || `Chapter ${idx + 1}`}</span>
+                        <span className={styles.chapterTitle}>{ch.title || `Phần ${idx + 1}`}</span>
                     </button>
                 ))}
             </div>
@@ -173,41 +173,12 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
             })
             : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
-    // Related articles
+    // Related articles — chỉ dùng dữ liệu thực từ API
     const relatedArticles =
         subjects?.content && subjects.content.length > 0 && subjects.content[0] !== null
             ? subjects.content
-            : [
-                {
-                    id: 101,
-                    name: 'Kỹ năng mềm quyết định sự thành công trong công việc',
-                    subject: 'Khám phá tầm quan trọng của kỹ năng giao tiếp, làm việc nhóm và giải quyết vấn đề...',
-                    category: { name: 'Kỹ năng nghề nghiệp' },
-                    image: null,
-                },
-                {
-                    id: 102,
-                    name: 'Xu hướng làm việc từ xa và mô hình Hybrid năm 2026',
-                    subject:
-                          'Những thay đổi lớn trong cách các doanh nghiệp vận hành và cách tối ưu hiệu suất làm việc...',
-                    category: { name: 'Xu hướng công nghệ' },
-                    image: null,
-                },
-                {
-                    id: 103,
-                    name: 'Xây dựng thương hiệu cá nhân cho lập trình viên',
-                    subject: 'Làm thế nào để tạo hồ sơ GitHub nổi bật, viết blog kỹ thuật và kết nối hiệu quả...',
-                    category: { name: 'Phát triển bản thân' },
-                    image: null,
-                },
-            ];
+            : [];
 
-    // Popular articles for sidebar
-    const sidebarArticles = [
-        { id: 201, title: 'Làm thế nào để viết CV chuyên nghiệp thu hút nhà tuyển dụng?', readTime: '5 phút đọc' },
-        { id: 202, title: 'Top câu hỏi phỏng vấn hành vi và cách trả lời STAR', readTime: '7 phút đọc' },
-        { id: 203, title: 'Học lập trình bắt đầu từ đâu? Lộ trình chuẩn cho người mới', readTime: '10 phút đọc' },
-    ];
 
     return (
         <>
@@ -301,7 +272,9 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                         )}
                                     </div>
                                     <span className={styles.divider}>•</span>
-                                    <span className={styles.readTime}>{displayDate}</span>
+                                    <time dateTime={modifiedDate || createdDate} className={styles.readTime}>
+                                        {displayDate}
+                                    </time>
                                     <span className={styles.divider}>•</span>
                                     <span className={styles.readTime}>{readingTime} phút đọc</span>
                                 </div>
@@ -320,7 +293,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                             <div className={styles.chapterIndicator}>
                                 <div className={styles.chapterIndicatorInner}>
                                     <span className={styles.chapterIndicatorNum}>
-                                        Chapter {activeChapter + 1} / {chapters.length}
+                                        Phần {activeChapter + 1} / {chapters.length}
                                     </span>
                                     <span className={styles.chapterIndicatorTitle}>
                                         {chapters[activeChapter]?.title}
@@ -365,7 +338,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                         className={styles.chapterNavBottomBtn}
                                         onClick={() => setActiveChapter((i) => i - 1)}
                                     >
-                                        <span className={styles.chapterNavDir}>← Chapter trước</span>
+                                        <span className={styles.chapterNavDir}>← Phần trước</span>
                                         <span className={styles.chapterNavName}>
                                             {chapters[activeChapter - 1]?.title}
                                         </span>
@@ -382,7 +355,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                         )}
                                         onClick={() => setActiveChapter((i) => i + 1)}
                                     >
-                                        <span className={styles.chapterNavDir}>Chapter tiếp theo →</span>
+                                        <span className={styles.chapterNavDir}>Phần tiếp theo →</span>
                                         <span className={styles.chapterNavName}>
                                             {chapters[activeChapter + 1]?.title}
                                         </span>
@@ -425,10 +398,6 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                                 )}
                                             </p>
                                         )}
-                                        <p className={styles.authorCardBio}>
-                                            Chuyên gia định hướng nghề nghiệp, có hơn 10 năm kinh nghiệm giảng dạy và
-                                            đào tạo nguồn nhân lực công nghệ chất lượng cao tại Việt Nam.
-                                        </p>
                                         {(educator.profileAccountDto?.email || educator.account?.email) && (
                                             <div className={styles.authorCardEmail}>
                                                 <svg
@@ -451,7 +420,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                         )}
                     </article>
 
-                    {/* RIGHT STICKY SIDEBAR */}
+                    {/* RIGHT STICKY SIDEBAR — ẩn khi không có dữ liệu */}
                     <aside className={styles.sidebar}>
                         {/* NEWSLETTER WIDGET */}
                         <div className={styles.sidebarWidget}>
@@ -459,71 +428,49 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                 <h4>Đăng ký Bản tin ITDream</h4>
                             </div>
                             <div className={styles.widgetBody}>
-                                <p>Nhận các bài viết chọn lọc về xu hướng công nghệ & cơ hội nghề nghiệp sớm nhất.</p>
-                                <div className={styles.newsletterForm}>
-                                    <input
-                                        type="email"
-                                        placeholder="Nhập email của bạn..."
-                                        className={styles.newsletterInput}
-                                    />
-                                    <button className={styles.newsletterBtn}>Đăng ký ngay</button>
+                                <p>Nhận các bài viết chọn lọc về xu hướng công nghệ &amp; cơ hội nghề nghiệp sớm nhất.</p>
+                                <div className={styles.newsletterComingSoon}>
+                                    <span>🔔</span>
+                                    <span>Tính năng sắp ra mắt</span>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* POPULAR POSTS WIDGET */}
-                        <div className={styles.sidebarWidget}>
-                            <div className={styles.widgetHeader}>
-                                <h4>Bài viết xem nhiều nhất</h4>
-                            </div>
-                            <div className={styles.widgetBody}>
-                                <ul className={styles.popularList}>
-                                    {sidebarArticles.map((article, index) => (
-                                        <li key={article.id} className={styles.popularItem}>
-                                            <span className={styles.popularIndex}>0{index + 1}</span>
-                                            <div className={styles.popularItemContent}>
-                                                <h5>{article.title}</h5>
-                                                <span>{article.readTime}</span>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
                             </div>
                         </div>
                     </aside>
                 </div>
 
-                {/* RELATED POSTS BOTTOM SECTION */}
-                <section className={styles.relatedSection}>
-                    <h2 className={styles.relatedSectionHeader}>Bài viết liên quan</h2>
-                    <div className={styles.relatedGrid}>
-                        {relatedArticles.map((article) => (
-                            <a key={article.id} href={`/blog/${article.id}`} className={styles.relatedCard}>
-                                <div className={styles.relatedThumbWrapper}>
-                                    {article.image ? (
-                                        <img
-                                            src={getImageUrl(article.image)}
-                                            alt={article.name}
-                                            className={styles.relatedThumb}
-                                        />
-                                    ) : (
-                                        <div className={styles.relatedThumbPlaceholder}>
-                                            <span>📝</span>
-                                        </div>
-                                    )}
-                                    {article.category && (
-                                        <span className={styles.relatedCategoryBadge}>{article.category.name}</span>
-                                    )}
-                                </div>
-                                <div className={styles.relatedCardBody}>
-                                    <h3>{article.name}</h3>
-                                    <p>{article.subject}</p>
-                                    <span className={styles.relatedCardRead}>Đọc bài viết &rarr;</span>
-                                </div>
-                            </a>
-                        ))}
-                    </div>
-                </section>
+                {/* RELATED POSTS BOTTOM SECTION — chỉ hiện khi có dữ liệu thực */}
+                {relatedArticles.length > 0 && (
+                    <section className={styles.relatedSection}>
+                        <h2 className={styles.relatedSectionHeader}>Bài viết liên quan</h2>
+                        <div className={styles.relatedGrid}>
+                            {relatedArticles.map((article) => (
+                                <a key={article.id} href={`/blog/${article.id}`} className={styles.relatedCard}>
+                                    <div className={styles.relatedThumbWrapper}>
+                                        {article.image ? (
+                                            <img
+                                                src={getImageUrl(article.image)}
+                                                alt={article.name}
+                                                className={styles.relatedThumb}
+                                            />
+                                        ) : (
+                                            <div className={styles.relatedThumbPlaceholder}>
+                                                <span>📝</span>
+                                            </div>
+                                        )}
+                                        {article.category && (
+                                            <span className={styles.relatedCategoryBadge}>{article.category.name}</span>
+                                        )}
+                                    </div>
+                                    <div className={styles.relatedCardBody}>
+                                        <h3>{article.name}</h3>
+                                        <p>{article.subject}</p>
+                                        <span className={styles.relatedCardRead}>Đọc bài viết &rarr;</span>
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    </section>
+                )}
             </div>
         </>
     );
