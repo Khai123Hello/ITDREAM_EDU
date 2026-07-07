@@ -228,12 +228,24 @@ const ProfileComponent = (props) => {
                                     username: user?.username || user?.account?.username || '',
                                     preferences,
                                 },
-                                onCompleted: () => {
-                                    toast.success('Cập nhật ảnh đại diện thành công!');
-                                    if (executeGetProfile) {
-                                        executeGetProfile();
+                                onCompleted: (res) => {
+                                    if (res?.result === true) {
+                                        toast.success('Cập nhật ảnh đại diện thành công!');
+                                        if (executeGetProfile) {
+                                            executeGetProfile()
+                                                .then(() => {
+                                                    window.location.reload();
+                                                })
+                                                .catch(() => {
+                                                    window.location.reload();
+                                                });
+                                        } else {
+                                            dispatch(accountActions.getProfile());
+                                            window.location.reload();
+                                        }
+                                    } else {
+                                        toast.error(res?.message || 'Không thể cập nhật ảnh đại diện.');
                                     }
-                                    dispatch(accountActions.getProfile());
                                 },
                                 onError: () => {
                                     toast.error('Không thể lưu ảnh đại diện vào hồ sơ.');
@@ -244,12 +256,24 @@ const ProfileComponent = (props) => {
                                 data: {
                                     avatarPath: newAvatarPath,
                                 },
-                                onCompleted: () => {
-                                    toast.success('Cập nhật ảnh đại diện thành công!');
-                                    if (executeGetProfile) {
-                                        executeGetProfile();
+                                onCompleted: (res) => {
+                                    if (res?.result === true) {
+                                        toast.success('Cập nhật ảnh đại diện thành công!');
+                                        if (executeGetProfile) {
+                                            executeGetProfile()
+                                                .then(() => {
+                                                    window.location.reload();
+                                                })
+                                                .catch(() => {
+                                                    window.location.reload();
+                                                });
+                                        } else {
+                                            dispatch(accountActions.getProfile());
+                                            window.location.reload();
+                                        }
+                                    } else {
+                                        toast.error(res?.message || 'Không thể cập nhật ảnh đại diện.');
                                     }
-                                    dispatch(accountActions.getProfile());
                                 },
                                 onError: () => {
                                     toast.error('Không thể lưu ảnh đại diện vào hồ sơ.');
@@ -306,15 +330,27 @@ const ProfileComponent = (props) => {
                     username: values.username || user?.username || user?.account?.username || '',
                     preferences,
                 },
-                onCompleted: () => {
-                    toast.success(translate.formatMessage(commonMessage.success));
-                    localStorage.removeItem('editingField');
-                    editingFieldRef.current = null;
-                    setEditingField(null);
-                    if (executeGetProfile) {
-                        executeGetProfile();
+                onCompleted: (res) => {
+                    if (res?.result === true) {
+                        toast.success(translate.formatMessage(commonMessage.success));
+                        localStorage.removeItem('editingField');
+                        editingFieldRef.current = null;
+                        setEditingField(null);
+                        if (executeGetProfile) {
+                            executeGetProfile()
+                                .then(() => {
+                                    window.location.reload();
+                                })
+                                .catch(() => {
+                                    window.location.reload();
+                                });
+                        } else {
+                            dispatch(accountActions.getProfile());
+                            window.location.reload();
+                        }
+                    } else {
+                        toast.error(res?.message || translate.formatMessage(commonMessage.fail));
                     }
-                    dispatch(accountActions.getProfile());
                 },
                 onError: () => {
                     toast.error(translate.formatMessage(commonMessage.fail));
@@ -325,15 +361,27 @@ const ProfileComponent = (props) => {
                 data: {
                     ...values,
                 },
-                onCompleted: () => {
-                    toast.success(translate.formatMessage(commonMessage.success));
-                    localStorage.removeItem('editingField');
-                    editingFieldRef.current = null;
-                    setEditingField(null);
-                    if (executeGetProfile) {
-                        executeGetProfile();
+                onCompleted: (res) => {
+                    if (res?.result === true) {
+                        toast.success(translate.formatMessage(commonMessage.success));
+                        localStorage.removeItem('editingField');
+                        editingFieldRef.current = null;
+                        setEditingField(null);
+                        if (executeGetProfile) {
+                            executeGetProfile()
+                                .then(() => {
+                                    window.location.reload();
+                                })
+                                .catch(() => {
+                                    window.location.reload();
+                                });
+                        } else {
+                            dispatch(accountActions.getProfile());
+                            window.location.reload();
+                        }
+                    } else {
+                        toast.error(res?.message || translate.formatMessage(commonMessage.fail));
                     }
-                    dispatch(accountActions.getProfile());
                 },
                 onError: () => {
                     toast.error(translate.formatMessage(commonMessage.fail));
