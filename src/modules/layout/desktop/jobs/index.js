@@ -4,6 +4,7 @@ import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import LoadingComponent from '@components/common/loading/LoadingComponent';
 import {
     AppConstants,
+    JOB_POST_ROLE_ATOMS,
     JOB_POST_ROLE_TYPE_ALL,
     JOB_POST_ROLE_TYPE_FULL_TIMES,
     JOB_POST_ROLE_TYPE_INTERNSHIP,
@@ -22,7 +23,6 @@ import {
 } from '@constants';
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
-import { getDownloadUrl } from '@utils';
 import { message } from 'antd';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
@@ -71,14 +71,14 @@ const getPlainTextFromTipTap = (content) => {
 
 function JobsDesktop() {
     const navigate = useNavigate();
-    const [ selectedJobId, setSelectedJobId ] = useState(null);
-    const [ selectedTab, setSelectedTab ] = useState('all'); // 'all', 'saved'
+    const [selectedJobId, setSelectedJobId] = useState(null);
+    const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'saved'
 
     // Dropdown filters
-    const [ opportunityFilter, setOpportunityFilter ] = useState('Tất cả');
-    const [ roleFilter, setRoleFilter ] = useState('Tất cả');
-    const [ selectedProvinceId, setSelectedProvinceId ] = useState(null);
-    const [ selectedWardId, setSelectedWardId ] = useState(null);
+    const [opportunityFilter, setOpportunityFilter] = useState('Tất cả');
+    const [roleFilter, setRoleFilter] = useState('Tất cả');
+    const [selectedProvinceId, setSelectedProvinceId] = useState(null);
+    const [selectedWardId, setSelectedWardId] = useState(null);
 
     // Fetch provinces on mount
     const { data: provinces } = useFetch(apiConfig.nation.client_list, {
@@ -88,7 +88,7 @@ function JobsDesktop() {
     });
 
     // Fetch wards dynamically based on province
-    const [ wards, setWards ] = useState([]);
+    const [wards, setWards] = useState([]);
     const { execute: fetchWards } = useFetch(apiConfig.nation.client_list, {
         immediate: false,
     });
@@ -106,7 +106,7 @@ function JobsDesktop() {
             setWards([]);
             setSelectedWardId(null);
         }
-    }, [ selectedProvinceId, fetchWards ]);
+    }, [selectedProvinceId, fetchWards]);
 
     const handleSelectJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -120,12 +120,11 @@ function JobsDesktop() {
         };
 
         if (opportunityFilter !== 'Tất cả') params.type = parseInt(opportunityFilter);
-        if (roleFilter !== 'Tất cả') params.roleType = parseInt(roleFilter);
         if (selectedProvinceId) params.provinceId = selectedProvinceId;
         if (selectedWardId) params.wardId = selectedWardId;
 
         return params;
-    }, [ opportunityFilter, roleFilter, selectedProvinceId, selectedWardId ]);
+    }, [opportunityFilter, selectedProvinceId, selectedWardId]);
 
     // Fetch saved job IDs on mount
     const { data: savedJobIdsResponse, execute: fetchSavedJobs } = useFetch(apiConfig.job.listSaveJob, {
@@ -147,22 +146,35 @@ function JobsDesktop() {
     // Load jobs on query parameters change
     useEffect(() => {
         fetchJobs({ params: queryParams });
-    }, [ queryParams, fetchJobs ]);
+    }, [queryParams, fetchJobs]);
 
     // Active job details resolver
     const jobs = jobsResponse?.content || [];
 
-    // Filter by tab: if tab is 'saved', filter in memory
+    // Filter by tab & roleType:
     const filteredJobs = useMemo(() => {
+        let list = jobs;
         if (selectedTab === 'saved') {
-            return jobs.filter((job) => savedJobIds.includes(job.id));
+            list = list.filter((job) => savedJobIds.includes(job.id));
         }
-        return jobs;
-    }, [ jobs, selectedTab, savedJobIds ]);
+
+        // Apply client-side role filtering (intersection logic)
+        if (roleFilter !== 'Tất cả') {
+            const filterAtomSet = new Set(JOB_POST_ROLE_ATOMS[parseInt(roleFilter)] || []);
+            list = list.filter((job) => {
+                if (!job.roleType) return false;
+                const jobAtoms = JOB_POST_ROLE_ATOMS[job.roleType] || [];
+                // Check if there is at least one overlapping atom
+                return jobAtoms.some((atom) => filterAtomSet.has(atom));
+            });
+        }
+
+        return list;
+    }, [jobs, selectedTab, savedJobIds, roleFilter]);
 
     const activeJob = useMemo(() => {
         return filteredJobs.find((job) => job.id === selectedJobId) || filteredJobs[0] || null;
-    }, [ filteredJobs, selectedJobId ]);
+    }, [filteredJobs, selectedJobId]);
 
     const {
         data: activeJobDetail,
@@ -179,7 +191,7 @@ function JobsDesktop() {
                 pathParams: { id: activeJob.id },
             });
         }
-    }, [ activeJob?.id, fetchJobDetail ]);
+    }, [activeJob?.id, fetchJobDetail]);
 
     const displayJob = activeJobDetail && activeJobDetail.id === activeJob?.id ? activeJobDetail : activeJob;
 
@@ -188,14 +200,14 @@ function JobsDesktop() {
         if (selectedJobId && filteredJobs.length > 0 && !filteredJobs.some((j) => j.id === selectedJobId)) {
             setSelectedJobId(null);
         }
-    }, [ filteredJobs, selectedJobId ]);
+    }, [filteredJobs, selectedJobId]);
 
     // Toggle save job action
     const { execute: callSaveJob } = useFetch(apiConfig.job.saveJob, {}, false);
     const handleToggleSaveJob = (e, jobId) => {
         e.stopPropagation();
         const isSaved = savedJobIds.includes(jobId);
-        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [ ...savedJobIds, jobId ];
+        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [...savedJobIds, jobId];
 
         callSaveJob({
             dataBody: { jobPostIds: newSavedIds },

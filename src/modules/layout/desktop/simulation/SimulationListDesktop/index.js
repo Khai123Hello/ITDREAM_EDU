@@ -42,7 +42,7 @@ const parseDurationInHours = (durationStr) => {
 
 // Reusable Dropdown Select Component to mimic Forage's pill-style selectors
 const DropdownFilter = ({ label, value, options, onChange }) => {
-    const [ isOpen, setIsOpen ] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const ref = React.useRef(null);
 
     React.useEffect(() => {
@@ -119,11 +119,11 @@ function SimulationListDesktop({
 }) {
     const navigate = useNavigate();
     const { profile: user } = useAuth();
-    const [ searchValue, setSearchValue ] = useState(filters.title || '');
+    const [searchValue, setSearchValue] = useState(filters.title || '');
 
     // Local filter states for horizontal filters
-    const [ activeQuickFilter, setActiveQuickFilter ] = useState('all');
-    const [ localDuration, setLocalDuration ] = useState('all');
+    const [activeQuickFilter, setActiveQuickFilter] = useState('all');
+    const [localDuration, setLocalDuration] = useState('all');
 
     const searchTimeout = React.useRef(null);
 
@@ -136,20 +136,20 @@ function SimulationListDesktop({
                 onFilterChange({ ...filters, title: value });
             }, 500);
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleSearchClick = useCallback(() => {
         if (searchTimeout.current) clearTimeout(searchTimeout.current);
         onFilterChange({ ...filters, title: searchValue });
-    }, [ filters, onFilterChange, searchValue ]);
+    }, [filters, onFilterChange, searchValue]);
 
     const handleFilterUpdate = useCallback(
         (key, value) => {
             const val = value === 'all' ? undefined : value;
             onFilterChange({ ...filters, [key]: val });
         },
-        [ filters, onFilterChange ],
+        [filters, onFilterChange],
     );
 
     const handleClearFilters = useCallback(() => {
@@ -164,29 +164,29 @@ function SimulationListDesktop({
             avgStar: undefined,
             sort: 'createdDate,desc',
         });
-    }, [ onFilterChange ]);
+    }, [onFilterChange]);
 
     const handleCardClick = useCallback(
         (id) => {
             navigate(`/simulations/${id}`);
         },
-        [ navigate ],
+        [navigate],
     );
 
     const categoryOptions = useMemo(() => {
         const list = Array.isArray(categories) ? categories.map((cat) => ({ value: cat.id, label: cat.name })) : [];
-        return [ { value: 'all', label: 'Tất cả' }, ...list ];
-    }, [ categories ]);
+        return [{ value: 'all', label: 'Tất cả' }, ...list];
+    }, [categories]);
 
     const organizationOptions = useMemo(() => {
         const list = Array.isArray(organizations)
             ? organizations.map((org) => ({ value: org.id, label: org.name }))
             : [];
-        return [ { value: 'all', label: 'Tất cả' }, ...list ];
-    }, [ organizations ]);
+        return [{ value: 'all', label: 'Tất cả' }, ...list];
+    }, [organizations]);
 
     const levelOptions = useMemo(() => {
-        return [ { value: 'all', label: 'Tất cả' }, ...SIMULATION_LEVEL_OPTIONS ];
+        return [{ value: 'all', label: 'Tất cả' }, ...SIMULATION_LEVEL_OPTIONS];
     }, []);
 
     // Apply local filters (Quick filters and local duration filter)
@@ -229,7 +229,7 @@ function SimulationListDesktop({
         }
 
         return list;
-    }, [ simulations, activeQuickFilter, localDuration, user ]);
+    }, [simulations, activeQuickFilter, localDuration, user]);
 
     const total = processedList.length;
     const current = pagination.current || 1;
@@ -238,7 +238,7 @@ function SimulationListDesktop({
     const paginatedList = useMemo(() => {
         const startIndex = (current - 1) * pageSize;
         return processedList.slice(startIndex, startIndex + pageSize);
-    }, [ processedList, current, pageSize ]);
+    }, [processedList, current, pageSize]);
 
     const hasActiveFilters = !!(
         filters.title ||

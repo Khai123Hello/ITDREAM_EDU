@@ -4,7 +4,7 @@ import RegisterDesktop from '@modules/layout/desktop/register';
 import { useForm } from 'rc-field-form';
 
 const RegisterContainer = () => {
-    const [ form ] = useForm();
+    const [form] = useForm();
 
     const layout = {
         defaultTheme: () => <RegisterDesktop form={form} />,

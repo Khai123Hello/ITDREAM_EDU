@@ -6,8 +6,8 @@ import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import BlogListDesktop from '@modules/layout/desktop/blog';
 
 function BlogListContainer() {
-    const [ selectedCategory, setSelectedCategory ] = useState(null);
-    const [ sort, setSort ] = useState('createdDate,desc');
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [sort, setSort] = useState('createdDate,desc');
 
     const catParams = useMemo(() => ({ kind: 2, page: 0, size: 100, paged: true }), []);
     const blogParams = useMemo(() => ({ page: 0, size: 200, paged: true }), []);

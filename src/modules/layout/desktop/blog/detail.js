@@ -46,7 +46,7 @@ function parseContentData(content) {
 
 // ─── Reading Progress Bar ───
 function ReadingProgressBar() {
-    const [ progress, setProgress ] = useState(0);
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         const updateProgress = () => {
@@ -127,8 +127,8 @@ function RelatedCard({ article, getImageUrl }) {
 
 function BlogDetailDesktop({ blog, urlBase, loading, relatedBlogs = [] }) {
     const navigate = useNavigate();
-    const [ activeId, setActiveId ] = useState('');
-    const [ activeChapter, setActiveChapter ] = useState(0);
+    const [activeId, setActiveId] = useState('');
+    const [activeChapter, setActiveChapter] = useState(0);
     const articleRef = useRef(null);
 
     const parsedContent = blog ? parseContentData(blog.content) : null;
@@ -154,13 +154,13 @@ function BlogDetailDesktop({ blog, urlBase, loading, relatedBlogs = [] }) {
 
         headingElements.forEach((el) => observer.observe(el));
         return () => headingElements.forEach((el) => observer.unobserve(el));
-    }, [ blog, currentContent, activeChapter ]);
+    }, [blog, currentContent, activeChapter]);
 
     // Reset to top when switching chapters
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setActiveId('');
-    }, [ activeChapter ]);
+    }, [activeChapter]);
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -203,10 +203,10 @@ function BlogDetailDesktop({ blog, urlBase, loading, relatedBlogs = [] }) {
     const displayDate =
         modifiedDate || createdDate
             ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-            })
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+              })
             : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const hasSidebar = relatedBlogs.length > 0;

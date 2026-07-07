@@ -56,7 +56,7 @@ const Table = forwardRef(
         },
         ref,
     ) => {
-        const [ selected, setRowSelection ] = useState({});
+        const [selected, setRowSelection] = useState({});
         const { isMobile } = useDevices();
         const columnsDefine = useMemo(
             () =>
@@ -67,12 +67,12 @@ const Table = forwardRef(
                         cell: column?.cell
                             ? column?.cell
                             : (value) =>
-                                column.render?.(value.getValue(), value.row.original, column.dataIndex) ||
+                                  column.render?.(value.getValue(), value.row.original, column.dataIndex) ||
                                   value.getValue(),
                     }),
                     pin: column.pin,
                 })),
-            [ columns ],
+            [columns],
         );
 
         const table = useReactTable({
@@ -145,9 +145,9 @@ const Table = forwardRef(
                                                     {header.isPlaceholder
                                                         ? null
                                                         : flexRender(
-                                                            header.column.columnDef.header,
-                                                            header.getContext(),
-                                                        )}
+                                                              header.column.columnDef.header,
+                                                              header.getContext(),
+                                                          )}
                                                 </th>
                                             );
                                         })}

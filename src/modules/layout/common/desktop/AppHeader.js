@@ -16,7 +16,7 @@ const AppHeader = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, profile } = useAuth();
-    const [ dropdownOpen, setDropdownOpen ] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
     const { execute: executeLogoutApi } = useFetch(apiConfig.account.logout);
 
     const isActive = (path) => (location.pathname === path ? styles.active : '');

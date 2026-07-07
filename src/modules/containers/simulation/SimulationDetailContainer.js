@@ -21,11 +21,11 @@ function SimulationDetailContainer() {
     const { id: simulationId } = useParams();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const [ isEnrolled, setIsEnrolled ] = useState(false);
-    const [ enrollmentLoading, setEnrollmentLoading ] = useState(false);
-    const [ simulationEnrollmentId, setSimulationEnrollmentId ] = useState(null);
-    const [ feedbacksPage, setFeedbacksPage ] = useState(INITIAL_PAGE);
-    const [ allFeedbacks, setAllFeedbacks ] = useState([]);
+    const [isEnrolled, setIsEnrolled] = useState(false);
+    const [enrollmentLoading, setEnrollmentLoading] = useState(false);
+    const [simulationEnrollmentId, setSimulationEnrollmentId] = useState(null);
+    const [feedbacksPage, setFeedbacksPage] = useState(INITIAL_PAGE);
+    const [allFeedbacks, setAllFeedbacks] = useState([]);
 
     // Fetch simulation detail - guest version
     const {
@@ -96,13 +96,13 @@ function SimulationDetailContainer() {
                 setAllFeedbacks((prev) => {
                     // Prevent duplicate appends in strict mode or rapid calls
                     const newItems = feedbacksData.content.filter((item) => !prev.some((p) => p.id === item.id));
-                    return [ ...prev, ...newItems ];
+                    return [...prev, ...newItems];
                 });
             }
         } else if (feedbacksPage === INITIAL_PAGE) {
             setAllFeedbacks([]);
         }
-    }, [ feedbacksData, feedbacksPage ]);
+    }, [feedbacksData, feedbacksPage]);
 
     const handleLoadMoreFeedbacks = useCallback(() => {
         const nextPage = feedbacksPage + 1;
@@ -110,7 +110,7 @@ function SimulationDetailContainer() {
         fetchFeedbacks({
             params: { simulationId: parseInt(simulationId), page: nextPage, size: FEEDBACKS_PAGE_SIZE },
         });
-    }, [ feedbacksPage, simulationId, fetchFeedbacks ]);
+    }, [feedbacksPage, simulationId, fetchFeedbacks]);
 
     // Create feedback
     const { execute: createReview } = useFetch(
@@ -164,7 +164,7 @@ function SimulationDetailContainer() {
                 fetchGuest({ pathParams });
             }
         }
-    }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest ]);
+    }, [simulationId, isAuthenticated, fetchStudent, fetchGuest]);
 
     // Fetch tasks when simulationId changes
     React.useEffect(() => {
@@ -172,7 +172,7 @@ function SimulationDetailContainer() {
 
         const params = { simulationId: parseInt(simulationId) };
         fetchGuestTasks({ params });
-    }, [ simulationId, fetchGuestTasks ]);
+    }, [simulationId, fetchGuestTasks]);
 
     // Check enrollment and feedback status on mount if authenticated
     React.useEffect(() => {
@@ -188,7 +188,7 @@ function SimulationDetailContainer() {
                 });
             }
         }
-    }, [ isAuthenticated, simulationId, checkEnrollment, fetchFeedbacks ]);
+    }, [isAuthenticated, simulationId, checkEnrollment, fetchFeedbacks]);
 
     // Check if already enrolled and get simulationEnrollmentId
     React.useEffect(() => {
@@ -202,7 +202,7 @@ function SimulationDetailContainer() {
                 setSimulationEnrollmentId(null);
             }
         }
-    }, [ enrollmentData, simulationId ]);
+    }, [enrollmentData, simulationId]);
 
     const handleRetry = useCallback(() => {
         if (simulationId) {
@@ -224,7 +224,7 @@ function SimulationDetailContainer() {
                 params: { simulationId: parseInt(simulationId) },
             });
         }
-    }, [ simulationId, isAuthenticated, fetchStudent, fetchGuest, checkEnrollment, fetchFeedbacks ]);
+    }, [simulationId, isAuthenticated, fetchStudent, fetchGuest, checkEnrollment, fetchFeedbacks]);
 
     // Handle enrollment button click
     const handleEnroll = useCallback(async () => {
@@ -279,19 +279,19 @@ function SimulationDetailContainer() {
         } finally {
             setEnrollmentLoading(false);
         }
-    }, [ simulationId, isAuthenticated, enrollToSimulation, checkEnrollment, navigate, simulationData ]);
+    }, [simulationId, isAuthenticated, enrollToSimulation, checkEnrollment, navigate, simulationData]);
 
     // Handle login button click
     const handleLogin = useCallback(() => {
         navigate('/login');
-    }, [ navigate ]);
+    }, [navigate]);
 
     // Check if user is a student (for UI logic)
     const isStudent = useMemo(() => {
         if (!isAuthenticated) return false;
         const userKind = getCacheUserKind();
         return userKind === USER_KIND_STUDENT;
-    }, [ isAuthenticated ]);
+    }, [isAuthenticated]);
 
     // Handle start/continue task
     const handleStartTask = useCallback(() => {
@@ -311,7 +311,7 @@ function SimulationDetailContainer() {
                 companyLogo: simulationData?.educator?.organization?.logoUrl,
             },
         });
-    }, [ simulationId, isAuthenticated, isEnrolled, simulationEnrollmentId, navigate, simulationData ]);
+    }, [simulationId, isAuthenticated, isEnrolled, simulationEnrollmentId, navigate, simulationData]);
 
     const hasCompleted = useMemo(() => {
         if (enrollmentData?.content) {
@@ -319,7 +319,7 @@ function SimulationDetailContainer() {
             return enrollment?.progress === 100;
         }
         return false;
-    }, [ enrollmentData, simulationId ]);
+    }, [enrollmentData, simulationId]);
 
     const handleSubmitReview = useCallback(
         async ({ content, star }) => {
@@ -345,7 +345,7 @@ function SimulationDetailContainer() {
                 return false;
             }
         },
-        [ simulationId, createReview, handleRetry ],
+        [simulationId, createReview, handleRetry],
     );
 
     const handleUpdateReview = useCallback(
@@ -372,7 +372,7 @@ function SimulationDetailContainer() {
                 return false;
             }
         },
-        [ updateReview, handleRetry ],
+        [updateReview, handleRetry],
     );
 
     return (

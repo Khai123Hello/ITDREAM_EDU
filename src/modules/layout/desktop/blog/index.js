@@ -16,7 +16,7 @@ const ITEMS_PER_PAGE = 16;
 
 // ─── Sort Dropdown ───
 function SortDropdown({ value, onChange }) {
-    const [ open, setOpen ] = useState(false);
+    const [open, setOpen] = useState(false);
     const ref = useRef(null);
 
     React.useEffect(() => {
@@ -120,9 +120,9 @@ function BlogListDesktop({
     sort,
     onSortChange,
 }) {
-    const [ searchQuery, setSearchQuery ] = useState('');
-    const [ currentPage, setCurrentPage ] = useState(1);
-    const [ localSort, setLocalSort ] = useState(sort || 'createdDate,desc');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [localSort, setLocalSort] = useState(sort || 'createdDate,desc');
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return null;
@@ -174,8 +174,8 @@ function BlogListDesktop({
         }
 
         // Sort
-        const [ field, dir ] = localSort.split(',');
-        result = [ ...result ].sort((a, b) => {
+        const [field, dir] = localSort.split(',');
+        result = [...result].sort((a, b) => {
             if (field === 'name') {
                 return dir === 'asc'
                     ? (a.name || '').localeCompare(b.name || '', 'vi')
@@ -188,14 +188,14 @@ function BlogListDesktop({
         });
 
         return result;
-    }, [ blogs, selectedCategory, searchQuery, localSort ]);
+    }, [blogs, selectedCategory, searchQuery, localSort]);
 
     const total = filteredBlogs.length;
 
     const paginatedBlogs = useMemo(() => {
         const start = (currentPage - 1) * ITEMS_PER_PAGE;
         return filteredBlogs.slice(start, start + ITEMS_PER_PAGE);
-    }, [ filteredBlogs, currentPage ]);
+    }, [filteredBlogs, currentPage]);
 
     const hasActiveFilters = !!(searchQuery || selectedCategory || localSort !== 'createdDate,desc');
 

@@ -25,7 +25,7 @@ function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = 
     const sliderRef = useRef(null);
     const stepsRef = useRef(null);
     const { isAuthenticated } = useAuth();
-    const [ activeIndex, setActiveIndex ] = useState(0);
+    const [activeIndex, setActiveIndex] = useState(0);
 
     const handleStartClick = () => {
         if (isAuthenticated) {
@@ -35,7 +35,7 @@ function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = 
         }
     };
 
-    const cards = useMemo(() => simulations || [], [ simulations ]);
+    const cards = useMemo(() => simulations || [], [simulations]);
     const totalCards = cards.length + 1;
 
     const handleSelectCard = (id) => {

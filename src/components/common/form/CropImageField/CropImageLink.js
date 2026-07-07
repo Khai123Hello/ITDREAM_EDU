@@ -19,7 +19,7 @@ function Component({ onFinish, url, show, beforeUpload, onError }) {
         } catch (error) {
             onError?.();
         }
-    }, [ url, show ]);
+    }, [url, show]);
 
     return <></>;
 }

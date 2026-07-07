@@ -25,7 +25,7 @@ const parseDate = (dateStr) => {
         const parts = dateStr.split(' ');
         const datePart = parts[0];
         const timePart = parts[1] || '00:00:00';
-        const [ day, month, year ] = datePart.split('/');
+        const [day, month, year] = datePart.split('/');
         return new Date(`${year}-${month}-${day}T${timePart}`);
     }
     return new Date(dateStr);
@@ -59,17 +59,17 @@ export default function CommentPanel({
     onUpdateComment = () => {},
     onDeleteComment = () => {},
 }) {
-    const [ mainText, setMainText ] = useState('');
-    const [ replyingToId, setReplyingToId ] = useState(null);
-    const [ replyText, setReplyText ] = useState('');
-    const [ editingId, setEditingId ] = useState(null);
-    const [ editText, setEditText ] = useState('');
+    const [mainText, setMainText] = useState('');
+    const [replyingToId, setReplyingToId] = useState(null);
+    const [replyText, setReplyText] = useState('');
+    const [editingId, setEditingId] = useState(null);
+    const [editText, setEditText] = useState('');
     const listEndRef = useRef(null);
 
     // Filter root comments and replies
     const rootComments = useMemo(() => {
         return comments.filter((c) => !c.parentId || c.parentId === 0);
-    }, [ comments ]);
+    }, [comments]);
 
     const repliesMap = useMemo(() => {
         const map = {};
@@ -98,7 +98,7 @@ export default function CommentPanel({
         });
 
         return map;
-    }, [ comments ]);
+    }, [comments]);
 
     // Handle submit main comment
     const handleMainSubmit = (e) => {
@@ -133,14 +133,14 @@ export default function CommentPanel({
         setReplyText('');
         setEditingId(null);
         setEditText('');
-    }, [ taskId ]);
+    }, [taskId]);
 
     // Scroll to bottom when comments count changes
     useEffect(() => {
         if (listEndRef.current) {
             listEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [ comments.length ]);
+    }, [comments.length]);
 
     // Render Avatar
     const renderAvatar = (user) => {
@@ -164,32 +164,32 @@ export default function CommentPanel({
     // Helper to get kind badge style and label based on user.kind
     const getUserKindBadge = (kind) => {
         switch (Number(kind)) {
-                        case 1: // Admin
-                            return {
-                                label: 'Quản trị viên',
-                                bgColor: '#fee2e2', // light red
-                                color: '#991b1b',
-                            };
-                        case 2: // Educator
-                            return {
-                                label: 'Giảng viên',
-                                bgColor: '#dbeafe', // light blue
-                                color: '#1e40af',
-                            };
-                        case 4: // Company
-                            return {
-                                label: 'Doanh nghiệp',
-                                bgColor: '#fef3c7', // light yellow
-                                color: '#92400e',
-                            };
-                        case 3: // Student
-                            return {
-                                label: 'Học viên',
-                                bgColor: '#f0fdf4', // light green
-                                color: '#166534',
-                            };
-                        default:
-                            return null;
+            case 1: // Admin
+                return {
+                    label: 'Quản trị viên',
+                    bgColor: '#fee2e2', // light red
+                    color: '#991b1b',
+                };
+            case 2: // Educator
+                return {
+                    label: 'Giảng viên',
+                    bgColor: '#dbeafe', // light blue
+                    color: '#1e40af',
+                };
+            case 4: // Company
+                return {
+                    label: 'Doanh nghiệp',
+                    bgColor: '#fef3c7', // light yellow
+                    color: '#92400e',
+                };
+            case 3: // Student
+                return {
+                    label: 'Học viên',
+                    bgColor: '#f0fdf4', // light green
+                    color: '#166534',
+                };
+            default:
+                return null;
         }
     };
 

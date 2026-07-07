@@ -10,8 +10,8 @@ function SimulationCompletedContainer() {
     const { id: simulationId } = useParams();
     const navigate = useNavigate();
     const { profile } = useAuth();
-    const [ isGeneratingCert, setIsGeneratingCert ] = useState(false);
-    const [ hasTried, setHasTried ] = useState(false);
+    const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+    const [hasTried, setHasTried] = useState(false);
 
     // Fetch simulation detail
     const {
@@ -98,12 +98,12 @@ function SimulationCompletedContainer() {
                 params: { simulationId: parseInt(simulationId) },
             });
         }
-    }, [ simulationId, fetchSimulationDetail, fetchAchievements, checkEnrollment ]);
+    }, [simulationId, fetchSimulationDetail, fetchAchievements, checkEnrollment]);
 
     const enrollment = useMemo(() => {
         if (!enrollmentData?.content) return null;
         return enrollmentData.content.find((e) => e.simulation?.id === parseInt(simulationId));
-    }, [ enrollmentData, simulationId ]);
+    }, [enrollmentData, simulationId]);
 
     const simulationEnrollmentId = enrollment?.id;
 
@@ -116,7 +116,7 @@ function SimulationCompletedContainer() {
                 params: { simulationEnrollmentId },
             });
         }
-    }, [ simulationEnrollmentId, fetchProgress, fetchReviews ]);
+    }, [simulationEnrollmentId, fetchProgress, fetchReviews]);
 
     const subtaskFeedbacks = useMemo(() => {
         if (!taskProgressData?.content || !reviewData?.content) return [];
@@ -131,12 +131,12 @@ function SimulationCompletedContainer() {
                 };
             })
             .filter((item) => item.reviews.length > 0);
-    }, [ taskProgressData, reviewData ]);
+    }, [taskProgressData, reviewData]);
 
     const currentAch = useMemo(() => {
         if (!achievementsData) return null;
         return achievementsData.find((ach) => ach.simulation?.id === parseInt(simulationId, 10));
-    }, [ achievementsData, simulationId ]);
+    }, [achievementsData, simulationId]);
 
     // Auto-generate certificate if missing filePath
     useEffect(() => {

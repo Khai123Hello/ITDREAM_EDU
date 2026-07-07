@@ -37,7 +37,7 @@ function Input({
     ...props
 }) {
     const { styleProps, rest } = extractStyleProps(props);
-    const [ _value, _onChange ] = useUncontrolled({
+    const [_value, _onChange] = useUncontrolled({
         value: isNull(value) ? '' : value,
         onChange,
         defaultValue: '',

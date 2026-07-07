@@ -26,7 +26,7 @@ function TaskPanel({
     // Tách task cha (kind=1) và subtask (kind=2)
     const parentTasks = useMemo(
         () => tasks.filter((t) => t.kind === 1).sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0)),
-        [ tasks ],
+        [tasks],
     );
 
     // Map parentId → subtasks[], sắp xếp theo orderInParent
@@ -45,14 +45,14 @@ function TaskPanel({
             map[pid].sort((a, b) => (a.orderInParent ?? 0) - (b.orderInParent ?? 0));
         });
         return map;
-    }, [ tasks ]);
+    }, [tasks]);
 
     // Task cha đang active — dùng activeTaskId từ prop (trỏ đến kind=1)
     // hoặc fallback về task cha đầu tiên
-    const [ activeParentId, setActiveParentId ] = useState(() => activeTaskId ?? parentTasks[0]?.id ?? null);
+    const [activeParentId, setActiveParentId] = useState(() => activeTaskId ?? parentTasks[0]?.id ?? null);
 
     // Subtask đang active (kind=2)
-    const [ activeSubId, setActiveSubId ] = useState(() => {
+    const [activeSubId, setActiveSubId] = useState(() => {
         const firstParent = activeTaskId ?? parentTasks[0]?.id;
         if (firstParent == null) return null;
         const subs = subTaskMap[firstParent] ?? [];
@@ -74,18 +74,18 @@ function TaskPanel({
             if (pid != null) setActiveParentId(pid);
             setActiveSubId(task.id);
         }
-    }, [ activeTaskId ]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [activeTaskId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Subtasks của task cha đang chọn
     const currentSubTasks = useMemo(
         () => (activeParentId != null ? (subTaskMap[activeParentId] ?? []) : []),
-        [ activeParentId, subTaskMap ],
+        [activeParentId, subTaskMap],
     );
 
     // Subtask đang hiển thị
     const activeSubTask = useMemo(
         () => currentSubTasks.find((s) => s.id === activeSubId) ?? currentSubTasks[0] ?? null,
-        [ currentSubTasks, activeSubId ],
+        [currentSubTasks, activeSubId],
     );
 
     // Click task cha trong sidebar
