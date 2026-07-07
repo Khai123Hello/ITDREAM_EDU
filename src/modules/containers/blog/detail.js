@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import apiConfig from '@constants/apiConfig';
+import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
 import AppFooter from '@modules/layout/common/AppFooter';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
@@ -8,25 +9,33 @@ import BlogDetailDesktop from '@modules/layout/desktop/blog/detail';
 
 function BlogDetailContainer() {
     const { id } = useParams();
+    const { isAuthenticated } = useAuth();
 
-    const { data: blogRes, loading } = useFetch(apiConfig.blog.studentGet, {
-        immediate: true,
+    const { data: blogRes, loading: detailLoading } = useFetch(apiConfig.blog.studentGet, {
+        immediate: isAuthenticated,
         pathParams: { id },
         mappingData: (res) => res || null,
     });
 
     const blogListParams = useMemo(() => ({ page: 0, size: 100, paged: true }), []);
 
-    const { data: blogsRes } = useFetch(apiConfig.blog.studentList, {
+    const { data: blogsRes, loading: listLoading } = useFetch(apiConfig.blog.studentList, {
         immediate: true,
         params: blogListParams,
         mappingData: (res) => res || {},
     });
 
-    // Get related blogs: same category, exclude current blog
-    const blog = blogRes?.data || null;
-    const urlBase = blogRes?.urlBase || blogsRes?.urlBase || '';
+    const loading = isAuthenticated ? detailLoading : listLoading;
     const allBlogs = blogsRes?.data?.content || [];
+
+    const blog = useMemo(() => {
+        if (isAuthenticated) {
+            return blogRes?.data || null;
+        }
+        return allBlogs.find((b) => String(b.id) === String(id)) || null;
+    }, [ isAuthenticated, blogRes, allBlogs, id ]);
+
+    const urlBase = blogRes?.urlBase || blogsRes?.urlBase || '';
 
     const relatedBlogs = useMemo(() => {
         if (!blog || !allBlogs.length) return [];

@@ -1,4 +1,5 @@
 import React from 'react';
+import { SIMULATION_LEVEL_MAP } from '@constants';
 
 import styles from '../SimulationDetailDesktop/detail.module.scss';
 
@@ -16,15 +17,9 @@ const parseList = (value) => {
 
 const getTaskMetaLevel = (task) => {
     if (task?.level !== undefined && task?.level !== null) {
-        const levelMap = {
-            0: 'Giới thiệu',
-            1: 'Cơ bản',
-            2: 'Trung cấp',
-            3: 'Nâng cao',
-        };
-        return levelMap[task.level] || task.level;
+        return SIMULATION_LEVEL_MAP[task.level] || task.level;
     }
-    return task?.difficulty || 'Giới thiệu';
+    return task?.difficulty || '';
 };
 
 const getTaskDuration = (task) => {

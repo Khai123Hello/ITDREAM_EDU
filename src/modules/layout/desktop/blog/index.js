@@ -121,7 +121,6 @@ function BlogListDesktop({
     onSortChange,
 }) {
     const [ searchQuery, setSearchQuery ] = useState('');
-    const [ quickFilter, setQuickFilter ] = useState('all');
     const [ currentPage, setCurrentPage ] = useState(1);
     const [ localSort, setLocalSort ] = useState(sort || 'createdDate,desc');
 
@@ -149,14 +148,8 @@ function BlogListDesktop({
         setCurrentPage(1);
     };
 
-    const handleQuickFilter = (filter) => {
-        setQuickFilter(filter);
-        setCurrentPage(1);
-    };
-
     const handleClearAll = () => {
         setSearchQuery('');
-        setQuickFilter('all');
         onCategoryChange(null);
         setLocalSort('createdDate,desc');
         setCurrentPage(1);
@@ -180,16 +173,6 @@ function BlogListDesktop({
             );
         }
 
-        // Quick filter
-        const now = Date.now();
-        const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-        if (quickFilter === 'new') {
-            result = result.filter((b) => {
-                const d = new Date(b.createdDate || b.modifiedDate || 0).getTime();
-                return now - d <= thirtyDaysMs;
-            });
-        }
-
         // Sort
         const [ field, dir ] = localSort.split(',');
         result = [ ...result ].sort((a, b) => {
@@ -205,7 +188,7 @@ function BlogListDesktop({
         });
 
         return result;
-    }, [ blogs, selectedCategory, searchQuery, quickFilter, localSort ]);
+    }, [ blogs, selectedCategory, searchQuery, localSort ]);
 
     const total = filteredBlogs.length;
 
@@ -214,12 +197,7 @@ function BlogListDesktop({
         return filteredBlogs.slice(start, start + ITEMS_PER_PAGE);
     }, [ filteredBlogs, currentPage ]);
 
-    const hasActiveFilters = !!(
-        searchQuery ||
-        selectedCategory ||
-        quickFilter !== 'all' ||
-        localSort !== 'createdDate,desc'
-    );
+    const hasActiveFilters = !!(searchQuery || selectedCategory || localSort !== 'createdDate,desc');
 
     const startItem = total === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
@@ -241,7 +219,6 @@ function BlogListDesktop({
             {/* FILTER BAR */}
             <section className={styles.filterBar}>
                 <div className={styles.filterBarInner}>
-
                     {/* Category pills */}
                     <div className={styles.categoryPillsRow}>
                         <button

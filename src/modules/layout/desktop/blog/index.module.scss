@@ -107,53 +107,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     gap: 14px;
 }
 
-/* Quick Pill Row */
-.quickPillsRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
 
-.quickPillsLabel {
-    font-size: 11px;
-    font-weight: 800;
-    color: $text-light;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.quickPills {
-    display: flex;
-    gap: 8px;
-}
-
-.quickPill {
-    padding: 6px 18px;
-    border-radius: 999px;
-    border: 1.5px solid $border-color;
-    background: $white;
-    color: $text-secondary;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: $transition-smooth;
-    white-space: nowrap;
-
-    &:hover {
-        border-color: $primary-teal;
-        color: $primary-teal;
-        background: $primary-teal-light;
-    }
-
-    &.quickPillActive {
-        background: $primary-teal;
-        border-color: $primary-teal;
-        color: $white;
-        box-shadow: 0 3px 10px $primary-teal-glow;
-    }
-}
 
 /* Category Pills Row */
 .categoryPillsRow {
@@ -812,9 +766,5 @@ $shimmer-gradient: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%)
 @media (max-width: 480px) {
     .articlesGrid {
         grid-template-columns: 1fr;
-    }
-
-    .quickPills {
-        flex-wrap: wrap;
     }
 }

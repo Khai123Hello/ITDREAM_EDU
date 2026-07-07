@@ -250,6 +250,18 @@ export const SIMULATION_LEVEL_INTERMEDIATE = 2;
 export const SIMULATION_LEVEL_ADVANCED = 3;
 export const SIMULATION_LEVELS = [ SIMULATION_LEVEL_BEGINNER, SIMULATION_LEVEL_INTERMEDIATE, SIMULATION_LEVEL_ADVANCED ];
 
+export const SIMULATION_LEVEL_MAP = {
+    1: 'Cơ bản',
+    2: 'Trung cấp',
+    3: 'Nâng cao',
+};
+
+export const SIMULATION_LEVEL_OPTIONS = [
+    { value: SIMULATION_LEVEL_BEGINNER, label: SIMULATION_LEVEL_MAP[1] },
+    { value: SIMULATION_LEVEL_INTERMEDIATE, label: SIMULATION_LEVEL_MAP[2] },
+    { value: SIMULATION_LEVEL_ADVANCED, label: SIMULATION_LEVEL_MAP[3] },
+];
+
 export const TASK_TYPE_CONTENT = 1;
 export const TASK_TYPE_QUESTION = 2;
 export const TASK_TYPE_ANSWER = 3;
@@ -310,3 +322,66 @@ export const groupRolesOptions = [
     { label: { id: 'superAdmin', defaultMessage: 'Super Admin' }, value: ROLE_SUPPER_ADMIN },
     { label: { id: 'admin', defaultMessage: 'Admin' }, value: ROLE_ADMIN },
 ];
+
+// ─── Job Post ────────────────────────────────────────────────────────────────
+export const JOB_POST_TYPE_EVENT = 1;
+export const JOB_POST_TYPE_JOB = 2;
+export const JOB_POST_TYPE_TALENT_NETWORK = 3;
+
+export const JOB_POST_TYPE_MAP = {
+    1: 'Sự kiện',
+    2: 'Tuyển dụng',
+    3: 'Mạng lưới tài năng',
+};
+
+export const JOB_POST_TYPE_OPTIONS = [
+    { value: JOB_POST_TYPE_EVENT, label: JOB_POST_TYPE_MAP[1] },
+    { value: JOB_POST_TYPE_JOB, label: JOB_POST_TYPE_MAP[2] },
+    { value: JOB_POST_TYPE_TALENT_NETWORK, label: JOB_POST_TYPE_MAP[3] },
+];
+
+export const JOB_POST_ROLE_TYPE_INTERNSHIP = 1;
+export const JOB_POST_ROLE_TYPE_PART_TIMES = 2;
+export const JOB_POST_ROLE_TYPE_FULL_TIMES = 3;
+export const JOB_POST_ROLE_TYPE_INTERNSHIP_PART_TIMES = 4;
+export const JOB_POST_ROLE_TYPE_INTERNSHIP_FULL_TIMES = 5;
+export const JOB_POST_ROLE_TYPE_PART_TIMES_FULL_TIMES = 6;
+export const JOB_POST_ROLE_TYPE_ALL = 7;
+
+export const JOB_POST_ROLE_TYPE_MAP = {
+    1: 'Thực tập',
+    2: 'Bán thời gian',
+    3: 'Toàn thời gian',
+    4: 'Thực tập & Bán thời gian',
+    5: 'Thực tập & Toàn thời gian',
+    6: 'Bán thời gian & Toàn thời gian',
+    7: 'Tất cả vai trò',
+};
+
+export const JOB_POST_ROLE_TYPE_OPTIONS = [
+    { value: JOB_POST_ROLE_TYPE_INTERNSHIP, label: JOB_POST_ROLE_TYPE_MAP[1] },
+    { value: JOB_POST_ROLE_TYPE_PART_TIMES, label: JOB_POST_ROLE_TYPE_MAP[2] },
+    { value: JOB_POST_ROLE_TYPE_FULL_TIMES, label: JOB_POST_ROLE_TYPE_MAP[3] },
+    { value: JOB_POST_ROLE_TYPE_INTERNSHIP_PART_TIMES, label: JOB_POST_ROLE_TYPE_MAP[4] },
+    { value: JOB_POST_ROLE_TYPE_INTERNSHIP_FULL_TIMES, label: JOB_POST_ROLE_TYPE_MAP[5] },
+    { value: JOB_POST_ROLE_TYPE_PART_TIMES_FULL_TIMES, label: JOB_POST_ROLE_TYPE_MAP[6] },
+    { value: JOB_POST_ROLE_TYPE_ALL, label: JOB_POST_ROLE_TYPE_MAP[7] },
+];
+
+// Mapping vai trò nguyên tử (atoms) cho mỗi roleType.
+// Dùng để lọc FE theo logic "giao nhau":
+//   job match filter nếu chúng có ít nhất 1 vai trò nguyên tử chung.
+export const JOB_POST_ROLE_ATOMS = {
+    1: ['intern'],
+    2: ['part'],
+    3: ['full'],
+    4: ['intern', 'part'],
+    5: ['intern', 'full'],
+    6: ['part', 'full'],
+    7: ['intern', 'part', 'full'],
+};
+
+
+export const JOB_POST_STATUS_ACTIVE = 1;
+export const JOB_POST_STATUS_HIDE = 0;
+export const JOB_POST_STATUS_BLOCK = -1;

@@ -229,10 +229,12 @@ function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = 
                         {feedbacks.map((f) => {
                             const studentProfile = f.student?.profileAccountDto || f.student;
                             const fullName = studentProfile?.fullName || f.student?.account?.fullName || 'Học viên';
-                            
+
                             const avatar = studentProfile?.avatar || studentProfile?.avatarPath || '';
                             const avatarUrl = avatar
-                                ? (avatar.startsWith('http') ? avatar : `${AppConstants.contentRootUrl}/${avatar}`)
+                                ? avatar.startsWith('http')
+                                    ? avatar
+                                    : `${AppConstants.contentRootUrl}/${avatar}`
                                 : '';
 
                             return (
@@ -245,9 +247,7 @@ function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = 
                                         )}
                                     </div>
                                     <p className={styles['lp-testimonial__text']}>{f.content}</p>
-                                    <p className={styles['lp-testimonial__name']}>
-                                        {fullName}
-                                    </p>
+                                    <p className={styles['lp-testimonial__name']}>{fullName}</p>
                                     <p className={styles['lp-testimonial__landed']}>
                                         {f.simulation?.title ? `Hoàn thành bài mô phỏng: ${f.simulation.title}` : ''}
                                     </p>

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { FileTextOutlined } from '@ant-design/icons';
 import RatingStar from '@components/common/elements/RatingStar';
-import { AppConstants } from '@constants';
+import { AppConstants, SIMULATION_LEVEL_MAP } from '@constants';
 import useAuth from '@hooks/useAuth';
 import AppFooter from '@modules/layout/common/AppFooter';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
@@ -128,8 +128,7 @@ function SimulationDetailDesktop({
 
     const handleTaskSelect = (taskId) => setActiveTaskId(taskId);
 
-    const getLevelLabel = (level) =>
-        ({ 0: 'Giới thiệu', 1: 'Cơ bản', 2: 'Trung cấp', 3: 'Nâng cao' })[level] ?? 'Giới thiệu';
+    const getLevelLabel = (level) => SIMULATION_LEVEL_MAP[level] || '';
 
     const myReview = useMemo(() => {
         if (!isAuthenticated || !profile || !feedbacks.length) return null;

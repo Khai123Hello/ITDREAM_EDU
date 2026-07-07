@@ -1,11 +1,12 @@
 import React from 'react';
+import { SIMULATION_LEVEL_MAP } from '@constants';
 
 import styles from './index.module.scss';
 
 const levelConfig = {
-    1: { label: 'Cơ bản', className: 'badgeBasic' },
-    2: { label: 'Trung cấp', className: 'badgeMid' },
-    3: { label: 'Nâng cao', className: 'badgeAdv' },
+    1: { label: SIMULATION_LEVEL_MAP[1], className: 'badgeBasic' },
+    2: { label: SIMULATION_LEVEL_MAP[2], className: 'badgeMid' },
+    3: { label: SIMULATION_LEVEL_MAP[3], className: 'badgeAdv' },
 };
 
 const thumbGradients = [

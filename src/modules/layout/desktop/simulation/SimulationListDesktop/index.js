@@ -2,17 +2,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchOutlined } from '@ant-design/icons';
 import SimulationCard from '@components/common/elements/SimulationCard';
-import { DEFAULT_PAGE_SIZE } from '@constants';
+import { DEFAULT_PAGE_SIZE, SIMULATION_LEVEL_OPTIONS } from '@constants';
 import useAuth from '@hooks/useAuth';
 import { Empty, Input, Pagination, Spin } from 'antd';
 
 import styles from './index.module.scss';
-
-const LEVEL_OPTIONS = [
-    { value: 1, label: 'Cơ bản' },
-    { value: 2, label: 'Trung cấp' },
-    { value: 3, label: 'Nâng cao' },
-];
 
 const DURATION_OPTIONS = [
     { value: 'all', label: 'Tất cả' },
@@ -192,7 +186,7 @@ function SimulationListDesktop({
     }, [ organizations ]);
 
     const levelOptions = useMemo(() => {
-        return [ { value: 'all', label: 'Tất cả' }, ...LEVEL_OPTIONS ];
+        return [ { value: 'all', label: 'Tất cả' }, ...SIMULATION_LEVEL_OPTIONS ];
     }, []);
 
     // Apply local filters (Quick filters and local duration filter)

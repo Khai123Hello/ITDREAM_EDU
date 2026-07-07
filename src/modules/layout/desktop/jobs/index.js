@@ -2,7 +2,24 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import LoadingComponent from '@components/common/loading/LoadingComponent';
-import { AppConstants } from '@constants';
+import {
+    AppConstants,
+    JOB_POST_ROLE_TYPE_ALL,
+    JOB_POST_ROLE_TYPE_FULL_TIMES,
+    JOB_POST_ROLE_TYPE_INTERNSHIP,
+    JOB_POST_ROLE_TYPE_INTERNSHIP_FULL_TIMES,
+    JOB_POST_ROLE_TYPE_INTERNSHIP_PART_TIMES,
+    JOB_POST_ROLE_TYPE_MAP,
+    JOB_POST_ROLE_TYPE_OPTIONS,
+    JOB_POST_ROLE_TYPE_PART_TIMES,
+    JOB_POST_ROLE_TYPE_PART_TIMES_FULL_TIMES,
+    JOB_POST_TYPE_EVENT,
+    JOB_POST_TYPE_JOB,
+    JOB_POST_TYPE_MAP,
+    JOB_POST_TYPE_OPTIONS,
+    JOB_POST_TYPE_TALENT_NETWORK,
+    SIMULATION_LEVEL_MAP,
+} from '@constants';
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import { getDownloadUrl } from '@utils';
@@ -14,25 +31,11 @@ import styles from './index.module.scss';
 
 const getJobTags = (job) => {
     const tags = [];
-    if (job.type === 1) {
-        tags.push('SỰ KIỆN');
-    } else if (job.type === 2) {
-        tags.push('CÔNG VIỆC');
-    } else if (job.type === 3) {
-        tags.push('MẠNG LƯỚI TÀI NĂNG');
+    if (JOB_POST_TYPE_MAP[job.type]) {
+        tags.push(JOB_POST_TYPE_MAP[job.type].toUpperCase());
     }
-
-    const roleTypeLabels = {
-        1: 'THỰC TẬP',
-        2: 'BÁN THỜI GIAN',
-        3: 'TOÀN THỜI GIAN',
-        4: 'THỰC TẬP & BÁN THỜI GIAN',
-        5: 'THỰC TẬP & TOÀN THỜI GIAN',
-        6: 'BÁN THỜI GIAN & TOÀN THỜI GIAN',
-        7: 'TẤT CẢ VAI TRÒ',
-    };
-    if (job.roleType && roleTypeLabels[job.roleType]) {
-        tags.push(roleTypeLabels[job.roleType]);
+    if (job.roleType && JOB_POST_ROLE_TYPE_MAP[job.roleType]) {
+        tags.push(JOB_POST_ROLE_TYPE_MAP[job.roleType].toUpperCase());
     }
     return tags;
 };
@@ -138,13 +141,12 @@ function JobsDesktop() {
         loading: listLoading,
         execute: fetchJobs,
     } = useFetch(apiConfig.job.guestList, {
-        params: queryParams,
         mappingData: (res) => res.data || {},
     });
 
     // Load jobs on query parameters change
     useEffect(() => {
-        fetchJobs();
+        fetchJobs({ params: queryParams });
     }, [ queryParams, fetchJobs ]);
 
     // Active job details resolver
@@ -263,9 +265,11 @@ function JobsDesktop() {
                             className={styles.filterSelect}
                         >
                             <option value="Tất cả">Loại cơ hội: Tất cả</option>
-                            <option value="1">Sự kiện</option>
-                            <option value="2">Tuyển dụng</option>
-                            <option value="3">Mạng lưới tài năng</option>
+                            {JOB_POST_TYPE_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={String(opt.value)}>
+                                    {opt.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -276,9 +280,11 @@ function JobsDesktop() {
                             className={styles.filterSelect}
                         >
                             <option value="Tất cả">Loại vai trò: Tất cả</option>
-                            <option value="1">Thực tập</option>
-                            <option value="2">Bán thời gian</option>
-                            <option value="3">Toàn thời gian</option>
+                            {JOB_POST_ROLE_TYPE_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={String(opt.value)}>
+                                    {opt.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -359,13 +365,25 @@ function JobsDesktop() {
                                             <span
                                                 key={i}
                                                 className={classNames(styles.tag, {
-                                                    [styles.tagEvent]: tag === 'SỰ KIỆN',
-                                                    [styles.tagJob]: tag === 'CÔNG VIỆC',
-                                                    [styles.tagNetwork]: tag === 'MẠNG LƯỚI TÀI NĂNG',
-                                                    [styles.tagIntern]: tag.includes('THỰC TẬP'),
-                                                    [styles.tagPartTime]: tag.includes('BÁN THỜI GIAN'),
-                                                    [styles.tagFullTime]:
-                                                        tag.includes('TOÀN THỜI GIAN') || tag === 'TẤT CẢ VAI TRÒ',
+                                                    [styles.tagEvent]: job.type === JOB_POST_TYPE_EVENT,
+                                                    [styles.tagJob]: job.type === JOB_POST_TYPE_JOB,
+                                                    [styles.tagNetwork]: job.type === JOB_POST_TYPE_TALENT_NETWORK,
+                                                    [styles.tagIntern]: [
+                                                        JOB_POST_ROLE_TYPE_INTERNSHIP,
+                                                        JOB_POST_ROLE_TYPE_INTERNSHIP_PART_TIMES,
+                                                        JOB_POST_ROLE_TYPE_INTERNSHIP_FULL_TIMES,
+                                                    ].includes(job.roleType),
+                                                    [styles.tagPartTime]: [
+                                                        JOB_POST_ROLE_TYPE_PART_TIMES,
+                                                        JOB_POST_ROLE_TYPE_INTERNSHIP_PART_TIMES,
+                                                        JOB_POST_ROLE_TYPE_PART_TIMES_FULL_TIMES,
+                                                    ].includes(job.roleType),
+                                                    [styles.tagFullTime]: [
+                                                        JOB_POST_ROLE_TYPE_FULL_TIMES,
+                                                        JOB_POST_ROLE_TYPE_INTERNSHIP_FULL_TIMES,
+                                                        JOB_POST_ROLE_TYPE_PART_TIMES_FULL_TIMES,
+                                                        JOB_POST_ROLE_TYPE_ALL,
+                                                    ].includes(job.roleType),
                                                 })}
                                             >
                                                 {tag}
@@ -596,7 +614,7 @@ function JobsDesktop() {
                                                     <div className={styles.simLabel}>{sim.category?.name || ''}</div>
                                                     <div className={styles.simName}>{sim.title}</div>
                                                     <div className={styles.simMeta}>
-                                                        <span>Giới thiệu</span>
+                                                        <span>{SIMULATION_LEVEL_MAP[sim.level] || ''}</span>
                                                         <div className={styles.simDots}>
                                                             <div
                                                                 className={classNames(styles.dot, {

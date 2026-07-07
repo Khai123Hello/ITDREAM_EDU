@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, LoadingOutlined } from '@ant-design/icons';
+import { SIMULATION_LEVEL_MAP } from '@constants';
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import useFetchAction from '@hooks/useFetchAction';
@@ -329,12 +330,7 @@ function DashboardDesktop({
 
     // Level label helper
     const getLevelLabel = (level) => {
-        const config = {
-            1: 'Cơ bản',
-            2: 'Trung cấp',
-            3: 'Nâng cao',
-        };
-        return config[level] || 'Cơ bản';
+        return SIMULATION_LEVEL_MAP[level] || SIMULATION_LEVEL_MAP[1];
     };
 
     // Dynamically construct TOP_CARDS
