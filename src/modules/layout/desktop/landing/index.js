@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimulationCard from '@components/common/elements/SimulationCard';
 import SliderScroll from '@components/common/elements/SliderScroll';
+import { AppConstants } from '@constants';
 import useAuth from '@hooks/useAuth';
 
 import styles from './index.module.scss';
@@ -225,18 +226,34 @@ function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = 
                 <section className={`${styles['lp-section']} ${styles['lp-testimonials-section']}`}>
                     <h2 className={styles['lp-section__title']}>Nghe từ chính các sinh viên đã thành công.</h2>
                     <div className={styles['lp-testimonials']}>
-                        {feedbacks.map((f) => (
-                            <div key={f.id} className={styles['lp-testimonial']}>
-                                <div className={styles['lp-testimonial__avatar']} />
-                                <p className={styles['lp-testimonial__text']}>{f.content}</p>
-                                <p className={styles['lp-testimonial__name']}>
-                                    {f.student?.fullName || f.student?.account?.fullName || 'Học viên'}
-                                </p>
-                                <p className={styles['lp-testimonial__landed']}>
-                                    {f.simulation?.title ? `Hoàn thành bài mô phỏng: ${f.simulation.title}` : ''}
-                                </p>
-                            </div>
-                        ))}
+                        {feedbacks.map((f) => {
+                            const studentProfile = f.student?.profileAccountDto || f.student;
+                            const fullName = studentProfile?.fullName || f.student?.account?.fullName || 'Học viên';
+                            
+                            const avatar = studentProfile?.avatar || studentProfile?.avatarPath || '';
+                            const avatarUrl = avatar
+                                ? (avatar.startsWith('http') ? avatar : `${AppConstants.contentRootUrl}/${avatar}`)
+                                : '';
+
+                            return (
+                                <div key={f.id} className={styles['lp-testimonial']}>
+                                    <div className={styles['lp-testimonial__avatar']}>
+                                        {avatarUrl ? (
+                                            <img src={avatarUrl} alt={fullName} />
+                                        ) : (
+                                            (fullName || 'H').charAt(0).toUpperCase()
+                                        )}
+                                    </div>
+                                    <p className={styles['lp-testimonial__text']}>{f.content}</p>
+                                    <p className={styles['lp-testimonial__name']}>
+                                        {fullName}
+                                    </p>
+                                    <p className={styles['lp-testimonial__landed']}>
+                                        {f.simulation?.title ? `Hoàn thành bài mô phỏng: ${f.simulation.title}` : ''}
+                                    </p>
+                                </div>
+                            );
+                        })}
                     </div>
                     <button
                         className={`${styles['lp-btn']} ${styles['lp-btn--primary']}`}

@@ -340,6 +340,9 @@ function JobsDesktop() {
                                 className={classNames(styles.jobCard, {
                                     [styles.selected]:
                                         selectedJobId === job.id || (!selectedJobId && activeJob?.id === job.id),
+                                    [styles.cardEvent]: job.type === 1,
+                                    [styles.cardJob]: job.type === 2,
+                                    [styles.cardNetwork]: job.type === 3,
                                 })}
                                 onClick={() => handleSelectJob(job.id)}
                             >
@@ -356,6 +359,10 @@ function JobsDesktop() {
                                                 className={classNames(styles.tag, {
                                                     [styles.tagEvent]: tag === 'SỰ KIỆN',
                                                     [styles.tagJob]: tag === 'CÔNG VIỆC',
+                                                    [styles.tagNetwork]: tag === 'MẠNG LƯỚI TÀI NĂNG',
+                                                    [styles.tagIntern]: tag.includes('THỰC TẬP'),
+                                                    [styles.tagPartTime]: tag.includes('BÁN THỜI GIAN'),
+                                                    [styles.tagFullTime]: tag.includes('TOÀN THỜI GIAN') || tag === 'TẤT CẢ VAI TRÒ',
                                                 })}
                                             >
                                                 {tag}
@@ -446,6 +453,10 @@ function JobsDesktop() {
                                             className={classNames(styles.tag, {
                                                 [styles.tagEvent]: tag === 'SỰ KIỆN',
                                                 [styles.tagJob]: tag === 'CÔNG VIỆC',
+                                                [styles.tagNetwork]: tag === 'MẠNG LƯỚI TÀI NĂNG',
+                                                [styles.tagIntern]: tag.includes('THỰC TẬP'),
+                                                [styles.tagPartTime]: tag.includes('BÁN THỜI GIAN'),
+                                                [styles.tagFullTime]: tag.includes('TOÀN THỜI GIAN') || tag === 'TẤT CẢ VAI TRÒ',
                                             })}
                                         >
                                             {tag}
@@ -505,18 +516,6 @@ function JobsDesktop() {
                                         {displayJob.address?.toLowerCase() === 'online'
                                             ? 'Online'
                                             : `${displayJob.address ? `${displayJob.address}, ` : ''}${displayJob.province?.name || ''}`}
-                                    </div>
-                                )}
-                                {displayJob.notice && (
-                                    <div className={classNames(styles.detailMetaRow, styles.eligibilityRow)}>
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <path
-                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                            />
-                                        </svg>
-                                        <span>{displayJob.notice}</span>
                                     </div>
                                 )}
 

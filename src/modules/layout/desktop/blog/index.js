@@ -214,26 +214,7 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
             {/* FILTER BAR */}
             <section className={styles.filterBar}>
                 <div className={styles.filterBarInner}>
-                    {/* Quick filter pills */}
-                    <div className={styles.quickPillsRow}>
-                        <span className={styles.quickPillsLabel}>LỌC NHANH</span>
-                        <div className={styles.quickPills}>
-                            <button
-                                type="button"
-                                className={classNames(styles.quickPill, { [styles.quickPillActive]: quickFilter === 'all' })}
-                                onClick={() => handleQuickFilter('all')}
-                            >
-                                Tất cả
-                            </button>
-                            <button
-                                type="button"
-                                className={classNames(styles.quickPill, { [styles.quickPillActive]: quickFilter === 'new' })}
-                                onClick={() => handleQuickFilter('new')}
-                            >
-                                🆕 30 ngày qua
-                            </button>
-                        </div>
-                    </div>
+
 
                     {/* Category pills */}
                     <div className={styles.categoryPillsRow}>

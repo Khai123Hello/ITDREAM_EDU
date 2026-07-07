@@ -177,12 +177,36 @@ $transition-smooth: all 0.2s ease;
 .jobCard {
     border: 1.5px solid $border;
     border-radius: $radius;
-    padding: 16px 18px;
+    padding: 16px 18px 16px 24px;
     margin-bottom: 12px;
     background: $white;
     cursor: pointer;
     transition: $transition-smooth;
     position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: transparent;
+        transition: $transition-smooth;
+    }
+
+    &.cardEvent::before {
+        background: $green-tag;
+    }
+
+    &.cardJob::before {
+        background: $blue-primary;
+    }
+
+    &.cardNetwork::before {
+        background: $purple-tag;
+    }
 
     &:hover {
         border-color: $blue-primary;
@@ -237,6 +261,26 @@ $transition-smooth: all 0.2s ease;
 .tagJob {
     background: $blue-light;
     color: $blue-primary;
+}
+
+.tagNetwork {
+    background: $purple-bg;
+    color: $purple-tag;
+}
+
+.tagIntern {
+    background: #e6fffa;
+    color: #0d9488;
+}
+
+.tagPartTime {
+    background: #fffaf0;
+    color: #dd6b20;
+}
+
+.tagFullTime {
+    background: #ebf8ff;
+    color: #3182ce;
 }
 
 .cardTitle {
