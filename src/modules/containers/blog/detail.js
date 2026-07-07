@@ -32,11 +32,7 @@ function BlogDetailContainer() {
         if (!blog || !allBlogs.length) return [];
         return allBlogs
             .filter(
-                (b) =>
-                    b.id !== blog.id &&
-                    b.category?.id &&
-                    blog.category?.id &&
-                    b.category.id === blog.category.id,
+                (b) => b.id !== blog.id && b.category?.id && blog.category?.id && b.category.id === blog.category.id,
             )
             .slice(0, 4);
     }, [ blog, allBlogs ]);
@@ -44,12 +40,7 @@ function BlogDetailContainer() {
     return (
         <>
             <AppHeader />
-            <BlogDetailDesktop
-                blog={blog}
-                urlBase={urlBase}
-                loading={loading}
-                relatedBlogs={relatedBlogs}
-            />
+            <BlogDetailDesktop blog={blog} urlBase={urlBase} loading={loading} relatedBlogs={relatedBlogs} />
             <AppFooter />
         </>
     );

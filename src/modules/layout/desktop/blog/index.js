@@ -31,11 +31,7 @@ function SortDropdown({ value, onChange }) {
 
     return (
         <div className={styles.sortDropdownWrapper} ref={ref}>
-            <button
-                type="button"
-                className={styles.sortDropdownBtn}
-                onClick={() => setOpen((v) => !v)}
-            >
+            <button type="button" className={styles.sortDropdownBtn} onClick={() => setOpen((v) => !v)}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                     <line x1="21" y1="10" x2="7" y2="10" />
                     <line x1="21" y1="6" x2="3" y2="6" />
@@ -50,7 +46,13 @@ function SortDropdown({ value, onChange }) {
                     fill="none"
                     className={classNames(styles.sortArrow, { [styles.sortArrowOpen]: open })}
                 >
-                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                        d="M1 1L5 5L9 1"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
                 </svg>
             </button>
             {open && (
@@ -59,14 +61,23 @@ function SortDropdown({ value, onChange }) {
                         <button
                             key={opt.value}
                             type="button"
-                            className={classNames(styles.sortMenuItem, { [styles.sortMenuItemActive]: opt.value === value })}
+                            className={classNames(styles.sortMenuItem, {
+                                [styles.sortMenuItemActive]: opt.value === value,
+                            })}
                             onClick={() => {
                                 onChange(opt.value);
                                 setOpen(false);
                             }}
                         >
                             {opt.value === value && (
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                >
                                     <polyline points="20 6 9 17 4 12" />
                                 </svg>
                             )}
@@ -99,7 +110,16 @@ function SkeletonCard() {
     );
 }
 
-function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory, onCategoryChange, sort, onSortChange }) {
+function BlogListDesktop({
+    categories,
+    blogs,
+    urlBase,
+    loading,
+    selectedCategory,
+    onCategoryChange,
+    sort,
+    onSortChange,
+}) {
     const [ searchQuery, setSearchQuery ] = useState('');
     const [ quickFilter, setQuickFilter ] = useState('all');
     const [ currentPage, setCurrentPage ] = useState(1);
@@ -154,9 +174,9 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
             const q = searchQuery.toLowerCase();
             result = result.filter(
                 (b) =>
-                    b.name?.toLowerCase().includes(q) ||
-                    b.subject?.toLowerCase().includes(q) ||
-                    b.content?.toLowerCase().includes(q),
+                    b.name?.toLowerCase()?.includes(q) ||
+                    b.subject?.toLowerCase()?.includes(q) ||
+                    b.content?.toLowerCase()?.includes(q),
             );
         }
 
@@ -194,7 +214,12 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
         return filteredBlogs.slice(start, start + ITEMS_PER_PAGE);
     }, [ filteredBlogs, currentPage ]);
 
-    const hasActiveFilters = !!(searchQuery || selectedCategory || quickFilter !== 'all' || localSort !== 'createdDate,desc');
+    const hasActiveFilters = !!(
+        searchQuery ||
+        selectedCategory ||
+        quickFilter !== 'all' ||
+        localSort !== 'createdDate,desc'
+    );
 
     const startItem = total === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
@@ -207,14 +232,15 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                 <div className={styles.heroContent}>
                     <span className={styles.heroTag}>ITDream Knowledge Hub</span>
                     <h1>Cẩm nang kiến thức &amp; Xu hướng công nghệ</h1>
-                    <p>Cập nhật những tin tức mới nhất, hướng nghiệp thực tế và chia sẻ chuyên môn từ các chuyên gia.</p>
+                    <p>
+                        Cập nhật những tin tức mới nhất, hướng nghiệp thực tế và chia sẻ chuyên môn từ các chuyên gia.
+                    </p>
                 </div>
             </section>
 
             {/* FILTER BAR */}
             <section className={styles.filterBar}>
                 <div className={styles.filterBarInner}>
-
 
                     {/* Category pills */}
                     <div className={styles.categoryPillsRow}>
@@ -227,7 +253,9 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                         {categories.map((cat) => (
                             <button
                                 key={cat.id}
-                                className={classNames(styles.categoryBtn, { [styles.active]: selectedCategory === cat.id })}
+                                className={classNames(styles.categoryBtn, {
+                                    [styles.active]: selectedCategory === cat.id,
+                                })}
                                 onClick={() => handleCategoryClick(cat.id)}
                             >
                                 {cat.name}
@@ -263,7 +291,11 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                 {!loading && (
                     <div className={styles.resultCountBar}>
                         <span>
-                            Hiển thị <strong>{startItem}–{endItem}</strong> trong <strong>{total}</strong> bài viết
+                            Hiển thị{' '}
+                            <strong>
+                                {startItem}–{endItem}
+                            </strong>{' '}
+                            trong <strong>{total}</strong> bài viết
                         </span>
                     </div>
                 )}
@@ -289,7 +321,14 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                                             />
                                         ) : (
                                             <div className={styles.cardImagePlaceholder}>
-                                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                <svg
+                                                    width="40"
+                                                    height="40"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.5"
+                                                >
                                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                                                     <polyline points="14 2 14 8 20 8" />
                                                     <line x1="16" y1="13" x2="8" y2="13" />
@@ -304,9 +343,7 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                                     </div>
                                     <div className={styles.cardContent}>
                                         <h3 className={styles.cardTitle}>{blog.name}</h3>
-                                        {blog.subject && (
-                                            <p className={styles.cardExcerpt}>{blog.subject}</p>
-                                        )}
+                                        {blog.subject && <p className={styles.cardExcerpt}>{blog.subject}</p>}
                                         <div className={styles.cardFooter}>
                                             <div className={styles.authorMetaMini}>
                                                 {blog.educator?.profileAccountDto?.avatar ? (
@@ -326,14 +363,13 @@ function BlogListDesktop({ categories, blogs, urlBase, loading, selectedCategory
                                                     </span>
                                                     {blog.educator?.organization && (
                                                         <span className={styles.orgNameMini}>
-                                                            {blog.educator.organization.shortName || blog.educator.organization.name}
+                                                            {blog.educator.organization.shortName ||
+                                                                blog.educator.organization.name}
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
-                                            <span className={styles.readMoreArrow}>
-                                                Đọc →
-                                            </span>
+                                            <span className={styles.readMoreArrow}>Đọc →</span>
                                         </div>
                                     </div>
                                 </a>

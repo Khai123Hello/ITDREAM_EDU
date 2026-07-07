@@ -12,7 +12,6 @@ import dayjs from 'dayjs';
 
 import styles from './index.module.scss';
 
-
 const getJobTags = (job) => {
     const tags = [];
     if (job.type === 1) {
@@ -39,7 +38,10 @@ const getJobTags = (job) => {
 };
 
 const getOrgLogo = (job) => {
-    const logo = job?.educator?.organization?.logoUrl || job?.educator?.profileAccountDto?.avatar || job?.educator?.account?.avatar;
+    const logo =
+        job?.educator?.organization?.logoUrl ||
+        job?.educator?.profileAccountDto?.avatar ||
+        job?.educator?.account?.avatar;
     if (!logo) return null;
     return logo.startsWith('http') ? logo : `${AppConstants.contentRootUrl}${logo}`;
 };
@@ -66,14 +68,14 @@ const getPlainTextFromTipTap = (content) => {
 
 function JobsDesktop() {
     const navigate = useNavigate();
-    const [ selectedJobId, setSelectedJobId ] = useState(null);
-    const [ selectedTab, setSelectedTab ] = useState('all'); // 'all', 'saved'
+    const [selectedJobId, setSelectedJobId] = useState(null);
+    const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'saved'
 
     // Dropdown filters
-    const [ opportunityFilter, setOpportunityFilter ] = useState('Tất cả');
-    const [ roleFilter, setRoleFilter ] = useState('Tất cả');
-    const [ selectedProvinceId, setSelectedProvinceId ] = useState(null);
-    const [ selectedWardId, setSelectedWardId ] = useState(null);
+    const [opportunityFilter, setOpportunityFilter] = useState('Tất cả');
+    const [roleFilter, setRoleFilter] = useState('Tất cả');
+    const [selectedProvinceId, setSelectedProvinceId] = useState(null);
+    const [selectedWardId, setSelectedWardId] = useState(null);
 
     // Fetch provinces on mount
     const { data: provinces } = useFetch(apiConfig.nation.client_list, {
@@ -83,7 +85,7 @@ function JobsDesktop() {
     });
 
     // Fetch wards dynamically based on province
-    const [ wards, setWards ] = useState([]);
+    const [wards, setWards] = useState([]);
     const { execute: fetchWards } = useFetch(apiConfig.nation.client_list, {
         immediate: false,
     });
@@ -101,7 +103,7 @@ function JobsDesktop() {
             setWards([]);
             setSelectedWardId(null);
         }
-    }, [ selectedProvinceId, fetchWards ]);
+    }, [selectedProvinceId, fetchWards]);
 
     const handleSelectJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -120,7 +122,7 @@ function JobsDesktop() {
         if (selectedWardId) params.wardId = selectedWardId;
 
         return params;
-    }, [ opportunityFilter, roleFilter, selectedProvinceId, selectedWardId ]);
+    }, [opportunityFilter, roleFilter, selectedProvinceId, selectedWardId]);
 
     // Fetch saved job IDs on mount
     const { data: savedJobIdsResponse, execute: fetchSavedJobs } = useFetch(apiConfig.job.listSaveJob, {
@@ -143,7 +145,7 @@ function JobsDesktop() {
     // Load jobs on query parameters change
     useEffect(() => {
         fetchJobs();
-    }, [ queryParams, fetchJobs ]);
+    }, [queryParams, fetchJobs]);
 
     // Active job details resolver
     const jobs = jobsResponse?.content || [];
@@ -154,11 +156,11 @@ function JobsDesktop() {
             return jobs.filter((job) => savedJobIds.includes(job.id));
         }
         return jobs;
-    }, [ jobs, selectedTab, savedJobIds ]);
+    }, [jobs, selectedTab, savedJobIds]);
 
     const activeJob = useMemo(() => {
         return filteredJobs.find((job) => job.id === selectedJobId) || filteredJobs[0] || null;
-    }, [ filteredJobs, selectedJobId ]);
+    }, [filteredJobs, selectedJobId]);
 
     const {
         data: activeJobDetail,
@@ -175,7 +177,7 @@ function JobsDesktop() {
                 pathParams: { id: activeJob.id },
             });
         }
-    }, [ activeJob?.id, fetchJobDetail ]);
+    }, [activeJob?.id, fetchJobDetail]);
 
     const displayJob = activeJobDetail && activeJobDetail.id === activeJob?.id ? activeJobDetail : activeJob;
 
@@ -184,14 +186,14 @@ function JobsDesktop() {
         if (selectedJobId && filteredJobs.length > 0 && !filteredJobs.some((j) => j.id === selectedJobId)) {
             setSelectedJobId(null);
         }
-    }, [ filteredJobs, selectedJobId ]);
+    }, [filteredJobs, selectedJobId]);
 
     // Toggle save job action
     const { execute: callSaveJob } = useFetch(apiConfig.job.saveJob, {}, false);
     const handleToggleSaveJob = (e, jobId) => {
         e.stopPropagation();
         const isSaved = savedJobIds.includes(jobId);
-        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [ ...savedJobIds, jobId ];
+        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [...savedJobIds, jobId];
 
         callSaveJob({
             dataBody: { jobPostIds: newSavedIds },
@@ -392,7 +394,9 @@ function JobsDesktop() {
                                                 />
                                                 <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
                                             </svg>
-                                            {job.address?.toLowerCase() === 'online' ? 'Online' : (job.province?.name || '')}
+                                            {job.address?.toLowerCase() === 'online'
+                                                ? 'Online'
+                                                : job.province?.name || ''}
                                         </span>
                                     )}
                                     {((job.type === 1 && job.date) || (job.type !== 1 && job.endDate)) && (
@@ -469,11 +473,7 @@ function JobsDesktop() {
                                 {displayJob.educator?.organization?.name && (
                                     <div className={styles.authorSection}>
                                         {getOrgLogo(displayJob) && (
-                                            <img
-                                                src={getOrgLogo(displayJob)}
-                                                alt="logo"
-                                                className={styles.orgLogo}
-                                            />
+                                            <img src={getOrgLogo(displayJob)} alt="logo" className={styles.orgLogo} />
                                         )}
                                         <div className={styles.authorInfo}>
                                             <div className={styles.orgName}>
@@ -483,25 +483,26 @@ function JobsDesktop() {
                                     </div>
                                 )}
 
-                                {((displayJob.type === 1 && displayJob.date) || (displayJob.type !== 1 && displayJob.endDate)) && (
-                                    <div className={styles.detailMetaRow}>
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-                                            <path
-                                                d="M12 7v5l3 3"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        <span className={styles.label}>
-                                            {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
-                                        </span>{' '}
-                                        {displayJob.type === 1
-                                            ? dayjs(displayJob.date).format('DD/MM/YYYY')
-                                            : dayjs(displayJob.endDate).format('DD/MM/YYYY')}
-                                    </div>
-                                )}
+                                {((displayJob.type === 1 && displayJob.date) ||
+                                    (displayJob.type !== 1 && displayJob.endDate)) && (
+                                        <div className={styles.detailMetaRow}>
+                                            <svg viewBox="0 0 24 24" fill="none">
+                                                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+                                                <path
+                                                    d="M12 7v5l3 3"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.5"
+                                                    strokeLinecap="round"
+                                                />
+                                            </svg>
+                                            <span className={styles.label}>
+                                                {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
+                                            </span>{' '}
+                                            {displayJob.type === 1
+                                                ? dayjs(displayJob.date).format('DD/MM/YYYY')
+                                                : dayjs(displayJob.endDate).format('DD/MM/YYYY')}
+                                        </div>
+                                    )}
                                 {(displayJob.address || displayJob.province?.name) && (
                                     <div className={styles.detailMetaRow}>
                                         <svg viewBox="0 0 24 24" fill="none">
@@ -554,9 +555,7 @@ function JobsDesktop() {
                                             <LoadingComponent />
                                         </div>
                                     ) : (
-                                        displayJob.content && (
-                                            <TipTapJsonRenderer content={displayJob.content} />
-                                        )
+                                        displayJob.content && <TipTapJsonRenderer content={displayJob.content} />
                                     )}
                                 </div>
 
@@ -588,7 +587,8 @@ function JobsDesktop() {
                                                         backgroundPosition: 'center',
                                                     }}
                                                 >
-                                                    {!sim.thumbnail && (sim.category?.name?.substring(0, 7).toUpperCase() || '')}
+                                                    {!sim.thumbnail &&
+                                                        (sim.category?.name?.substring(0, 7).toUpperCase() || '')}
                                                 </div>
                                                 <div className={styles.simInfo}>
                                                     <div className={styles.simLabel}>{sim.category?.name || ''}</div>
@@ -614,16 +614,17 @@ function JobsDesktop() {
                                                         </div>
                                                         <span>{sim.duration || '2-3 giờ'}</span>
                                                     </div>
-                                                    {(sim.totalParticipant !== undefined || (sim.avgStar !== undefined && sim.avgStar > 0)) && (
-                                                        <div className={styles.simExtraMeta}>
-                                                            {sim.totalParticipant !== undefined && (
-                                                                <span>👤 {sim.totalParticipant} học viên</span>
-                                                            )}
-                                                            {sim.avgStar !== undefined && sim.avgStar > 0 && (
-                                                                <span>⭐ {sim.avgStar} / 5</span>
-                                                            )}
-                                                        </div>
-                                                    )}
+                                                    {(sim.totalParticipant !== undefined ||
+                                                        (sim.avgStar !== undefined && sim.avgStar > 0)) && (
+                                                            <div className={styles.simExtraMeta}>
+                                                                {sim.totalParticipant !== undefined && (
+                                                                    <span>👤 {sim.totalParticipant} học viên</span>
+                                                                )}
+                                                                {sim.avgStar !== undefined && sim.avgStar > 0 && (
+                                                                    <span>⭐ {sim.avgStar} / 5</span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                 </div>
                                             </div>
                                         ))}

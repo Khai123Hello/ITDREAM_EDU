@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, LoadingOutlined } from '@ant-design/icons';
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
+import useFetchAction from '@hooks/useFetchAction';
 import { accountActions } from '@store/actions';
 import { getDownloadUrl } from '@utils';
 import { Button, Modal, Spin } from 'antd';
@@ -38,6 +39,7 @@ function DashboardDesktop({
     const [ selectedOrgs, setSelectedOrgs ] = useState([]);
 
     const { execute: executeUpdateProfile, loading: updatingPreferences } = useFetch(apiConfig.student.clientUpdate);
+    const { execute: executeGetProfile } = useFetchAction(accountActions.getProfile);
 
     const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
     const [ previewLoading, setPreviewLoading ] = useState(false);
@@ -84,9 +86,24 @@ function DashboardDesktop({
                 username: profile?.username || profile?.account?.username || '',
                 preferences: payloadPreferences,
             },
-            onCompleted: () => {
-                toast.success('Lưu sở thích thành công!');
-                dispatch(accountActions.getProfile());
+            onCompleted: (res) => {
+                if (res?.result === true) {
+                    toast.success('Lưu sở thích thành công!');
+                    if (executeGetProfile) {
+                        executeGetProfile()
+                            .then(() => {
+                                window.location.reload();
+                            })
+                            .catch(() => {
+                                window.location.reload();
+                            });
+                    } else {
+                        dispatch(accountActions.getProfile());
+                        window.location.reload();
+                    }
+                } else {
+                    toast.error(res?.message || 'Có lỗi xảy ra khi lưu sở thích. Vui lòng thử lại.');
+                }
             },
             onError: () => {
                 toast.error('Có lỗi xảy ra khi lưu sở thích. Vui lòng thử lại.');
@@ -285,15 +302,22 @@ function DashboardDesktop({
     if (hasPreferences) {
         recommendedSims = nonEnrolledSims.filter((sim) => {
             const matchesSpec = sim.category?.id && prefSpecIds.includes(String(sim.category.id));
-            const matchesOrg = sim.educator?.organization?.id && prefOrgIds.includes(String(sim.educator.organization.id));
+            const matchesOrg =
+                sim.educator?.organization?.id && prefOrgIds.includes(String(sim.educator.organization.id));
             return matchesSpec || matchesOrg;
         });
-        
+
         console.log('--- DEBUG FILTERING ---');
         console.log('1. prefSpecIds:', prefSpecIds);
         console.log('2. prefOrgIds:', prefOrgIds);
-        console.log('3. nonEnrolledSims:', nonEnrolledSims.map(s => ({ id: s.id, categoryId: s.category?.id, title: s.title })));
-        console.log('4. recommendedSims results:', recommendedSims.map(s => s.title));
+        console.log(
+            '3. nonEnrolledSims:',
+            nonEnrolledSims.map((s) => ({ id: s.id, categoryId: s.category?.id, title: s.title })),
+        );
+        console.log(
+            '4. recommendedSims results:',
+            recommendedSims.map((s) => s.title),
+        );
         console.log('-----------------------');
 
         recommendedSims = recommendedSims.slice(0, 3);
