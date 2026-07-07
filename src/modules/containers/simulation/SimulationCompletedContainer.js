@@ -150,17 +150,17 @@ function SimulationCompletedContainer() {
                 setIsGeneratingCert(true);
                 try {
                     const simulationTitle = simulationDetail.title || currentAch.simulation?.title || 'Bài mô phỏng';
-                    const username =
-                        profile?.username ||
-                        profile?.account?.username ||
-                        currentAch.student?.profileAccountDto?.username ||
+                    const fullName =
+                        profile?.fullName ||
+                        profile?.account?.fullName ||
+                        currentAch.student?.profileAccountDto?.fullName ||
                         '';
 
                     // 1. Tạo chứng chỉ
                     const certRes = await uploadCertificate({
                         dataBody: {
                             simulationTitle,
-                            username,
+                            fullName,
                         },
                     });
 
