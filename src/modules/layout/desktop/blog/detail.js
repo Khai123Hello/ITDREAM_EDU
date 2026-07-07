@@ -10,7 +10,6 @@ import styles from './detail.module.scss';
 function estimateReadingTime(content) {
     if (!content) return 1;
     let plainText = content;
-    // Try parse JSON and extract text
     try {
         const parsed = typeof content === 'string' ? JSON.parse(content) : content;
         const extractText = (node) => {
@@ -71,7 +70,7 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
     if (!chapters || chapters.length <= 1) return null;
     return (
         <div className={styles.chapterNav}>
-            <p className={styles.chapterNavLabel}>📚 Mục lục</p>
+            <p className={styles.chapterNavLabel}>📚 Mục lục chương</p>
             <div className={styles.chapterList}>
                 {chapters.map((ch, idx) => (
                     <button
@@ -89,7 +88,34 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
     );
 }
 
-function BlogDetailDesktop({ blog, urlBase, loading }) {
+// ─── Related Article Card (compact) ───
+function RelatedCard({ article, getImageUrl }) {
+    return (
+        <a href={`/blog/${article.id}`} className={styles.relatedCompactCard}>
+            <div className={styles.relatedCompactThumb}>
+                {article.image ? (
+                    <img src={getImageUrl(article.image)} alt={article.name} className={styles.relatedCompactImg} loading="lazy" />
+                ) : (
+                    <div className={styles.relatedCompactPlaceholder}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                    </div>
+                )}
+            </div>
+            <div className={styles.relatedCompactInfo}>
+                {article.category && (
+                    <span className={styles.relatedCompactCat}>{article.category.name}</span>
+                )}
+                <p className={styles.relatedCompactTitle}>{article.name}</p>
+                <span className={styles.relatedCompactLink}>Đọc bài →</span>
+            </div>
+        </a>
+    );
+}
+
+function BlogDetailDesktop({ blog, urlBase, loading, relatedBlogs = [] }) {
     const navigate = useNavigate();
     const [ activeId, setActiveId ] = useState('');
     const [ activeChapter, setActiveChapter ] = useState(0);
@@ -138,7 +164,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
         return (
             <div className={styles.blogDetailContainer}>
                 <div className={styles.loadingWrapper}>
-                    <div className={styles.spinner}></div>
+                    <div className={styles.spinner} />
                     <p>Đang tải chi tiết bài viết...</p>
                 </div>
             </div>
@@ -160,7 +186,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
         );
     }
 
-    const { name, image, category, content, educator, subject, subjects, modifiedDate, createdDate } = blog;
+    const { name, image, category, content, educator, subject, modifiedDate, createdDate } = blog;
 
     const readingTime = estimateReadingTime(content);
 
@@ -168,17 +194,12 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
         modifiedDate || createdDate
             ? new Date(modifiedDate || createdDate).toLocaleDateString('vi-VN', {
                 day: 'numeric',
-                month: 'numeric',
+                month: 'long',
                 year: 'numeric',
             })
-            : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric' });
+            : new Date().toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-    // Related articles — chỉ dùng dữ liệu thực từ API
-    const relatedArticles =
-        subjects?.content && subjects.content.length > 0 && subjects.content[0] !== null
-            ? subjects.content
-            : [];
-
+    const hasSidebar = relatedBlogs.length > 0;
 
     return (
         <>
@@ -187,12 +208,10 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
 
             <div className={styles.blogDetailContainer}>
                 {/* MAIN LAYOUT */}
-                <div className={styles.mainLayout}>
+                <div className={classNames(styles.mainLayout, { [styles.mainLayoutNoSidebar]: !hasSidebar })}>
                     {/* LEFT SIDEBAR: TOC + Chapter Navigator */}
                     <aside className={styles.tocSidebar}>
-                        {/* Chapter navigator (if chaptered blog) */}
                         <ChapterNavigator chapters={chapters} activeIndex={activeChapter} onSelect={setActiveChapter} />
-
                         <TableOfContents content={currentContent} activeId={activeId} />
                     </aside>
 
@@ -200,16 +219,9 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                     <article className={styles.contentArea} ref={articleRef}>
                         {/* BACK BUTTON */}
                         <button className={styles.backBtn} onClick={() => navigate('/blog')}>
-                            <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                            >
-                                <line x1="19" y1="12" x2="5" y2="12"></line>
-                                <polyline points="12 19 5 12 12 5"></polyline>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <line x1="19" y1="12" x2="5" y2="12" />
+                                <polyline points="12 19 5 12 12 5" />
                             </svg>
                             Quay lại danh sách Blog
                         </button>
@@ -276,7 +288,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                         {displayDate}
                                     </time>
                                     <span className={styles.divider}>•</span>
-                                    <span className={styles.readTime}>{readingTime} phút đọc</span>
+                                    <span className={styles.readTime}>⏱ {readingTime} phút đọc</span>
                                 </div>
                             )}
                         </header>
@@ -329,7 +341,7 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                             </div>
                         </section>
 
-                        {/* CHAPTER NAV BOTTOM (if multi-chapter) */}
+                        {/* CHAPTER NAV BOTTOM */}
                         {isChaptered && chapters.length > 1 && (
                             <div className={styles.chapterNavBottom}>
                                 {activeChapter > 0 ? (
@@ -400,16 +412,9 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                                         )}
                                         {(educator.profileAccountDto?.email || educator.account?.email) && (
                                             <div className={styles.authorCardEmail}>
-                                                <svg
-                                                    width="14"
-                                                    height="14"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2.5"
-                                                >
-                                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                                    <polyline points="22,6 12,13 2,6" />
                                                 </svg>
                                                 {educator.profileAccountDto?.email || educator.account?.email}
                                             </div>
@@ -420,56 +425,38 @@ function BlogDetailDesktop({ blog, urlBase, loading }) {
                         )}
                     </article>
 
-                    {/* RIGHT STICKY SIDEBAR — ẩn khi không có dữ liệu */}
-                    <aside className={styles.sidebar}>
-                        {/* NEWSLETTER WIDGET */}
-                        <div className={styles.sidebarWidget}>
-                            <div className={classNames(styles.widgetHeader, styles.tealBg)}>
-                                <h4>Đăng ký Bản tin ITDream</h4>
-                            </div>
-                            <div className={styles.widgetBody}>
-                                <p>Nhận các bài viết chọn lọc về xu hướng công nghệ &amp; cơ hội nghề nghiệp sớm nhất.</p>
-                                <div className={styles.newsletterComingSoon}>
-                                    <span>🔔</span>
-                                    <span>Tính năng sắp ra mắt</span>
+                    {/* RIGHT SIDEBAR — Related articles */}
+                    {hasSidebar && (
+                        <aside className={styles.sidebar}>
+                            <div className={styles.relatedWidget}>
+                                <div className={styles.relatedWidgetHeader}>
+                                    <h4>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                            <polyline points="14 2 14 8 20 8" />
+                                            <line x1="16" y1="13" x2="8" y2="13" />
+                                            <line x1="16" y1="17" x2="8" y2="17" />
+                                        </svg>
+                                        Bài viết liên quan
+                                    </h4>
+                                    {category && <span className={styles.relatedWidgetCat}>{category.name}</span>}
                                 </div>
+                                <div className={styles.relatedWidgetList}>
+                                    {relatedBlogs.map((article) => (
+                                        <RelatedCard key={article.id} article={article} getImageUrl={getImageUrl} />
+                                    ))}
+                                </div>
+                                <a href="/blog" className={styles.relatedWidgetMore}>
+                                    Xem tất cả bài viết →
+                                </a>
                             </div>
-                        </div>
-                    </aside>
+                        </aside>
+                    )}
                 </div>
 
-                {/* RELATED POSTS BOTTOM SECTION — chỉ hiện khi có dữ liệu thực */}
-                {relatedArticles.length > 0 && (
-                    <section className={styles.relatedSection}>
-                        <h2 className={styles.relatedSectionHeader}>Bài viết liên quan</h2>
-                        <div className={styles.relatedGrid}>
-                            {relatedArticles.map((article) => (
-                                <a key={article.id} href={`/blog/${article.id}`} className={styles.relatedCard}>
-                                    <div className={styles.relatedThumbWrapper}>
-                                        {article.image ? (
-                                            <img
-                                                src={getImageUrl(article.image)}
-                                                alt={article.name}
-                                                className={styles.relatedThumb}
-                                            />
-                                        ) : (
-                                            <div className={styles.relatedThumbPlaceholder}>
-                                                <span>📝</span>
-                                            </div>
-                                        )}
-                                        {article.category && (
-                                            <span className={styles.relatedCategoryBadge}>{article.category.name}</span>
-                                        )}
-                                    </div>
-                                    <div className={styles.relatedCardBody}>
-                                        <h3>{article.name}</h3>
-                                        <p>{article.subject}</p>
-                                        <span className={styles.relatedCardRead}>Đọc bài viết &rarr;</span>
-                                    </div>
-                                </a>
-                            ))}
-                        </div>
-                    </section>
+                {/* RELATED POSTS BOTTOM — grid khi không có sidebar */}
+                {!hasSidebar && relatedBlogs.length === 0 && (
+                    <div className={styles.relatedSectionEmpty} />
                 )}
             </div>
         </>

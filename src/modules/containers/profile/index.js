@@ -9,7 +9,7 @@ import useFetch from '@hooks/useFetch';
 import useFetchAction from '@hooks/useFetchAction';
 import useTranslate from '@hooks/useTranslate';
 import ProfileComponent from '@modules/layout/desktop/profile';
-import { accountActions } from '@store/actions';
+import { actions as accountActions } from '@store/actions/account';
 import { toast } from 'sonner';
 const ProfilePageContainer = ({ title }) => {
     const { execute: executeGetProfile } = useFetchAction(accountActions.getProfile, {

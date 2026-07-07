@@ -364,49 +364,18 @@ function JobsDesktop() {
                                     </div>
                                 </div>
                                 <div className={styles.cardTitle}>{job.title}</div>
-                                <div className={styles.cardDesc}>
-                                    {job.content
-                                        ? (() => {
+                                {job.content && (
+                                    <div className={styles.cardDesc}>
+                                        {(() => {
                                             const plainText = getPlainTextFromTipTap(job.content);
                                             return plainText.length > 120
                                                 ? plainText.substring(0, 120) + '...'
                                                 : plainText;
-                                        })()
-                                        : ''}
-                                </div>
+                                        })()}
+                                    </div>
+                                )}
                                 <div className={styles.cardMeta}>
-<<<<<<< Updated upstream
-                                    <span>
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <path
-                                                d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                            />
-                                            <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
-                                        </svg>
-                                        {job.address?.toLowerCase() === 'online' ? 'Online' : (job.province?.name || 'Toàn quốc')}
-                                    </span>
-                                    <span>
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-                                            <path
-                                                d="M12 7v5l3 3"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        {job.type === 1
-                                            ? job.date
-                                                ? dayjs(job.date).format('DD/MM/YYYY')
-                                                : 'N/A'
-                                            : job.endDate
-                                                ? `Hạn: ${dayjs(job.endDate).format('DD/MM/YYYY')}`
-                                                : 'N/A'}
-                                    </span>
-=======
-                                    {job.location && (
+                                    {(job.address || job.province?.name) && (
                                         <span>
                                             <svg viewBox="0 0 24 24" fill="none">
                                                 <path
@@ -416,10 +385,10 @@ function JobsDesktop() {
                                                 />
                                                 <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
                                             </svg>
-                                            {job.location}
+                                            {job.address?.toLowerCase() === 'online' ? 'Online' : (job.province?.name || '')}
                                         </span>
                                     )}
-                                    {job.date && (
+                                    {((job.type === 1 && job.date) || (job.type !== 1 && job.endDate)) && (
                                         <span>
                                             <svg viewBox="0 0 24 24" fill="none">
                                                 <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
@@ -430,10 +399,11 @@ function JobsDesktop() {
                                                     strokeLinecap="round"
                                                 />
                                             </svg>
-                                            {job.date}
+                                            {job.type === 1
+                                                ? dayjs(job.date).format('DD/MM/YYYY')
+                                                : `Hạn: ${dayjs(job.endDate).format('DD/MM/YYYY')}`}
                                         </span>
                                     )}
->>>>>>> Stashed changes
                                     <button
                                         className={classNames(styles.saveBtn, {
                                             [styles.saved]: savedJobIds.includes(job.id),
@@ -456,7 +426,6 @@ function JobsDesktop() {
                 <div className={styles.rightColumn}>
                     {displayJob ? (
                         <div className={classNames(styles.detailPanel, styles.visible)}>
-<<<<<<< Updated upstream
                             <div
                                 className={styles.detailHeroImg}
                                 style={{
@@ -468,19 +437,6 @@ function JobsDesktop() {
                                     height: '180px',
                                 }}
                             />
-=======
-                            {activeJob.bannerUrl ? (
-                                <img
-                                    src={getDownloadUrl(activeJob.bannerUrl)}
-                                    alt={activeJob.company}
-                                    className={styles.detailHeroImgTag}
-                                />
-                            ) : (
-                                <div className={styles.detailHeroImg} style={{ background: activeJob.bannerGradient || 'linear-gradient(135deg, #1a56db 0%, #6c2bd9 100%)' }}>
-                                    <div className={styles.logoOverlay}>{activeJob.company}</div>
-                                </div>
-                            )}
->>>>>>> Stashed changes
 
                             <div className={styles.detailBody}>
                                 <div className={styles.detailTags}>
@@ -516,43 +472,7 @@ function JobsDesktop() {
                                     </div>
                                 )}
 
-<<<<<<< Updated upstream
-                                <div className={styles.detailMetaRow}>
-                                    <svg viewBox="0 0 24 24" fill="none">
-                                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-                                        <path
-                                            d="M12 7v5l3 3"
-                                            stroke="currentColor"
-                                            strokeWidth="1.5"
-                                            strokeLinecap="round"
-                                        />
-                                    </svg>
-                                    <span className={styles.label}>
-                                        {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
-                                    </span>{' '}
-                                    {displayJob.type === 1
-                                        ? displayJob.date
-                                            ? dayjs(displayJob.date).format('DD/MM/YYYY')
-                                            : 'N/A'
-                                        : displayJob.endDate
-                                            ? dayjs(displayJob.endDate).format('DD/MM/YYYY')
-                                            : 'N/A'}
-                                </div>
-                                <div className={styles.detailMetaRow}>
-                                    <svg viewBox="0 0 24 24" fill="none">
-                                        <path
-                                            d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                            stroke="currentColor"
-                                            strokeWidth="1.5"
-                                        />
-                                        <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
-                                    </svg>
-                                    <span className={styles.label}>Địa điểm làm việc:</span>{' '}
-                                    {displayJob.address?.toLowerCase() === 'online'
-                                        ? 'Online'
-                                        : `${displayJob.address ? `${displayJob.address}, ` : ''}${displayJob.province?.name || 'Toàn quốc'}`}
-=======
-                                {activeJob.date && (
+                                {((displayJob.type === 1 && displayJob.date) || (displayJob.type !== 1 && displayJob.endDate)) && (
                                     <div className={styles.detailMetaRow}>
                                         <svg viewBox="0 0 24 24" fill="none">
                                             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
@@ -563,10 +483,15 @@ function JobsDesktop() {
                                                 strokeLinecap="round"
                                             />
                                         </svg>
-                                        <span className={styles.label}>Ngày:</span> {activeJob.date}
+                                        <span className={styles.label}>
+                                            {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
+                                        </span>{' '}
+                                        {displayJob.type === 1
+                                            ? dayjs(displayJob.date).format('DD/MM/YYYY')
+                                            : dayjs(displayJob.endDate).format('DD/MM/YYYY')}
                                     </div>
                                 )}
-                                {activeJob.location && (
+                                {(displayJob.address || displayJob.province?.name) && (
                                     <div className={styles.detailMetaRow}>
                                         <svg viewBox="0 0 24 24" fill="none">
                                             <path
@@ -576,20 +501,24 @@ function JobsDesktop() {
                                             />
                                             <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="1.5" />
                                         </svg>
-                                        <span className={styles.label}>Địa điểm làm việc:</span> {activeJob.location}
+                                        <span className={styles.label}>Địa điểm làm việc:</span>{' '}
+                                        {displayJob.address?.toLowerCase() === 'online'
+                                            ? 'Online'
+                                            : `${displayJob.address ? `${displayJob.address}, ` : ''}${displayJob.province?.name || ''}`}
                                     </div>
                                 )}
-                                <div className={classNames(styles.detailMetaRow, styles.eligibilityRow)}>
-                                    <svg viewBox="0 0 24 24" fill="none">
-                                        <path
-                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                            stroke="currentColor"
-                                            strokeWidth="1.5"
-                                        />
-                                    </svg>
-                                    Chỉ công dân và thường trú nhân <strong>được hưởng quyền làm việc</strong>.
->>>>>>> Stashed changes
-                                </div>
+                                {displayJob.notice && (
+                                    <div className={classNames(styles.detailMetaRow, styles.eligibilityRow)}>
+                                        <svg viewBox="0 0 24 24" fill="none">
+                                            <path
+                                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                                stroke="currentColor"
+                                                strokeWidth="1.5"
+                                            />
+                                        </svg>
+                                        <span>{displayJob.notice}</span>
+                                    </div>
+                                )}
 
                                 <div className={styles.actionBtns}>
                                     <button

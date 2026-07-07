@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { TbBriefcase, TbCalendar, TbCamera, TbCheck, TbEdit, TbMail, TbPhone, TbUser, TbX } from 'react-icons/tb';
 import { defineMessages } from 'react-intl';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
-import { ReactComponent as IconClose } from '@assets/icons/closeModal.svg';
+import { useDispatch } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import DatePickerField from '@components/common/elements/DatePicker/DatePickerField';
 import { Form } from '@components/common/elements/Form';
 import Grid from '@components/common/elements/Grid';
@@ -18,13 +17,8 @@ import useAuth from '@hooks/useAuth';
 import useBasicForm from '@hooks/useBasicForm';
 import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
-import routes from '@routes';
 import { getCacheUserKind } from '@services/userService';
-<<<<<<< Updated upstream
-=======
-import { accountActions } from '@store/actions';
-import { Select } from 'antd';
->>>>>>> Stashed changes
+import { actions as accountActions } from '@store/actions/account';
 import { toast } from 'sonner';
 
 import styles from './index.module.scss';
@@ -217,7 +211,7 @@ const ProfileComponent = (props) => {
                     if (response?.result === true && response?.data?.filePath) {
                         const newAvatarPath = response.data.filePath;
                         setImageUrl(newAvatarPath);
-                        
+
                         // Tự động lưu ảnh đại diện mới vào thông tin cá nhân
                         if (isStudent) {
                             const prefs = user?.preferences || [];
@@ -389,11 +383,7 @@ const ProfileComponent = (props) => {
 
     const handleClose = () => {
         localStorage.setItem('editingField', null);
-        navigation(
-            generatePath(`${routes.homePage.path}`, {
-                restaurantId: params.restaurantId,
-            }),
-        );
+        navigation('/');
     };
 
     return (
@@ -412,7 +402,7 @@ const ProfileComponent = (props) => {
                         <span>{translate.formatMessage(messages.profilePage)}</span>
                     </div>
                     <button type="button" className={styles.closeBtn} onClick={handleClose} aria-label="Close">
-                        <IconClose style={{ width: '12px', height: '12px' }} />
+                        <TbX style={{ width: '14px', height: '14px' }} />
                     </button>
                 </div>
 
