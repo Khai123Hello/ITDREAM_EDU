@@ -251,10 +251,8 @@ function SimulationCompletedPage({
                         previewBlobUrl ? (
                             <div className="tfo-cert-iframe-container">
                                 <iframe
-                                    src={`${previewBlobUrl}#toolbar=0&navpanes=0&view=Fit`}
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 'none' }}
+                                    src={`${previewBlobUrl}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
+                                    className="tfo-cert-iframe"
                                     title="Chứng chỉ hoàn thành"
                                 />
                             </div>

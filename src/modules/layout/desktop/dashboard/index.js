@@ -95,8 +95,7 @@ function DashboardDesktop({
     };
 
     const userPrefs = profile?.preferences || [];
-    const hasPhoneVal = profile?.phone || profile?.account?.phone;
-    const showPreferenceSetup = userPrefs.length === 0 && !!hasPhoneVal;
+    const showPreferenceSetup = userPrefs.length === 0;
 
     const categoriesList = Array.isArray(categories) ? categories : categories?.content || [];
     const organizationsList = Array.isArray(organizations) ? organizations : organizations?.content || [];

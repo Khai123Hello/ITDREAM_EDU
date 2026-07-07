@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { TbBriefcase, TbCalendar, TbCamera, TbCheck, TbEdit, TbMail, TbPhone, TbUser, TbX } from 'react-icons/tb';
 import { defineMessages } from 'react-intl';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
@@ -19,6 +20,11 @@ import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
 import routes from '@routes';
 import { getCacheUserKind } from '@services/userService';
+<<<<<<< Updated upstream
+=======
+import { accountActions } from '@store/actions';
+import { Select } from 'antd';
+>>>>>>> Stashed changes
 import { toast } from 'sonner';
 
 import styles from './index.module.scss';
@@ -100,6 +106,7 @@ const messages = defineMessages({
 const ProfileComponent = (props) => {
     const { formId, actions, dataDetail, onSubmit, setIsChangedFormValues, groups, branchs, data, executeGetProfile } =
         props;
+    const dispatch = useDispatch();
     const { profile: user } = useAuth();
     const translate = useTranslate();
     const fullName = user?.fullName || user?.account?.fullName || '';
@@ -208,8 +215,53 @@ const ProfileComponent = (props) => {
                 },
                 onCompleted: (response) => {
                     if (response?.result === true && response?.data?.filePath) {
-                        setImageUrl(response.data.filePath);
-                        toast.success('Cập nhật ảnh đại diện thành công!');
+                        const newAvatarPath = response.data.filePath;
+                        setImageUrl(newAvatarPath);
+                        
+                        // Tự động lưu ảnh đại diện mới vào thông tin cá nhân
+                        if (isStudent) {
+                            const prefs = user?.preferences || [];
+                            const preferences = prefs.map((p) => ({
+                                specializationId: p.specializationId,
+                                organizationId: p.organizationId,
+                            }));
+                            executeStudentUpdate({
+                                data: {
+                                    avatarPath: newAvatarPath,
+                                    fullname: fullName,
+                                    phone: phone,
+                                    birthday: user?.birthday || user?.account?.birthday || null,
+                                    username: user?.username || user?.account?.username || '',
+                                    preferences,
+                                },
+                                onCompleted: () => {
+                                    toast.success('Cập nhật ảnh đại diện thành công!');
+                                    if (executeGetProfile) {
+                                        executeGetProfile();
+                                    }
+                                    dispatch(accountActions.getProfile());
+                                },
+                                onError: () => {
+                                    toast.error('Không thể lưu ảnh đại diện vào hồ sơ.');
+                                },
+                            });
+                        } else {
+                            executeUpdateProfile({
+                                data: {
+                                    avatarPath: newAvatarPath,
+                                },
+                                onCompleted: () => {
+                                    toast.success('Cập nhật ảnh đại diện thành công!');
+                                    if (executeGetProfile) {
+                                        executeGetProfile();
+                                    }
+                                    dispatch(accountActions.getProfile());
+                                },
+                                onError: () => {
+                                    toast.error('Không thể lưu ảnh đại diện vào hồ sơ.');
+                                },
+                            });
+                        }
                     } else {
                         toast.error(response?.message || 'Không thể tải ảnh lên.');
                     }
@@ -268,6 +320,7 @@ const ProfileComponent = (props) => {
                     if (executeGetProfile) {
                         executeGetProfile();
                     }
+                    dispatch(accountActions.getProfile());
                 },
                 onError: () => {
                     toast.error(translate.formatMessage(commonMessage.fail));
@@ -286,6 +339,7 @@ const ProfileComponent = (props) => {
                     if (executeGetProfile) {
                         executeGetProfile();
                     }
+                    dispatch(accountActions.getProfile());
                 },
                 onError: () => {
                     toast.error(translate.formatMessage(commonMessage.fail));

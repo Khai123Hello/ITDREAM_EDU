@@ -331,6 +331,13 @@ $transition-smooth: all 0.2s ease;
     padding: 20px;
 }
 
+.detailHeroImgTag {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
 .logoOverlay {
     background: rgba(255, 255, 255, 0.94);
     padding: 8px 18px;
