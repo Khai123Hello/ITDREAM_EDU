@@ -53,7 +53,7 @@ $transition-smooth: all 0.2s ease;
 
 /* ── FILTER BAR ── */
 .filterBar {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 32px 16px;
 }
@@ -135,7 +135,7 @@ $transition-smooth: all 0.2s ease;
 }
 
 .resultCount {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 32px 16px;
     font-size: 13px;
@@ -147,14 +147,14 @@ $transition-smooth: all 0.2s ease;
     display: grid;
     grid-template-columns: 1fr 0px;
     gap: 0;
-    max-width: 1200px;
+    max-width: 1400px;
     padding: 0 32px;
     margin: 0 auto;
     transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mainLayout.panelOpen {
-    grid-template-columns: 1fr 390px;
+    grid-template-columns: 1fr 600px;
     gap: 24px;
 }
 
@@ -308,9 +308,6 @@ $transition-smooth: all 0.2s ease;
     overflow: hidden;
     position: sticky;
     top: 74px;
-    max-height: calc(100vh - 90px);
-    overflow-y: auto;
-    scrollbar-width: thin;
     opacity: 0;
     visibility: hidden;
     transform: translateX(16px);
@@ -334,6 +331,13 @@ $transition-smooth: all 0.2s ease;
     padding: 20px;
 }
 
+.detailHeroImgTag {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
 .logoOverlay {
     background: rgba(255, 255, 255, 0.94);
     padding: 8px 18px;
@@ -349,6 +353,47 @@ $transition-smooth: all 0.2s ease;
     padding: 20px;
 }
 
+.authorSection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid $border;
+    margin-bottom: 16px;
+}
+
+.orgLogo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid $border;
+    background: $white;
+}
+
+.authorInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.orgName {
+    font-size: 13px;
+    font-weight: 700;
+    color: $gray-900;
+}
+
+.authorName {
+    font-size: 12px;
+    color: $gray-500;
+}
+
+.authorEmail,
+.authorPhone {
+    font-size: 11.5px;
+    color: $gray-500;
+}
+
 .detailTags {
     display: flex;
     gap: 6px;
@@ -357,7 +402,7 @@ $transition-smooth: all 0.2s ease;
 }
 
 .detailTitle {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: $gray-900;
     margin: 10px 0 12px;
@@ -368,7 +413,7 @@ $transition-smooth: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    font-size: 13px;
     color: $gray-500;
     margin-bottom: 8px;
 
@@ -466,7 +511,7 @@ $transition-smooth: all 0.2s ease;
 }
 
 .detailDesc {
-    font-size: 13px;
+    font-size: 14px;
     color: #4b5563;
     line-height: 1.7;
     margin-bottom: 8px;
@@ -502,6 +547,15 @@ $transition-smooth: all 0.2s ease;
     border: 1px solid $border;
     border-radius: 8px;
     background: $gray-50;
+    cursor: pointer;
+    transition: $transition-smooth;
+
+    &:hover {
+        border-color: $blue-primary;
+        background: $white;
+        box-shadow: $shadow-sm;
+        transform: translateY(-2px);
+    }
 }
 
 .simThumb {
@@ -544,6 +598,21 @@ $transition-smooth: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.simExtraMeta {
+    font-size: 11px;
+    color: $gray-500;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    span {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
 }
 
 .simDots {

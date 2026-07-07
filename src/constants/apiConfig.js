@@ -568,26 +568,35 @@ const apiConfig = {
             headers: baseHeader,
         },
     },
-    job: {
-        studentList: {
-            baseURL: `${apiUrl}v1/job/student-list`,
+    nation: {
+        client_list: {
+            baseURL: `${apiUrl}v1/nation/client-list`,
             method: 'GET',
             headers: baseHeader,
         },
-        toggleSave: {
-            baseURL: `${apiUrl}v1/job/toggle-save`,
-            method: 'POST',
+    },
+    job: {
+        guestList: {
+            baseURL: `${apiUrl}v1/job-post/guest-list`,
+            method: 'GET',
             headers: baseHeader,
         },
-        apply: {
-            baseURL: `${apiUrl}v1/job/apply`,
-            method: 'POST',
+        guestGet: {
+            baseURL: `${apiUrl}v1/job-post/guest-get/:id`,
+            method: 'GET',
             headers: baseHeader,
         },
-        cancelApply: {
-            baseURL: `${apiUrl}v1/job/cancel-apply`,
-            method: 'POST',
+        saveJob: {
+            baseURL: `${apiUrl}v1/job-post/save-job`,
+            method: 'PUT',
             headers: baseHeader,
+            permissionCode: 'JP_ST_SJ',
+        },
+        listSaveJob: {
+            baseURL: `${apiUrl}v1/job-post/list-save-job`,
+            method: 'GET',
+            headers: baseHeader,
+            permissionCode: 'JP_ST_LSJ',
         },
     },
 };

@@ -7,9 +7,10 @@ import BlogListDesktop from '@modules/layout/desktop/blog';
 
 function BlogListContainer() {
     const [ selectedCategory, setSelectedCategory ] = useState(null);
+    const [ sort, setSort ] = useState('createdDate,desc');
 
     const catParams = useMemo(() => ({ kind: 2, page: 0, size: 100, paged: true }), []);
-    const blogParams = useMemo(() => ({ page: 0, size: 100, paged: true }), []);
+    const blogParams = useMemo(() => ({ page: 0, size: 200, paged: true }), []);
 
     const { data: categoriesData, loading: catLoading } = useFetch(apiConfig.category.autoComplete, {
         immediate: true,
@@ -33,6 +34,8 @@ function BlogListContainer() {
                 loading={catLoading || blogLoading}
                 selectedCategory={selectedCategory}
                 onCategoryChange={setSelectedCategory}
+                sort={sort}
+                onSortChange={setSort}
             />
             <AppFooter />
         </>
