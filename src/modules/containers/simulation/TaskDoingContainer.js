@@ -1592,7 +1592,7 @@ function TaskDoingContainer() {
             }
 
             // Đây là Task Con cuối cùng của Task Cha hiện tại -> Complete Task Cha
-            await completeTaskProgress({
+            const completeRes = await completeTaskProgress({
                 dataBody: { taskId: selectedParentTask.id },
             });
 
@@ -1614,8 +1614,8 @@ function TaskDoingContainer() {
                 let filePath = null;
                 try {
                     const simulationTitle =
-                        simulationDetail?.title || selectedParentTask?.simulation?.title || 'Bài mô phỏng';
-                    const username = profile?.username || '';
+                        completeRes?.data?.simulationTitle || simulationDetail?.title || selectedParentTask?.simulation?.title || 'Bài mô phỏng';
+                    const fullName = completeRes?.data?.fullName || profile?.fullName || profile?.account?.fullName || '';
 
                     // 1. Lấy danh sách thành tựu của học viên trước
                     const achRes = await fetchAchievements();
@@ -1629,7 +1629,7 @@ function TaskDoingContainer() {
                         const certRes = await uploadCertificate({
                             dataBody: {
                                 simulationTitle,
-                                username,
+                                fullName,
                             },
                         });
 
