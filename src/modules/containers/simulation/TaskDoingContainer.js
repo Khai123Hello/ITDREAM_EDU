@@ -1094,19 +1094,27 @@ function TaskDoingContainer() {
         });
     }, [ progressDetail ]);
 
-    // Tìm câu trả lời file đã nộp mới nhất (Sửa tìm đáp án mới nhất)
+    // Tìm file đã nộp mới nhất
     const previousFile = useMemo(() => {
         if (!requiresFileUpload) return null;
+        if (!requiresTextResponse) {
+            const found = [ ...submissions ].reverse().find((s) => !s.taskQuestion);
+            return found ? getSubmissionAnswer(found) : null;
+        }
         const found = [ ...submissions ].reverse().find((s) => !s.taskQuestion && isFilePath(getSubmissionAnswer(s)));
         return found ? getSubmissionAnswer(found) : null;
-    }, [ submissions, requiresFileUpload ]);
+    }, [ submissions, requiresFileUpload, requiresTextResponse ]);
 
-    // Tìm câu trả lời text đã nộp mới nhất (Sửa tìm đáp án mới nhất)
+    // Tìm câu trả lời text đã nộp mới nhất
     const previousText = useMemo(() => {
         if (!requiresTextResponse) return '';
+        if (!requiresFileUpload) {
+            const found = [ ...submissions ].reverse().find((s) => !s.taskQuestion);
+            return found ? getSubmissionAnswer(found) : '';
+        }
         const found = [ ...submissions ].reverse().find((s) => !s.taskQuestion && !isFilePath(getSubmissionAnswer(s)));
         return found ? getSubmissionAnswer(found) : '';
-    }, [ submissions, requiresTextResponse ]);
+    }, [ submissions, requiresTextResponse, requiresFileUpload ]);
 
     // Bản đồ đáp án đúng lấy từ API questions
     const correctAnswersMap = useMemo(() => {
