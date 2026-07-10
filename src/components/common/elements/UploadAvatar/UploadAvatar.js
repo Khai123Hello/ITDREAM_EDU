@@ -5,6 +5,7 @@ import { AppConstants } from '@constants';
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
+import { getDownloadUrl } from '@utils';
 import { set } from 'lodash';
 
 import styles from './UploadAvatar.module.scss';
@@ -40,7 +41,7 @@ function UploadAvatar({ onChange, value, error, upload, setImageUrl, imageUrl, d
 
     const previewSrc = value
         ? typeof value === 'string'
-            ? `${AppConstants.contentRootUrl}${value}`
+            ? getDownloadUrl(value)
             : URL.createObjectURL(value)
         : null;
 

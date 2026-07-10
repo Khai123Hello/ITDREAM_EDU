@@ -6,6 +6,7 @@ import useAuth from '@hooks/useAuth';
 import useFetch from '@hooks/useFetch';
 import { removeCacheToken, removeCacheUserEmail, removeCacheUserKind } from '@services/userService';
 import { accountActions } from '@store/actions';
+import { getDownloadUrl } from '@utils';
 
 import NotificationDropdown from './NotificationDropdown';
 
@@ -105,7 +106,7 @@ const AppHeader = () => {
                                 >
                                     {profile?.avatar || profile?.avatarPath ? (
                                         <img
-                                            src={profile.avatar || profile.avatarPath}
+                                            src={getDownloadUrl(profile.avatar || profile.avatarPath)}
                                             alt={profile?.fullName || 'User'}
                                             className={styles.userAvatarImg}
                                         />

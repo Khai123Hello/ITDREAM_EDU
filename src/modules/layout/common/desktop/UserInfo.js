@@ -15,6 +15,7 @@ import { AppConstants } from '@constants';
 import useAuth from '@hooks/useAuth';
 import { removeCacheToken, removeCacheUserEmail, removeCacheUserKind } from '@services/userService';
 import { accountActions } from '@store/actions';
+import { getDownloadUrl } from '@utils';
 
 import styles from './AppHeader.module.scss';
 
@@ -59,7 +60,7 @@ function UserInfo() {
             trigger={
                 <div className={styles.userInfo}>
                     <div className={styles.avatar}>
-                        <img alt="avatar" src={user?.avatar ? AppConstants.contentRootUrl + user?.avatar : Avatar} />
+                        <img alt="avatar" src={user?.avatar ? getDownloadUrl(user.avatar) : Avatar} />
                     </div>
                 </div>
             }
@@ -73,7 +74,7 @@ function UserInfo() {
                                     <img
                                         alt="avatar"
                                         className={styles.avatar}
-                                        src={user?.avatar ? AppConstants.contentRootUrl + user?.avatar : Avatar}
+                                        src={user?.avatar ? getDownloadUrl(user.avatar) : Avatar}
                                     />
                                 </div>
                                 <Flex direction="column" gap="8px">

@@ -185,11 +185,7 @@ const ProfileComponent = (props) => {
     const editingFieldRef = useRef(null);
     const [ editingField, setEditingField ] = useState(null);
 
-    const getAvatarUrl = (path) => {
-        if (!path) return '';
-        if (path.startsWith('http')) return path;
-        return `${AppConstants.contentRootUrl}${path}`;
-    };
+    const getAvatarUrl = (path) => getDownloadUrl(path);
 
     const avatarUrl = getAvatarUrl(imageUrl || avatarRaw);
 

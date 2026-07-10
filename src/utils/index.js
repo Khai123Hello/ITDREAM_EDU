@@ -642,26 +642,36 @@ export const getColumnWidth = (params = {}) => {
     return Math.max(width, maxLength * ratio);
 };
 
-export const getDownloadUrl = (filePath) => {
+const resolveAssetUrl = (filePath, { preview = false } = {}) => {
     if (!filePath) return '';
-    if (filePath.startsWith('http')) return filePath;
-    let cleanPath = filePath.replace(/\\/g, '/');
-    if (cleanPath.startsWith('/')) {
-        cleanPath = cleanPath.substring(1);
+
+    const value = String(filePath);
+    if (/^(https?:)?\/\//i.test(value) || value.startsWith('data:') || value.startsWith('blob:')) return value;
+
+    const normalizedPath = value.replace(/\\/g, '/');
+    if (
+        normalizedPath.startsWith('/images/') ||
+        normalizedPath.startsWith('/static/') ||
+        normalizedPath.startsWith('/assets/') ||
+        normalizedPath.startsWith('/media/') ||
+        normalizedPath.startsWith('/favicon') ||
+        normalizedPath.startsWith('/manifest') ||
+        normalizedPath.startsWith('/robots') ||
+        normalizedPath.startsWith('/v1/file/') ||
+        normalizedPath.startsWith('/api/')
+    ) {
+        return normalizedPath;
     }
-    const rootUrl = AppConstants.contentRootUrl || '';
+
+    const cleanPath = normalizedPath.replace(/^\/+/, '');
+    const rootUrl = preview
+        ? (AppConstants.contentRootUrl || '').replace('v1/file/download', 'v1/file/preview')
+        : AppConstants.contentRootUrl || '';
     const separator = rootUrl.endsWith('/') ? '' : '/';
+
     return `${rootUrl}${separator}${cleanPath}`;
 };
 
-export const getPreviewUrl = (filePath) => {
-    if (!filePath) return '';
-    if (filePath.startsWith('http')) return filePath;
-    let cleanPath = filePath.replace(/\\/g, '/');
-    if (cleanPath.startsWith('/')) {
-        cleanPath = cleanPath.substring(1);
-    }
-    const rootUrl = (AppConstants.contentRootUrl || '').replace('v1/file/download', 'v1/file/preview');
-    const separator = rootUrl.endsWith('/') ? '' : '/';
-    return `${rootUrl}${separator}${cleanPath}`;
-};
+export const getDownloadUrl = (filePath) => resolveAssetUrl(filePath);
+
+export const getPreviewUrl = (filePath) => resolveAssetUrl(filePath, { preview: true });

@@ -4,6 +4,7 @@ import SimulationCard from '@components/common/elements/SimulationCard';
 import SliderScroll from '@components/common/elements/SliderScroll';
 import { AppConstants } from '@constants';
 import useAuth from '@hooks/useAuth';
+import { getDownloadUrl } from '@utils';
 
 import styles from './index.module.scss';
 
@@ -231,11 +232,7 @@ function LandingPageDesktop({ simulations = [], organizations = [], feedbacks = 
                             const fullName = studentProfile?.fullName || f.student?.account?.fullName || 'Học viên';
 
                             const avatar = studentProfile?.avatar || studentProfile?.avatarPath || '';
-                            const avatarUrl = avatar
-                                ? avatar.startsWith('http')
-                                    ? avatar
-                                    : `${AppConstants.contentRootUrl}/${avatar}`
-                                : '';
+                            const avatarUrl = avatar ? getDownloadUrl(avatar) : '';
 
                             return (
                                 <div key={f.id} className={styles['lp-testimonial']}>

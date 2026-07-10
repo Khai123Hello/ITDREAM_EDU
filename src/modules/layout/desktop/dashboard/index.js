@@ -206,11 +206,7 @@ function DashboardDesktop({
                             <div className={styles.orgSelectionGrid}>
                                 {organizationsList.map((org) => {
                                     const isSelected = selectedOrgs.includes(org.id);
-                                    const logoUrl = org.logoUrl
-                                        ? org.logoUrl.startsWith('http')
-                                            ? org.logoUrl
-                                            : `${enrolledUrlBase || ''}${org.logoUrl}`
-                                        : null;
+                                    const logoUrl = org.logoUrl ? getDownloadUrl(org.logoUrl) : null;
                                     const orgName = org.shortName || org.name || 'Tổ chức';
 
                                     return (

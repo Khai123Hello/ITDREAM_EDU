@@ -24,6 +24,7 @@ import {
 import apiConfig from '@constants/apiConfig';
 import useFetch from '@hooks/useFetch';
 import { message } from 'antd';
+import { getDownloadUrl } from '@utils';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
@@ -48,8 +49,7 @@ const getOrgLogo = (job) => {
         job?.educator?.organization?.logoUrl ||
         job?.educator?.profileAccountDto?.avatar ||
         job?.educator?.account?.avatar;
-    if (!logo) return null;
-    return logo.startsWith('http') ? logo : `${AppConstants.contentRootUrl}${logo}`;
+    return logo ? getDownloadUrl(logo) : null;
 };
 
 const getPlainTextFromTipTap = (content) => {
@@ -475,7 +475,7 @@ function JobsDesktop() {
                                 className={styles.detailHeroImg}
                                 style={{
                                     backgroundImage: displayJob.image
-                                        ? `url(${displayJob.image.startsWith('http') ? displayJob.image : `${AppConstants.contentRootUrl}${displayJob.image}`})`
+                                        ? `url(${getDownloadUrl(displayJob.image)})`
                                         : 'linear-gradient(135deg, #0f2042, #1b3564)',
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
@@ -616,7 +616,7 @@ function JobsDesktop() {
                                                     className={styles.simThumb}
                                                     style={{
                                                         backgroundImage: sim.thumbnail
-                                                            ? `url(${sim.thumbnail.startsWith('http') ? sim.thumbnail : `${AppConstants.contentRootUrl}${sim.thumbnail}`})`
+                                                            ? `url(${getDownloadUrl(sim.thumbnail)})`
                                                             : 'none',
                                                         backgroundSize: 'cover',
                                                         backgroundPosition: 'center',

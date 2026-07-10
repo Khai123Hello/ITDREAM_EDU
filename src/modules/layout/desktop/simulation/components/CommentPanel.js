@@ -3,6 +3,7 @@ import { FiCornerDownRight, FiEdit2, FiSend, FiTrash2, FiX } from 'react-icons/f
 import { Spin } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { getDownloadUrl } from '@utils';
 
 import 'dayjs/locale/vi';
 
@@ -148,8 +149,9 @@ export default function CommentPanel({
         const initials = getInitials(fullName);
         const bg = getAvatarColor(fullName);
 
-        if (user?.avatar && user.avatar.startsWith('http')) {
-            return <img src={user.avatar} alt={fullName} className="tfo-comment-avatar" />;
+        const avatarSrc = user?.avatar ? getDownloadUrl(user.avatar) : '';
+        if (avatarSrc) {
+            return <img src={avatarSrc} alt={fullName} className="tfo-comment-avatar" />;
         }
 
         return (

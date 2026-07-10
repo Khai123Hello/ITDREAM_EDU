@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Modal, Spin } from 'antd';
+import { getDownloadUrl } from '@utils';
 import dayjs from 'dayjs';
 
 import CommentPanel from '../components/CommentPanel';
@@ -986,7 +987,7 @@ export default function TaskDoingPage({
 
     const renderMedia = () => {
         if (!mediaPath) return null;
-        const fullMediaPath = mediaPath.startsWith('http') ? mediaPath : `${urlBase}${mediaPath}`;
+        const fullMediaPath = getDownloadUrl(mediaPath);
         const ext = mediaPath.split('.').pop().toLowerCase();
 
         if ([ 'jpg', 'jpeg', 'png', 'gif', 'webp' ].includes(ext)) {
@@ -1248,9 +1249,7 @@ export default function TaskDoingPage({
                                                                         review.createdBy ||
                                                                         'Giảng viên';
                                                                 const reviewerAvatar = review.creator?.avatar
-                                                                    ? review.creator.avatar.startsWith('http')
-                                                                        ? review.creator.avatar
-                                                                        : `${urlBase}${review.creator.avatar}`
+                                                                    ? getDownloadUrl(review.creator.avatar)
                                                                     : null;
                                                                 const initials = getInitials(reviewerName);
                                                                 const avatarBg = getAvatarColor(reviewerName);

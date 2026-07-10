@@ -1,5 +1,6 @@
 import React from 'react';
 import { SIMULATION_LEVEL_MAP } from '@constants';
+import { getDownloadUrl } from '@utils';
 
 import styles from './index.module.scss';
 
@@ -54,13 +55,13 @@ const SimulationCard = ({
             aria-label={title}
         >
             <div className={styles.thumb} style={{ background: `linear-gradient(135deg, ${gStart} 0%, ${gEnd} 100%)` }}>
-                {thumbnail && <img src={thumbnail} alt={title} className={styles.thumbImg} />}
+                {thumbnail && <img src={getDownloadUrl(thumbnail)} alt={title} className={styles.thumbImg} />}
                 <span className={`${styles.thumbBadge} ${styles[lvl.className]}`}>{lvl.label}</span>
             </div>
 
             <div className={styles.orgBar}>
                 {organization.logoUrl ? (
-                    <img src={organization.logoUrl} alt={orgName} className={styles.orgLogo} />
+                    <img src={getDownloadUrl(organization.logoUrl)} alt={orgName} className={styles.orgLogo} />
                 ) : (
                     <div className={styles.orgLogoFallback}>{orgInitial}</div>
                 )}
