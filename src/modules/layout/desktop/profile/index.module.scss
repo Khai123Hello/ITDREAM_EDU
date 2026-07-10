@@ -8,7 +8,7 @@
     justify-content: center;
     align-items: center;
     background-color: #f0fdf4; // Matches public layouts green backdrop
-    font-family: 'Be Vietnam Pro', 'SF-Pro', sans-serif;
+    font-family: var(--font-sans);
 
     .form {
         background-color: #ffffff;

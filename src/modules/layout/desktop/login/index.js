@@ -111,7 +111,7 @@ function LoginPageDesktop({
     fieldName = 'email',
     fieldLabel = 'E-mail',
 }) {
-    const [otp, setOtpLocal] = useState('');
+    const [ otp, setOtpLocal ] = useState('');
     const translate = useTranslate();
 
     const loginGoogle = useGoogleLogin({

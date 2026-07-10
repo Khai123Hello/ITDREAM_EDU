@@ -29,7 +29,7 @@ const LandingPageContainer = ({ title }) => {
                 organization: item.educator?.organization || {},
                 category: item.category,
             })),
-        [data],
+        [ data ],
     );
 
     const { data: organizationData } = useFetch(apiConfig.organization.guestList, {

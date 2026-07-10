@@ -33,7 +33,7 @@ function BlogDetailContainer() {
             return blogRes?.data || null;
         }
         return allBlogs.find((b) => String(b.id) === String(id)) || null;
-    }, [isAuthenticated, blogRes, allBlogs, id]);
+    }, [ isAuthenticated, blogRes, allBlogs, id ]);
 
     const urlBase = blogRes?.urlBase || blogsRes?.urlBase || '';
 
@@ -44,7 +44,7 @@ function BlogDetailContainer() {
                 (b) => b.id !== blog.id && b.category?.id && blog.category?.id && b.category.id === blog.category.id,
             )
             .slice(0, 4);
-    }, [blog, allBlogs]);
+    }, [ blog, allBlogs ]);
 
     return (
         <>

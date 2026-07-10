@@ -43,6 +43,12 @@ function DashboardPageContainer() {
         },
     });
 
+    const { data: jobPostsList, loading: jobsLoading } = useFetch(apiConfig.job.guestList, {
+        immediate: true,
+        params: { page: 0, size: 1000, paged: true },
+        mappingData: (res) => res?.data?.content || res?.data || [],
+    });
+
     return (
         <>
             <AppHeader />
@@ -54,7 +60,8 @@ function DashboardPageContainer() {
                 allSimulations={allSimsRes?.content || []}
                 organizations={organizationList || []}
                 categories={categoriesRes || []}
-                loading={simLoading || achLoading || allSimsLoading || orgLoading || categoriesLoading}
+                jobPosts={jobPostsList || []}
+                loading={simLoading || achLoading || allSimsLoading || orgLoading || categoriesLoading || jobsLoading}
             />
             <AppFooter />
         </>

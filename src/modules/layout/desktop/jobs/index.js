@@ -74,14 +74,14 @@ const getPlainTextFromTipTap = (content) => {
 
 function JobsDesktop() {
     const navigate = useNavigate();
-    const [selectedJobId, setSelectedJobId] = useState(null);
-    const [selectedTab, setSelectedTab] = useState('all'); // 'all', 'saved'
+    const [ selectedJobId, setSelectedJobId ] = useState(null);
+    const [ selectedTab, setSelectedTab ] = useState('all'); // 'all', 'saved'
 
     // Dropdown filters
-    const [opportunityFilter, setOpportunityFilter] = useState('Tất cả');
-    const [roleFilter, setRoleFilter] = useState('Tất cả');
-    const [selectedProvinceId, setSelectedProvinceId] = useState(null);
-    const [selectedWardId, setSelectedWardId] = useState(null);
+    const [ opportunityFilter, setOpportunityFilter ] = useState('Tất cả');
+    const [ roleFilter, setRoleFilter ] = useState('Tất cả');
+    const [ selectedProvinceId, setSelectedProvinceId ] = useState(null);
+    const [ selectedWardId, setSelectedWardId ] = useState(null);
 
     // Fetch provinces on mount
     const { data: provinces } = useFetch(apiConfig.nation.client_list, {
@@ -91,7 +91,7 @@ function JobsDesktop() {
     });
 
     // Fetch wards dynamically based on province
-    const [wards, setWards] = useState([]);
+    const [ wards, setWards ] = useState([]);
     const { execute: fetchWards } = useFetch(apiConfig.nation.client_list, {
         immediate: false,
     });
@@ -109,7 +109,7 @@ function JobsDesktop() {
             setWards([]);
             setSelectedWardId(null);
         }
-    }, [selectedProvinceId, fetchWards]);
+    }, [ selectedProvinceId, fetchWards ]);
 
     const handleSelectJob = (jobId) => {
         setSelectedJobId(jobId);
@@ -127,7 +127,7 @@ function JobsDesktop() {
         if (selectedWardId) params.wardId = selectedWardId;
 
         return params;
-    }, [opportunityFilter, selectedProvinceId, selectedWardId]);
+    }, [ opportunityFilter, selectedProvinceId, selectedWardId ]);
 
     // Fetch saved job IDs on mount
     const { data: savedJobIdsResponse, execute: fetchSavedJobs } = useFetch(apiConfig.job.listSaveJob, {
@@ -149,7 +149,7 @@ function JobsDesktop() {
     // Load jobs on query parameters change
     useEffect(() => {
         fetchJobs({ params: queryParams });
-    }, [queryParams, fetchJobs]);
+    }, [ queryParams, fetchJobs ]);
 
     // Active job details resolver
     const jobs = jobsResponse?.content || [];
@@ -173,11 +173,11 @@ function JobsDesktop() {
         }
 
         return list;
-    }, [jobs, selectedTab, savedJobIds, roleFilter]);
+    }, [ jobs, selectedTab, savedJobIds, roleFilter ]);
 
     const activeJob = useMemo(() => {
         return filteredJobs.find((job) => job.id === selectedJobId) || filteredJobs[0] || null;
-    }, [filteredJobs, selectedJobId]);
+    }, [ filteredJobs, selectedJobId ]);
 
     const {
         data: activeJobDetail,
@@ -194,7 +194,7 @@ function JobsDesktop() {
                 pathParams: { id: activeJob.id },
             });
         }
-    }, [activeJob?.id, fetchJobDetail]);
+    }, [ activeJob?.id, fetchJobDetail ]);
 
     const displayJob = activeJobDetail && activeJobDetail.id === activeJob?.id ? activeJobDetail : activeJob;
 
@@ -203,14 +203,14 @@ function JobsDesktop() {
         if (selectedJobId && filteredJobs.length > 0 && !filteredJobs.some((j) => j.id === selectedJobId)) {
             setSelectedJobId(null);
         }
-    }, [filteredJobs, selectedJobId]);
+    }, [ filteredJobs, selectedJobId ]);
 
     // Toggle save job action
     const { execute: callSaveJob } = useFetch(apiConfig.job.saveJob, {}, false);
     const handleToggleSaveJob = (e, jobId) => {
         e.stopPropagation();
         const isSaved = savedJobIds.includes(jobId);
-        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [...savedJobIds, jobId];
+        const newSavedIds = isSaved ? savedJobIds.filter((id) => id !== jobId) : [ ...savedJobIds, jobId ];
 
         callSaveJob({
             dataBody: { jobPostIds: newSavedIds },

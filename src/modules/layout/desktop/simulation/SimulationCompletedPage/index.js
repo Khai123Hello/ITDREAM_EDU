@@ -130,9 +130,9 @@ function SimulationCompletedPage({
 }) {
     // Parse the PDF certificate URL
     const filePath = currentAch?.filePath;
-    const [previewBlobUrl, setPreviewBlobUrl] = useState(null);
-    const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
+    const [ previewBlobUrl, setPreviewBlobUrl ] = useState(null);
+    const [ isPreviewLoading, setIsPreviewLoading ] = useState(false);
+    const [ isDownloading, setIsDownloading ] = useState(false);
 
     const parseFilePath = (path) => {
         if (!path) return null;
@@ -162,7 +162,7 @@ function SimulationCompletedPage({
                 sendRequest(apiConfig.file.preview, { pathParams })
                     .then((res) => {
                         if (isMounted && res.data) {
-                            const blob = new Blob([res.data], { type: 'application/pdf' });
+                            const blob = new Blob([ res.data ], { type: 'application/pdf' });
                             objectUrl = URL.createObjectURL(blob);
                             setPreviewBlobUrl(objectUrl);
                         }
@@ -186,7 +186,7 @@ function SimulationCompletedPage({
                 URL.revokeObjectURL(objectUrl);
             }
         };
-    }, [filePath]);
+    }, [ filePath ]);
 
     const handleDownload = async () => {
         if (!filePath) return;
@@ -197,7 +197,7 @@ function SimulationCompletedPage({
         try {
             const res = await sendRequest(apiConfig.file.download, { pathParams });
             if (res.data) {
-                const blob = new Blob([res.data], { type: 'application/pdf' });
+                const blob = new Blob([ res.data ], { type: 'application/pdf' });
                 const objectUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = objectUrl;

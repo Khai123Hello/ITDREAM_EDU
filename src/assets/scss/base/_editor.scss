@@ -16,7 +16,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif !important;
+    font-family: var(--font-heading) !important;
     color: #111236 !important;
     font-weight: 700 !important;
     line-height: 1.3 !important;
@@ -215,7 +215,7 @@
   justify-content: center;
   margin-top: 1px;
   user-select: none;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-heading);
 }
 
 .tfo-block-step-content {
@@ -230,7 +230,7 @@
   font-size: 14px;
   font-weight: 700;
   color: #0062E3;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-heading);
 }
 
 .tfo-block-step-body {

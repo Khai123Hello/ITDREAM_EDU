@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { DownloadOutlined, LoadingOutlined } from '@ant-design/icons';
@@ -27,32 +27,33 @@ function DashboardDesktop({
     allSimulations = [],
     organizations = [],
     categories = [],
+    jobPosts = [],
     loading,
 }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const name = profile?.fullName || profile?.account?.fullName || '';
-    const [dismissedOrgs, setDismissedOrgs] = useState([]);
-    const [dismissedCardKeys, setDismissedCardKeys] = useState([]);
-    const [dismissedRecSimIds, setDismissedRecSimIds] = useState([]);
+    const [ dismissedOrgs, setDismissedOrgs ] = useState([]);
+    const [ dismissedCardKeys, setDismissedCardKeys ] = useState([]);
+    const [ dismissedRecSimIds, setDismissedRecSimIds ] = useState([]);
 
-    const [selectedSpecs, setSelectedSpecs] = useState([]);
-    const [selectedOrgs, setSelectedOrgs] = useState([]);
+    const [ selectedSpecs, setSelectedSpecs ] = useState([]);
+    const [ selectedOrgs, setSelectedOrgs ] = useState([]);
 
     const { execute: executeUpdateProfile, loading: updatingPreferences } = useFetch(apiConfig.student.clientUpdate);
     const { execute: executeGetProfile } = useFetchAction(accountActions.getProfile);
 
-    const [previewModalVisible, setPreviewModalVisible] = useState(false);
-    const [previewLoading, setPreviewLoading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [currentDownloadUrl, setCurrentDownloadUrl] = useState(null);
-    const [currentFileName, setCurrentFileName] = useState('');
+    const [ previewModalVisible, setPreviewModalVisible ] = useState(false);
+    const [ previewLoading, setPreviewLoading ] = useState(false);
+    const [ previewUrl, setPreviewUrl ] = useState(null);
+    const [ currentDownloadUrl, setCurrentDownloadUrl ] = useState(null);
+    const [ currentFileName, setCurrentFileName ] = useState('');
 
     const toggleSpec = (id) => {
         if (selectedSpecs.includes(id)) {
             setSelectedSpecs(selectedSpecs.filter((s) => s !== id));
         } else {
-            setSelectedSpecs([...selectedSpecs, id]);
+            setSelectedSpecs([ ...selectedSpecs, id ]);
         }
     };
 
@@ -60,7 +61,7 @@ function DashboardDesktop({
         if (selectedOrgs.includes(id)) {
             setSelectedOrgs(selectedOrgs.filter((o) => o !== id));
         } else {
-            setSelectedOrgs([...selectedOrgs, id]);
+            setSelectedOrgs([ ...selectedOrgs, id ]);
         }
     };
 
@@ -117,6 +118,48 @@ function DashboardDesktop({
 
     const categoriesList = Array.isArray(categories) ? categories : categories?.content || [];
     const organizationsList = Array.isArray(organizations) ? organizations : organizations?.content || [];
+
+    const preferences = profile?.preferences || [];
+    const prefSpecIds = useMemo(() => {
+        return preferences
+            .map((p) => p.specializationId)
+            .filter(Boolean)
+            .map(String);
+    }, [ preferences ]);
+
+    const prefOrgIds = useMemo(() => {
+        return preferences
+            .map((p) => p.organizationId)
+            .filter(Boolean)
+            .map(String);
+    }, [ preferences ]);
+
+    // Calculate recommended organizations based on preferences and simulations
+    const recommendedOrgs = useMemo(() => {
+        const specOrgs = allSimulations
+            .filter((sim) => sim.category?.id && prefSpecIds.includes(String(sim.category.id)))
+            .map((sim) => sim.educator?.organization)
+            .filter(Boolean);
+
+        const favoriteOrgs = organizationsList.filter((org) => prefOrgIds.includes(String(org.id)));
+
+        const merged = [ ...specOrgs, ...favoriteOrgs ];
+        const uniqueMap = {};
+        merged.forEach((org) => {
+            if (org.id) {
+                uniqueMap[org.id] = org;
+            }
+        });
+
+        return Object.values(uniqueMap);
+    }, [ allSimulations, organizationsList, prefSpecIds, prefOrgIds ]);
+
+    const displayOrgs = useMemo(() => {
+        if (recommendedOrgs.length > 0) {
+            return recommendedOrgs;
+        }
+        return organizationsList.slice(0, 3);
+    }, [ recommendedOrgs, organizationsList ]);
 
     if (showPreferenceSetup) {
         return (
@@ -264,11 +307,10 @@ function DashboardDesktop({
     const hasFullName = !!(profile?.fullName || profile?.account?.fullName);
     const hasEmail = !!(profile?.email || profile?.account?.email);
 
-    const preferences = profile?.preferences || [];
     const hasSpecialization = preferences.some((p) => p.specializationId && String(p.specializationId) !== '0');
     const hasOrganization = preferences.some((p) => p.organizationId && String(p.organizationId) !== '0');
 
-    const completionStatus = [hasFullName, hasEmail, hasSpecialization, hasOrganization];
+    const completionStatus = [ hasFullName, hasEmail, hasSpecialization, hasOrganization ];
     const hasPhone = profile?.phone || profile?.account?.phone;
     if (hasPhone) {
         completionStatus.push(true);
@@ -286,15 +328,6 @@ function DashboardDesktop({
     // Calculate recommended simulations based on preferences
     const enrolledIds = enrolledSims.map((item) => item.simulation?.id).filter(Boolean);
     const nonEnrolledSims = allSimulations.filter((sim) => !enrolledIds.includes(sim.id));
-
-    const prefSpecIds = preferences
-        .map((p) => p.specializationId)
-        .filter(Boolean)
-        .map(String);
-    const prefOrgIds = preferences
-        .map((p) => p.organizationId)
-        .filter(Boolean)
-        .map(String);
 
     const hasPreferences = prefSpecIds.length > 0 || prefOrgIds.length > 0;
 
@@ -385,7 +418,7 @@ function DashboardDesktop({
     const filteredDynamicCards = dynamicCards.filter((card) => !dismissedCardKeys.includes(card.key));
 
     const handleDismissCard = (key) => {
-        setDismissedCardKeys([...dismissedCardKeys, key]);
+        setDismissedCardKeys([ ...dismissedCardKeys, key ]);
     };
 
     return (
@@ -654,7 +687,7 @@ function DashboardDesktop({
                                                 <button
                                                     className={styles.btnDismiss}
                                                     onClick={() =>
-                                                        setDismissedRecSimIds([...dismissedRecSimIds, sim.id])
+                                                        setDismissedRecSimIds([ ...dismissedRecSimIds, sim.id ])
                                                     }
                                                 >
                                                     Bỏ qua
@@ -747,9 +780,9 @@ function DashboardDesktop({
                             <span className={styles.sectionIcon}>💼</span> Đối tác & Tổ chức
                         </div>
 
-                        {organizations
+                        {displayOrgs
                             .filter((org) => !dismissedOrgs.includes(org.id))
-                            .slice(0, 3)
+                            .slice(0, 4)
                             .map((org) => {
                                 const logoUrl = org.logoUrl
                                     ? org.logoUrl.startsWith('http')
@@ -758,15 +791,79 @@ function DashboardDesktop({
                                     : null;
                                 const orgName = org.shortName || org.name || 'Tổ chức';
 
+                                const orgJobs = jobPosts.filter((job) => job.educator?.organization?.id === org.id);
+                                const matchingJobs = orgJobs.filter((job) => {
+                                    const matchesSpec = job.simulations?.some(
+                                        (sim) => sim.category?.id && prefSpecIds.includes(String(sim.category.id)),
+                                    );
+                                    const matchesOrg =
+                                        job.educator?.organization?.id &&
+                                        prefOrgIds.includes(String(job.educator.organization.id));
+                                    return matchesSpec || matchesOrg;
+                                });
+
+                                const isFavorite = prefOrgIds.includes(String(org.id));
+                                const hasSimRecommendation = allSimulations.some(
+                                    (sim) =>
+                                        sim.educator?.organization?.id === org.id &&
+                                        sim.category?.id &&
+                                        prefSpecIds.includes(String(sim.category.id)),
+                                );
+
                                 return (
                                     <div key={org.id} className={styles.jobCard}>
                                         <div style={{ flex: 1 }}>
-                                            <h4>Thôn tin tuyển dụng tại {orgName}</h4>
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    gap: '8px',
+                                                    marginBottom: '8px',
+                                                    flexWrap: 'wrap',
+                                                }}
+                                            >
+                                                {isFavorite && (
+                                                    <span className={`${styles.badge} ${styles.badgeFavorite}`}>
+                                                        ⭐ Tổ chức quan tâm
+                                                    </span>
+                                                )}
+                                                {hasSimRecommendation && (
+                                                    <span className={`${styles.badge} ${styles.badgeRecommended}`}>
+                                                        💡 Gợi ý theo chuyên ngành
+                                                    </span>
+                                                )}
+                                                {matchingJobs.length > 0 && (
+                                                    <span className={`${styles.badge} ${styles.badgeMatch}`}>
+                                                        🎯 {matchingJobs.length} tin phù hợp chuyên ngành
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h4>Thông tin tuyển dụng tại {orgName}</h4>
                                             <p>{org.description || `Tham gia mạng lưới nhân tài của ${orgName}.`}</p>
+
+                                            <div
+                                                style={{
+                                                    marginTop: '8px',
+                                                    marginBottom: '12px',
+                                                    fontSize: '13px',
+                                                    color: '#64748b',
+                                                    display: 'flex',
+                                                    gap: '16px',
+                                                }}
+                                            >
+                                                <span>
+                                                    📄 <strong>{orgJobs.length}</strong> tin tuyển dụng
+                                                </span>
+                                                {matchingJobs.length > 0 && (
+                                                    <span style={{ color: '#10b981', fontWeight: '600' }}>
+                                                        🔥 {matchingJobs.length} cơ hội phù hợp với chuyên ngành của bạn
+                                                    </span>
+                                                )}
+                                            </div>
+
                                             <div className={styles.cardActions}>
                                                 <button
                                                     className={styles.btnDismiss}
-                                                    onClick={() => setDismissedOrgs([...dismissedOrgs, org.id])}
+                                                    onClick={() => setDismissedOrgs([ ...dismissedOrgs, org.id ])}
                                                 >
                                                     Không quan tâm
                                                 </button>
