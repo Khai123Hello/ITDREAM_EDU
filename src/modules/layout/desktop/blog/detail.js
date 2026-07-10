@@ -367,10 +367,7 @@ function BlogDetailDesktop({ blog, urlBase, loading, relatedBlogs = [] }) {
                                         className={styles.chapterNavBottomBtn}
                                         onClick={() => setActiveChapter((i) => i - 1)}
                                     >
-                                        <span className={styles.chapterNavDir}>← Phần trước</span>
-                                        <span className={styles.chapterNavName}>
-                                            {chapters[activeChapter - 1]?.title}
-                                        </span>
+                                        ← Phần trước
                                     </button>
                                 ) : (
                                     <div />
@@ -384,10 +381,7 @@ function BlogDetailDesktop({ blog, urlBase, loading, relatedBlogs = [] }) {
                                         )}
                                         onClick={() => setActiveChapter((i) => i + 1)}
                                     >
-                                        <span className={styles.chapterNavDir}>Phần tiếp theo →</span>
-                                        <span className={styles.chapterNavName}>
-                                            {chapters[activeChapter + 1]?.title}
-                                        </span>
+                                        Tiếp tục →
                                     </button>
                                 )}
                             </div>

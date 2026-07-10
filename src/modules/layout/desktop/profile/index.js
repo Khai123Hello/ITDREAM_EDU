@@ -19,6 +19,7 @@ import useFetch from '@hooks/useFetch';
 import useTranslate from '@hooks/useTranslate';
 import { getCacheUserKind } from '@services/userService';
 import { actions as accountActions } from '@store/actions/account';
+import { getDownloadUrl } from '@utils';
 import { toast } from 'sonner';
 
 import styles from './index.module.scss';

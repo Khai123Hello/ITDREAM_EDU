@@ -50,13 +50,15 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     max-height: calc(100vh - 80px);
     overflow-y: auto;
     padding-right: 16px;
-    
+
     &::-webkit-scrollbar {
         width: 4px;
     }
+
     &::-webkit-scrollbar-track {
         background: transparent;
     }
+
     &::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 4px;
@@ -67,7 +69,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     .tfo-toc-container {
         padding: 16px 0;
         border-left: 2px solid #e2e8f0;
-        
+
         .tfo-toc-title {
             font-size: 12px;
             font-weight: 700;
@@ -77,7 +79,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             font-family: var(--font-heading);
         }
-        
+
         .tfo-toc-list {
             list-style: none;
             padding: 0;
@@ -86,13 +88,13 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-direction: column;
             gap: 12px;
         }
-        
+
         .tfo-toc-item {
             padding-left: 16px;
             margin-left: -2px;
             border-left: 2px solid transparent;
             transition: all 0.2s ease;
-            
+
             button {
                 all: unset;
                 cursor: pointer;
@@ -104,25 +106,27 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 width: 100%;
                 display: block;
                 transition: color 0.2s ease;
-                
+
                 &:hover {
                     color: #168E85;
                 }
             }
-            
+
             &.level-1 {
                 padding-left: 16px;
             }
+
             &.level-2 {
                 padding-left: 28px;
             }
+
             &.level-3 {
                 padding-left: 40px;
             }
-            
+
             &.active {
                 border-left-color: #168E85;
-                
+
                 button {
                     color: #168E85;
                     font-weight: 700;
@@ -225,13 +229,12 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .articleTitle {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading);
     font-size: 42px;
     font-weight: 800;
     color: $primary-navy;
     line-height: 1.2;
     margin: 0 0 24px;
-    letter-spacing: -0.03em;
 }
 
 .articleExcerpt {
@@ -364,7 +367,12 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     line-height: 1.85;
     color: $text-main;
 
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         color: $primary-navy;
         font-weight: 800;
         margin-top: 36px;
@@ -372,16 +380,30 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         line-height: 1.3;
     }
 
-    h1 { font-size: 28px; }
-    h2 { font-size: 24px; border-left: 4px solid $primary-teal; padding-left: 12px; }
-    h3 { font-size: 20px; }
-    h4 { font-size: 18px; }
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+        border-left: 4px solid $primary-teal;
+        padding-left: 12px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    h4 {
+        font-size: 18px;
+    }
 
     p {
         margin-bottom: 20px;
     }
 
-    ul, ol {
+    ul,
+    ol {
         margin-left: 24px;
         margin-bottom: 24px;
 
@@ -435,7 +457,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: $shadow-sm;
     }
 
-    pre, code {
+    pre,
+    code {
         font-family: var(--font-mono);
         background: #f1f5f9;
         border-radius: 6px;
@@ -481,7 +504,9 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
             min-width: 0;
 
-            > * { margin: 0; }
+            >* {
+                margin: 0;
+            }
         }
     }
 
@@ -535,7 +560,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         margin: 1.5em 0;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 
         iframe {
             width: 100%;
@@ -579,7 +604,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 50%;
     overflow: hidden;
     background: $border-color;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .authorCardAvatar {
@@ -844,6 +869,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &.tealBg {
         background: linear-gradient(135deg, $primary-navy-dark 0%, $primary-navy 100%);
+
         h4 {
             color: $white;
         }
@@ -1116,8 +1142,13 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* =============================================
@@ -1195,11 +1226,13 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (max-width: 1024px) {
+
     .mainLayout,
     .mainLayoutNoSidebar {
         grid-template-columns: 200px 1fr;
         gap: 28px;
     }
+
     .sidebar {
         display: none;
     }
@@ -1209,26 +1242,32 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     .blogDetailContainer {
         padding: 24px 16px 60px;
     }
+
     .mainLayout,
     .mainLayoutNoSidebar {
         grid-template-columns: 1fr;
         gap: 0;
     }
+
     .tocSidebar {
         display: none;
     }
+
     .contentArea {
         padding: 24px 20px;
         border-radius: 16px;
     }
+
     .articleTitle {
         font-size: 28px;
     }
+
     .coverImageWrapper {
         height: 240px;
         border-radius: 12px;
         margin-bottom: 24px;
     }
+
     .authorCard {
         grid-template-columns: 1fr;
         text-align: center;
@@ -1250,7 +1289,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     left: 0;
     right: 0;
     height: 3px;
-    background: rgba(0,0,0,0.06);
+    background: rgba(0, 0, 0, 0.06);
     z-index: 9999;
 }
 
@@ -1322,7 +1361,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
         background: $bg-light;
-        
+
         .chapterNum {
             border-color: $primary-teal;
             color: $primary-teal;
@@ -1468,77 +1507,48 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
    CHAPTER BOTTOM NAV (prev / next)
    ============================================= */
 .chapterNavBottom {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-top: 64px;
-    padding-top: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 48px;
+    padding-top: 32px;
     border-top: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .chapterNavBottomBtn {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 24px 32px;
-    border: 1px solid rgba(22, 142, 133, 0.12);
-    border-radius: 20px;
-    background: rgba(22, 142, 133, 0.02);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    background: #fff;
+    color: $text-secondary;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    text-align: left;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
+    transition: $transition-smooth;
+    box-shadow: $shadow-sm;
 
     &:hover {
-        background: linear-gradient(135deg, $primary-teal 0%, #0f766e 100%);
         border-color: $primary-teal;
-        box-shadow: 0 12px 28px rgba(22, 142, 133, 0.25);
-        transform: translateY(-5px);
-
-        .chapterNavDir {
-            color: rgba(255, 255, 255, 0.75);
-            transform: translateX(-6px);
-        }
-
-        .chapterNavName {
-            color: #fff;
-        }
+        color: $primary-teal;
+        background: rgba(22, 142, 133, 0.04);
+        transform: translateX(-3px);
     }
 }
 
 .chapterNavBottomBtnNext {
-    text-align: right;
-    align-items: flex-end;
+    background: $primary-teal;
+    color: #fff;
+    border-color: $primary-teal;
+    box-shadow: 0 4px 12px rgba(22, 142, 133, 0.15);
 
     &:hover {
-        .chapterNavDir {
-            transform: translateX(6px);
-        }
+        background: darken($primary-teal, 6%);
+        color: #fff;
+        border-color: darken($primary-teal, 6%);
+        transform: translateX(3px);
+        box-shadow: 0 6px 16px rgba(22, 142, 133, 0.25);
     }
 }
-
-.chapterNavDir {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: $primary-teal;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.chapterNavName {
-    font-size: 16px;
-    font-weight: 800;
-    color: $primary-navy;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-
-
-
