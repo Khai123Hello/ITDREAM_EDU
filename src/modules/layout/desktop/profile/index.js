@@ -181,10 +181,15 @@ const ProfileComponent = (props) => {
     });
 
     const [ imageUrl, setImageUrl ] = useState(null);
+    const [ imageError, setImageError ] = useState(false);
     const { execute: executeUpFile } = useFetch(apiConfig.file.upload);
     const fileInputRef = useRef(null);
     const editingFieldRef = useRef(null);
     const [ editingField, setEditingField ] = useState(null);
+
+    useEffect(() => {
+        setImageError(false);
+    }, [ imageUrl, avatarRaw ]);
 
     const getAvatarUrl = (path) => getDownloadUrl(path);
 
@@ -458,8 +463,8 @@ const ProfileComponent = (props) => {
                             onClick={handleAvatarClick}
                             title="Nhấp để thay đổi ảnh đại diện"
                         >
-                            {avatarUrl ? (
-                                <img src={avatarUrl} alt={fullName || 'Avatar'} />
+                            {avatarUrl && !imageError ? (
+                                <img src={avatarUrl} alt={fullName || 'Avatar'} onError={() => setImageError(true)} />
                             ) : (
                                 <div className={styles.heroAvatarPlaceholder}>
                                     {(fullName || 'U').charAt(0).toUpperCase()}
