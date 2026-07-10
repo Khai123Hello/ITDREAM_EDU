@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TipTapJsonRenderer from '@components/common/editor/TipTapJsonRenderer';
 import AppHeader from '@modules/layout/common/desktop/AppHeader';
-import { Modal, Spin } from 'antd';
 import { getDownloadUrl } from '@utils';
+import { Modal, Spin } from 'antd';
 import dayjs from 'dayjs';
 
 import CommentPanel from '../components/CommentPanel';

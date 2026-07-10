@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FiCornerDownRight, FiEdit2, FiSend, FiTrash2, FiX } from 'react-icons/fi';
+import { getDownloadUrl } from '@utils';
 import { Spin } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { getDownloadUrl } from '@utils';
 
 import 'dayjs/locale/vi';
 
