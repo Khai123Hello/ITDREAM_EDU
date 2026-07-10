@@ -1254,7 +1254,7 @@ function TaskDoingContainer() {
     // Handle file upload - lưu file hoặc đường dẫn vào studentSubmission
     const handleFileUpload = useCallback(
         async (fileOrPath) => {
-            if (hasCompleted) return;
+            if (hasCompleted || previousFile) return;
             if (!currentSubtaskProgress?.taskProgressId) {
                 message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
                 return;
@@ -1305,13 +1305,13 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi nộp bài!');
             }
         },
-        [ currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail, hasCompleted ],
+        [ currentSubtaskProgress, uploadFile, createQuizHistory, fetchProgressDetail, hasCompleted, previousFile ],
     );
 
     // Handle text response submit - lưu câu trả lời text vào studentSubmission
     const handleTextResponseSubmit = useCallback(
         async (text) => {
-            if (hasCompleted) return;
+            if (hasCompleted || previousText) return;
             if (!currentSubtaskProgress?.taskProgressId) {
                 message.error('Tiến độ nhiệm vụ chưa sẵn sàng. Vui lòng thử lại!');
                 return;
@@ -1335,7 +1335,7 @@ function TaskDoingContainer() {
                 message.error('Có lỗi xảy ra khi lưu câu trả lời!');
             }
         },
-        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted ],
+        [ currentSubtaskProgress, createQuizHistory, fetchProgressDetail, hasCompleted, previousText ],
     );
 
     /**

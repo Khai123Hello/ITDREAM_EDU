@@ -586,7 +586,6 @@ function FileDropzone({
     previousFile = null,
     urlBase = '',
     disabled = false,
-    onReset = null,
 }) {
     // Xác định mode mặc định dựa vào submission trước đó
     const defaultMode = previousFile && isExternalUrl(previousFile) ? 'link' : 'file';
@@ -655,26 +654,6 @@ function FileDropzone({
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
                 <div className="tfo-upload-label">Nộp Bài Làm Của Bạn</div>
-                {previousFile && !disabled && onReset && (
-                    <button type="button" className="tfo-reset-small-btn" onClick={onReset}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            style={{ marginRight: 4 }}
-                        >
-                            <polyline points="23 4 23 10 17 10" />
-                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                        </svg>
-                        Reset
-                    </button>
-                )}
             </div>
 
             {/* Tab switcher - chỉ hiển thị khi chưa hoàn thành */}
@@ -1371,7 +1350,6 @@ export default function TaskDoingPage({
                                                             previousFile={previousFile}
                                                             urlBase={urlBase}
                                                             disabled={isCompleted}
-                                                            onReset={handleResetClick}
                                                         />
                                                     </div>
                                                 )}
@@ -1383,30 +1361,6 @@ export default function TaskDoingPage({
                                                             <div className="tfo-text-response-label">
                                                                 Câu trả lời của bạn
                                                             </div>
-                                                            {previousText && !isCompleted && (
-                                                                <button
-                                                                    type="button"
-                                                                    className="tfo-reset-small-btn"
-                                                                    onClick={handleResetClick}
-                                                                >
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width="12"
-                                                                        height="12"
-                                                                        viewBox="0 0 24 24"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        strokeWidth="2.5"
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                        style={{ marginRight: 4 }}
-                                                                    >
-                                                                        <polyline points="23 4 23 10 17 10" />
-                                                                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                                                                    </svg>
-                                                                    Reset
-                                                                </button>
-                                                            )}
                                                         </div>
                                                         <textarea
                                                             className="tfo-text-response-textarea"
