@@ -761,7 +761,7 @@ function DashboardDesktop({
                                 return (
                                     <div key={org.id} className={styles.jobCard}>
                                         <div style={{ flex: 1 }}>
-                                            <h4>Cơ hội việc làm tại {orgName}</h4>
+                                            <h4>Thôn tin tuyển dụng tại {orgName}</h4>
                                             <p>{org.description || `Tham gia mạng lưới nhân tài của ${orgName}.`}</p>
                                             <div className={styles.cardActions}>
                                                 <button

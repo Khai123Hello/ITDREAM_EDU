@@ -26,6 +26,9 @@ import useFetch from '@hooks/useFetch';
 import { message } from 'antd';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 import styles from './index.module.scss';
 
@@ -213,7 +216,7 @@ function JobsDesktop() {
             dataBody: { jobPostIds: newSavedIds },
             onCompleted: () => {
                 fetchSavedJobs(); // Refresh saved jobs list from backend
-                message.success(isSaved ? 'Đã bỏ lưu cơ hội việc làm' : 'Đã lưu cơ hội việc làm');
+                message.success(isSaved ? 'Đã bỏ lưu tin tuyển dụng' : 'Đã lưu tin tuyển dụng');
             },
             onError: (err) => {
                 message.error(err?.message || 'Không thể cập nhật trạng thái lưu.');
@@ -442,8 +445,8 @@ function JobsDesktop() {
                                                 />
                                             </svg>
                                             {job.type === 1
-                                                ? dayjs(job.date).format('DD/MM/YYYY')
-                                                : `Hạn: ${dayjs(job.endDate).format('DD/MM/YYYY')}`}
+                                                ? dayjs(job.date, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')
+                                                : `Hạn: ${dayjs(job.endDate, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')}`}
                                         </span>
                                     )}
                                     <button
@@ -460,7 +463,7 @@ function JobsDesktop() {
                             </div>
                         ))
                     ) : (
-                        <div className={styles.noJobs}>Không tìm thấy cơ hội việc làm nào phù hợp.</div>
+                        <div className={styles.noJobs}>Không tìm thấy tin tuyển dụng nào phù hợp.</div>
                     )}
                 </div>
 
@@ -531,8 +534,8 @@ function JobsDesktop() {
                                             {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
                                         </span>{' '}
                                         {displayJob.type === 1
-                                            ? dayjs(displayJob.date).format('DD/MM/YYYY')
-                                            : dayjs(displayJob.endDate).format('DD/MM/YYYY')}
+                                            ? dayjs(displayJob.date, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')
+                                            : dayjs(displayJob.endDate, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')}
                                     </div>
                                 )}
                                 {(displayJob.address || displayJob.province?.name) && (

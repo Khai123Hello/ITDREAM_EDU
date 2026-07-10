@@ -79,7 +79,7 @@ const AppHeader = () => {
                                 Blog
                             </a>
                             <a href="/jobs" className={isActive('/jobs')} onClick={handleNavClick('/jobs')}>
-                                Cơ hội việc làm
+                                Tin tuyển dụng
                             </a>
                         </>
                     ) : (

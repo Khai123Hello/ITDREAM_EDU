@@ -372,13 +372,13 @@ export const JOB_POST_ROLE_TYPE_OPTIONS = [
 // Dùng để lọc FE theo logic "giao nhau":
 //   job match filter nếu chúng có ít nhất 1 vai trò nguyên tử chung.
 export const JOB_POST_ROLE_ATOMS = {
-    1: ['intern'],
-    2: ['part'],
-    3: ['full'],
-    4: ['intern', 'part'],
-    5: ['intern', 'full'],
-    6: ['part', 'full'],
-    7: ['intern', 'part', 'full'],
+    1: [ 'intern' ],
+    2: [ 'part' ],
+    3: [ 'full' ],
+    4: [ 'intern', 'part' ],
+    5: [ 'intern', 'full' ],
+    6: [ 'part', 'full' ],
+    7: [ 'intern', 'part', 'full' ],
 };
 
 export const JOB_POST_STATUS_ACTIVE = 1;
