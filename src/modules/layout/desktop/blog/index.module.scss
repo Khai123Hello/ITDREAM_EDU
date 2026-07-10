@@ -628,31 +628,118 @@ $shimmer-gradient: linear-gradient(90deg, #f0f4f8 25%, #e2e8f0 50%, #f0f4f8 75%)
 .paginationContainer {
     display: flex;
     justify-content: center;
-    margin-top: 48px;
-    padding-top: 32px;
+    margin-top: 56px;
+    padding-top: 36px;
     border-top: 1px solid $border-color;
 
-    :global(.ant-pagination-item-active) {
-        background: $primary-teal !important;
-        border-color: $primary-teal !important;
-
-        a {
-            color: $white !important;
+    :global {
+        .ant-pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-    }
 
-    :global(.ant-pagination-item:hover) {
-        border-color: $primary-teal !important;
+        .ant-pagination-item {
+            border-radius: 10px !important;
+            border: 1px solid $border-color !important;
+            background-color: $white !important;
+            transition: $transition-smooth !important;
+            min-width: 40px !important;
+            height: 40px !important;
+            line-height: 38px !important;
 
-        a {
-            color: $primary-teal !important;
+            a {
+                color: $text-secondary !important;
+                font-weight: 600 !important;
+                font-size: 14px !important;
+                display: block !important;
+                text-align: center !important;
+                transition: $transition-smooth !important;
+            }
+
+            &:hover {
+                border-color: $primary-teal !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(22, 142, 133, 0.15) !important;
+
+                a {
+                    color: $primary-teal !important;
+                }
+            }
         }
-    }
 
-    :global(.ant-pagination-prev:hover .ant-pagination-item-link),
-    :global(.ant-pagination-next:hover .ant-pagination-item-link) {
-        border-color: $primary-teal !important;
-        color: $primary-teal !important;
+        .ant-pagination-item-active {
+            background: linear-gradient(135deg, $primary-teal 0%, darken($primary-teal, 6%) 100%) !important;
+            border-color: $primary-teal !important;
+            box-shadow: 0 4px 14px rgba(22, 142, 133, 0.3) !important;
+
+            a {
+                color: $white !important;
+            }
+
+            &:hover {
+                a {
+                    color: $white !important;
+                }
+            }
+        }
+
+        .ant-pagination-prev,
+        .ant-pagination-next {
+            min-width: 40px !important;
+            height: 40px !important;
+            line-height: 38px !important;
+
+            .ant-pagination-item-link {
+                border-radius: 10px !important;
+                border: 1px solid $border-color !important;
+                background-color: $white !important;
+                color: $text-secondary !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: $transition-smooth !important;
+                font-size: 14px !important;
+            }
+
+            &:not(.ant-pagination-disabled):hover {
+                transform: translateY(-2px);
+                
+                .ant-pagination-item-link {
+                    border-color: $primary-teal !important;
+                    color: $primary-teal !important;
+                    background-color: $primary-teal-light !important;
+                    box-shadow: 0 4px 10px rgba(22, 142, 133, 0.15) !important;
+                }
+            }
+
+            &.ant-pagination-disabled {
+                .ant-pagination-item-link {
+                    color: $text-light !important;
+                    border-color: #f1f5f9 !important;
+                    background-color: #f8fafc !important;
+                    cursor: not-allowed !important;
+                }
+            }
+        }
+
+        .ant-pagination-jump-prev,
+        .ant-pagination-jump-next {
+            min-width: 40px !important;
+            height: 40px !important;
+            line-height: 40px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+
+            .ant-pagination-item-link-icon {
+                color: $primary-teal !important;
+            }
+
+            .ant-pagination-item-ellipsis {
+                color: $text-light !important;
+            }
+        }
     }
 }
 

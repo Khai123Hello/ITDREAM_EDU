@@ -1267,63 +1267,95 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 .chapterNav {
     background: #fff;
     border: 1px solid $border-color;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 20px;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 24px;
     box-shadow: $shadow-sm;
+    transition: $transition-smooth;
+
+    &:hover {
+        box-shadow: 0 6px 20px rgba(13, 43, 94, 0.04);
+    }
 }
 
 .chapterNavLabel {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: $text-light;
-    margin: 0 0 10px;
+    letter-spacing: 0.05em;
+    color: $primary-navy;
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(22, 142, 133, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &::before {
+        content: '';
+        display: inline-block;
+        width: 3px;
+        height: 12px;
+        background: $primary-teal;
+        border-radius: 2px;
+    }
 }
 
 .chapterList {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .chapterBtn {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: none;
     border-radius: 8px;
     background: transparent;
     cursor: pointer;
     text-align: left;
-    transition: background 0.15s;
+    transition: $transition-smooth;
 
     &:hover {
         background: $bg-light;
+        
+        .chapterNum {
+            border-color: $primary-teal;
+            color: $primary-teal;
+        }
+
+        .chapterTitle {
+            color: $primary-teal;
+        }
     }
 }
 
 .chapterBtnActive {
-    background: rgba(22, 142, 133, 0.08) !important;
+    background: linear-gradient(135deg, rgba(22, 142, 133, 0.08) 0%, rgba(22, 142, 133, 0.02) 100%) !important;
+    border-left: 3px solid $primary-teal;
+    border-radius: 0 8px 8px 0;
+    padding-left: 9px;
 
     .chapterNum {
         background: $primary-teal;
         color: #fff;
         border-color: $primary-teal;
+        box-shadow: 0 2px 6px rgba(22, 142, 133, 0.3);
     }
 
     .chapterTitle {
         color: $primary-teal;
-        font-weight: 600;
+        font-weight: 700;
     }
 }
 
 .chapterNum {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: $bg-light;
     border: 1px solid $border-color;
@@ -1334,16 +1366,17 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 700;
     color: $text-secondary;
     flex-shrink: 0;
-    transition: background 0.15s, color 0.15s;
+    transition: $transition-smooth;
 }
 
 .chapterTitle {
-    font-size: 12.5px;
+    font-size: 13px;
     color: $text-secondary;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: color 0.15s;
+    transition: $transition-smooth;
+    font-weight: 500;
 }
 
 /* =============================================
@@ -1353,59 +1386,66 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
-    background: linear-gradient(135deg, rgba(22,142,133,0.05), rgba(108,99,255,0.05));
-    border: 1px solid rgba(22,142,133,0.15);
-    border-radius: 12px;
-    margin-bottom: 28px;
-    gap: 12px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, rgba(22, 142, 133, 0.04) 0%, rgba(13, 43, 94, 0.02) 100%);
+    border: 1px solid rgba(22, 142, 133, 0.12);
+    border-radius: 16px;
+    margin-bottom: 32px;
+    gap: 16px;
     flex-wrap: wrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
 }
 
 .chapterIndicatorInner {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .chapterIndicatorNum {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: $primary-teal;
-    background: rgba(22,142,133,0.1);
-    padding: 3px 8px;
-    border-radius: 4px;
+    color: #fff;
+    background: linear-gradient(135deg, $primary-teal, darken($primary-teal, 6%));
+    padding: 4px 10px;
+    border-radius: 6px;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(22, 142, 133, 0.25);
 }
 
 .chapterIndicatorTitle {
     font-size: 15px;
-    font-weight: 600;
-    color: $text-main;
+    font-weight: 700;
+    color: $primary-navy;
 }
 
 .chapterNavBtns {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .chapterNavArrow {
-    padding: 6px 14px;
-    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    border-radius: 10px;
     border: 1px solid $border-color;
     background: #fff;
     color: $text-secondary;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: $transition-smooth;
+    box-shadow: $shadow-sm;
 
     &:hover {
         border-color: $primary-teal;
         color: $primary-teal;
         background: rgba(22, 142, 133, 0.04);
+        transform: translateX(-3px);
     }
 }
 
@@ -1413,11 +1453,14 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: $primary-teal;
     color: #fff;
     border-color: $primary-teal;
+    box-shadow: 0 4px 12px rgba(22, 142, 133, 0.2);
 
     &:hover {
-        background: darken(#168E85, 5%);
+        background: darken($primary-teal, 6%);
         color: #fff;
-        border-color: darken(#168E85, 5%);
+        border-color: darken($primary-teal, 6%);
+        transform: translateX(3px);
+        box-shadow: 0 6px 16px rgba(22, 142, 133, 0.3);
     }
 }
 
@@ -1427,53 +1470,75 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 .chapterNavBottom {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 40px;
-    padding-top: 32px;
-    border-top: 1px solid $border-color;
+    gap: 24px;
+    margin-top: 64px;
+    padding-top: 48px;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .chapterNavBottomBtn {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding: 16px 20px;
-    border: 1px solid $border-color;
-    border-radius: 12px;
-    background: #fff;
+    gap: 8px;
+    padding: 24px 32px;
+    border: 1px solid rgba(22, 142, 133, 0.12);
+    border-radius: 20px;
+    background: rgba(22, 142, 133, 0.02);
     cursor: pointer;
     text-align: left;
-    transition: all 0.2s;
-    box-shadow: $shadow-sm;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.01);
 
     &:hover {
+        background: linear-gradient(135deg, $primary-teal 0%, #0f766e 100%);
         border-color: $primary-teal;
-        box-shadow: $shadow-lg;
-        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(22, 142, 133, 0.25);
+        transform: translateY(-5px);
+
+        .chapterNavDir {
+            color: rgba(255, 255, 255, 0.75);
+            transform: translateX(-6px);
+        }
+
+        .chapterNavName {
+            color: #fff;
+        }
     }
 }
 
 .chapterNavBottomBtnNext {
     text-align: right;
     align-items: flex-end;
+
+    &:hover {
+        .chapterNavDir {
+            transform: translateX(6px);
+        }
+    }
 }
 
 .chapterNavDir {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.12em;
     color: $primary-teal;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .chapterNavName {
-    font-size: 14px;
-    font-weight: 600;
-    color: $text-main;
+    font-size: 16px;
+    font-weight: 800;
+    color: $primary-navy;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 200px;
+    max-width: 100%;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+
 
 

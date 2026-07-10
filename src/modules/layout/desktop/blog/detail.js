@@ -70,7 +70,7 @@ function ChapterNavigator({ chapters, activeIndex, onSelect }) {
     if (!chapters || chapters.length <= 1) return null;
     return (
         <div className={styles.chapterNav}>
-            <p className={styles.chapterNavLabel}>📚 Mục lục chương</p>
+            <p className={styles.chapterNavLabel}>Mục lục</p>
             <div className={styles.chapterList}>
                 {chapters.map((ch, idx) => (
                     <button
