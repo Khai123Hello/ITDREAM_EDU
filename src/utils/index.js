@@ -17,6 +17,7 @@ import store from '@store';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import isBetween from 'dayjs/plugin/isBetween';
+import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { isValidJson } from 'itz-react-library/dist/utils';
 import { isArray, isObject } from 'lodash';
@@ -24,6 +25,7 @@ import qs from 'query-string';
 
 import { getObjectData } from './localStorage';
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(isBetween);
 dayjs.extend(customParseFormat);
 export const convertGlobImportToObject = (modules) =>
@@ -111,7 +113,7 @@ export const formatNumber = (value) => {
 };
 
 export const formatDateString = (dateString, formatDate = DATE_SHORT_MONTH_FORMAT) => {
-    return dayjs(dateString).format(formatDate);
+    return convertUtcToLocalTime(dateString, formatDate);
 };
 
 export const removeAccents = (str) => {
@@ -167,7 +169,18 @@ export const relativePosition = (element, target) => {
 
 export const convertUtcToLocalTime = (utcTime, format = DATE_FORMAT_DISPLAY) => {
     try {
-        if (utcTime) return dayjs.utc(utcTime).format(format);
+        if (!utcTime) return '';
+        let parsed;
+        if (typeof utcTime === 'string') {
+            parsed = dayjs.utc(utcTime, DEFAULT_FORMAT);
+            if (!parsed.isValid()) {
+                parsed = dayjs.utc(utcTime);
+            }
+        } else {
+            parsed = dayjs.utc(utcTime);
+        }
+        if (!parsed.isValid()) return '';
+        return parsed.tz('Asia/Ho_Chi_Minh').format(format);
     } catch (error) {
         return '';
     }
@@ -560,7 +573,7 @@ export function generateTimeSlotsInDay(selectedDate, setting, interval = 15) {
 
 export const convertLocalTimeToUtc = (localTime, inputFormat = DEFAULT_FORMAT, format = DEFAULT_FORMAT) => {
     if (!localTime) return '';
-    return dayjs(localTime, inputFormat).utc().format(format);
+    return dayjs.tz(localTime, inputFormat, 'Asia/Ho_Chi_Minh').utc().format(format);
 };
 
 export function getComboSkusName(skus) {

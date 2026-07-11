@@ -9,7 +9,12 @@ import Grid from '@components/common/elements/Grid';
 import { InputField } from '@components/common/elements/Input';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import { AppConstants, MALE, USER_KIND_STUDENT } from '@constants';
 import apiConfig from '@constants/apiConfig';
 import { commonMessage } from '@constants/intl';
@@ -327,7 +332,7 @@ const ProfileComponent = (props) => {
                     fullname,
                     phone: values.phone || user?.phone || user?.account?.phone || '',
                     birthday: values.birthday
-                        ? dayjs(values.birthday).format('DD/MM/YYYY 00:00:00')
+                        ? dayjs(values.birthday).utc().format('DD/MM/YYYY HH:mm:ss')
                         : user?.birthday || user?.account?.birthday || null,
                     username: values.username || user?.username || user?.account?.username || '',
                     preferences,
@@ -405,6 +410,9 @@ const ProfileComponent = (props) => {
                     user.gender === MALE
                         ? translate.formatMessage(commonMessage.male)
                         : translate.formatMessage(commonMessage.female),
+                birthday: user?.birthday || user?.account?.birthday
+                    ? dayjs.utc(user.birthday || user.account.birthday, 'DD/MM/YYYY HH:mm:ss').tz('Asia/Ho_Chi_Minh')
+                    : null,
             });
             setImageUrl(user.avatar || user.avatarPath);
             setEditingField(currentEditingField);
@@ -740,10 +748,10 @@ const ProfileComponent = (props) => {
                                 ) : (
                                     <div className={styles.fieldValue}>
                                         {user?.birthday || user?.account?.birthday
-                                            ? dayjs(
+                                            ? dayjs.utc(
                                                 user?.birthday || user?.account?.birthday,
                                                 'DD/MM/YYYY HH:mm:ss',
-                                            ).format('DD/MM/YYYY')
+                                            ).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                             : '—'}
                                     </div>
                                 )}

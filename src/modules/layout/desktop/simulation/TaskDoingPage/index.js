@@ -4,6 +4,11 @@ import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { getDownloadUrl } from '@utils';
 import { Modal, Spin } from 'antd';
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 import CommentPanel from '../components/CommentPanel';
 import TaskDoingSidebar from '../components/TaskDoingSidebar';
@@ -737,7 +742,7 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
                         <span className="tfo-file-chosen">
                             {previousFile && !file ? (
                                 <a
-                                    href={previousFile.startsWith('http') ? previousFile : `${urlBase}${previousFile}`}
+                                    href={isExternalUrl(previousFile) ? previousFile : getDownloadUrl(previousFile)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={(e) => e.stopPropagation()}
@@ -809,7 +814,15 @@ function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = 
                                 />
                             </svg>
                             <span className="tfo-link-submitted-label">Đường dẫn đã nộp:</span>
-                            <span className="tfo-link-submitted-path">{previousFile}</span>
+                            <a
+                                href={getDownloadUrl(previousFile)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="tfo-link-submitted-path"
+                                style={{ color: '#0062E3', textDecoration: 'underline' }}
+                            >
+                                {previousFile}
+                            </a>
                         </div>
                     )}
                     {!disabled && !isLocked && (
@@ -1284,9 +1297,9 @@ export default function TaskDoingPage({
                                                                             </div>
                                                                             <span className="tfo-review-display__date">
                                                                                 {review.createdDate
-                                                                                    ? dayjs(
+                                                                                    ? dayjs.utc(
                                                                                         review.createdDate,
-                                                                                    ).format('DD/MM/YYYY')
+                                                                                    ).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
                                                                                     : '-'}
                                                                             </span>
                                                                         </div>
@@ -1466,7 +1479,7 @@ export default function TaskDoingPage({
                             </div>
                             <div style={{ marginLeft: 'auto', fontSize: 12, color: '#94a3b8' }}>
                                 {selectedReviewDetail.createdDate
-                                    ? dayjs(selectedReviewDetail.createdDate).format('DD/MM/YYYY HH:mm')
+                                    ? dayjs.utc(selectedReviewDetail.createdDate).tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY HH:mm')
                                     : '-'}
                             </div>
                         </div>

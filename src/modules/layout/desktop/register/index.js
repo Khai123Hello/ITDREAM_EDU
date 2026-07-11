@@ -15,7 +15,10 @@ import useRegisterValidation from '@hooks/useRegisterValidation';
 import useTranslate from '@hooks/useTranslate';
 import { getData, setData } from '@utils/localStorage';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { toast } from 'sonner';
+
+dayjs.extend(utc);
 
 import styles from './register.module.scss';
 
@@ -124,7 +127,7 @@ function RegisterDesktop({ form }) {
     const handleRegisterSubmit = (values) => {
         const payload = {
             ...values,
-            birthday: values.birthday ? dayjs(values.birthday).format(DEFAULT_FORMAT) : null,
+            birthday: values.birthday ? dayjs(values.birthday).utc().format(DEFAULT_FORMAT) : null,
         };
 
         executeRegister({

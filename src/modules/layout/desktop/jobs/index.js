@@ -28,8 +28,12 @@ import { message } from 'antd';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 import styles from './index.module.scss';
 
@@ -445,8 +449,8 @@ function JobsDesktop() {
                                                 />
                                             </svg>
                                             {job.type === 1
-                                                ? dayjs(job.date, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')
-                                                : `Hạn: ${dayjs(job.endDate, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')}`}
+                                                ? dayjs.utc(job.date, 'DD/MM/YYYY HH:mm:ss').tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                                : `Hạn: ${dayjs.utc(job.endDate, 'DD/MM/YYYY HH:mm:ss').tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}`}
                                         </span>
                                     )}
                                     <button
@@ -534,8 +538,8 @@ function JobsDesktop() {
                                             {displayJob.type === 1 ? 'Ngày tổ chức:' : 'Hạn chót ứng tuyển:'}
                                         </span>{' '}
                                         {displayJob.type === 1
-                                            ? dayjs(displayJob.date, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')
-                                            : dayjs(displayJob.endDate, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')}
+                                            ? dayjs.utc(displayJob.date, 'DD/MM/YYYY HH:mm:ss').tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')
+                                            : dayjs.utc(displayJob.endDate, 'DD/MM/YYYY HH:mm:ss').tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY')}
                                     </div>
                                 )}
                                 {(displayJob.address || displayJob.province?.name) && (
