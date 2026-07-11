@@ -404,6 +404,22 @@ function TaskDoingContainer() {
         attemptedProgressCreationRef.current.clear();
     }, [ simulationEnrollmentId ]);
 
+    // Reset refs and states when simulationId changes
+    React.useEffect(() => {
+        initializedProgressRef.current = false;
+        appliedResumeRef.current = false;
+        initializingProgressRef.current = false;
+        creatingProgressTasksRef.current.clear();
+
+        setLocalProgressMap({});
+        setLocalQuizAnswers({});
+        setIsContinuing(false);
+
+        const sessionData = getSessionData();
+        setSelectedParentTaskId(sessionData.selectedParentTaskId || null);
+        setSelectedSubtaskId(sessionData.selectedSubtaskId || null);
+    }, [ simulationId ]);
+
     // Load task list on mount
     React.useEffect(() => {
         if (simulationId) {

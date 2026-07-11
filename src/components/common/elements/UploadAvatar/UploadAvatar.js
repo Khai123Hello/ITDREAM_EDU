@@ -39,11 +39,7 @@ function UploadAvatar({ onChange, value, error, upload, setImageUrl, imageUrl, d
         },
     });
 
-    const previewSrc = value
-        ? typeof value === 'string'
-            ? getDownloadUrl(value)
-            : URL.createObjectURL(value)
-        : null;
+    const previewSrc = value ? (typeof value === 'string' ? getDownloadUrl(value) : URL.createObjectURL(value)) : null;
 
     return (
         <div {...getRootProps()} data-error={error} className={styles.uploadThumbnail}>
