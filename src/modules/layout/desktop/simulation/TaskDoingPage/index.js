@@ -582,12 +582,7 @@ const isExternalUrl = (str) => {
     return /^(https?:\/\/|www\.)/i.test(str.trim());
 };
 
-function FileDropzone({
-    onFileChange = () => {},
-    previousFile = null,
-    urlBase = '',
-    disabled = false,
-}) {
+function FileDropzone({ onFileChange = () => {}, previousFile = null, urlBase = '', disabled = false }) {
     // Xác định mode mặc định dựa vào submission trước đó
     const defaultMode = previousFile && isExternalUrl(previousFile) ? 'link' : 'file';
     const [ mode, setMode ] = useState(defaultMode);
