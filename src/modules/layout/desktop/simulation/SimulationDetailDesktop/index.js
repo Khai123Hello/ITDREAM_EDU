@@ -8,6 +8,7 @@ import AppHeader from '@modules/layout/common/desktop/AppHeader';
 import { Empty, Spin } from 'antd';
 import dayjs from 'dayjs';
 import DOMPurify from 'dompurify';
+import ReactPlayer from 'react-player/lazy';
 
 import TaskPanel from '../components/TaskPanel';
 
@@ -479,14 +480,25 @@ function SimulationDetailDesktop({
                                                 boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                                             }}
                                         >
-                                            <video
-                                                controls
-                                                style={{ width: '100%', display: 'block' }}
-                                                key={simulation.videoPath}
-                                            >
-                                                <source src={getVideoUrl(simulation.videoPath)} />
-                                                Trình duyệt của bạn không hỗ trợ phát video.
-                                            </video>
+                                            {simulation.videoPath.startsWith('http://') || simulation.videoPath.startsWith('https://') ? (
+                                                <video
+                                                    controls
+                                                    style={{ width: '100%', display: 'block' }}
+                                                    key={simulation.videoPath}
+                                                >
+                                                    <source src={simulation.videoPath} />
+                                                    Trình duyệt của bạn không hỗ trợ phát video.
+                                                </video>
+                                            ) : (
+                                                <ReactPlayer
+                                                    url={`${process.env.REACT_APP_PORTAL_VIDEO}${simulation.videoPath}`}
+                                                    controls
+                                                    width="100%"
+                                                    height="auto"
+                                                    style={{ display: 'block' }}
+                                                    key={simulation.videoPath}
+                                                />
+                                            )}
                                         </div>
                                     </section>
                                 )}
