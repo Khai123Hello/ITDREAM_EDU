@@ -636,7 +636,7 @@ function DashboardDesktop({
                                 const orgInitial = orgName ? orgName.charAt(0).toUpperCase() : '?';
                                 const catName = sim.category?.name || 'Chuyên ngành';
                                 const lvlLabel = getLevelLabel(sim.level);
-                                const durationText = sim.duration ? `${sim.duration} giờ` : '';
+                                const durationText = sim.duration ? `${sim.duration}` : '';
 
                                 return (
                                     <div key={sim.id} className={styles.recSimCard}>
